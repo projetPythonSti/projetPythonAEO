@@ -17,7 +17,7 @@ def placer(monde,cle,ressource,chance=50): #place un cluster d'une ressource aut
         for j in range(-1,2):
             if(randint(0,100)<=chance): #50% réplication -16% à chaque réplication
                 placer(monde,somme((i,j),cle),ressource,chance-16)
-
+#randomise pourrait être remplacé par une fonction de la même forme pour chaque archetype de maps (arabia,
 def randomise(monde,richesse): #prend un monde, place des clusters de ressources sur un cercle, +de clusters selon la richesse
     #blocs de wood
     for i in range(3+richesse*2):

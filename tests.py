@@ -2,10 +2,10 @@
 
 from randommap import *
 
-monde=Monde(120,120)
+monde=Monde(30,160)
 monde.creer_monde()
 
 randomise(monde,2)
-placer(monde,(60,60),gold,80)
+placer(monde,(monde.x//2,monde.y//2),gold,80)
 
 monde.afficher_console()
