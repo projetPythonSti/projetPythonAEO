@@ -1,3 +1,5 @@
+#Créé par Max le 27/09/2024
+
 from mmonde import *
 from random import *
 

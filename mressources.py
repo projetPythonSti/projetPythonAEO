@@ -17,4 +17,4 @@ class Ressource:
 #définition de toutes les ressources
 wood=Ressource("Wood",100)
 gold=Ressource("Gold",800)
-food=Ressource("Food",300) #à priori inutile ?
+food=Ressource("Food",300) #à priori inutile ??

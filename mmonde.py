@@ -14,7 +14,7 @@ class Tuile:
         return self.ressource
 
 class Monde:
-    def __init__(self,x,y):
+    def __init__(self,x,y): #x et y dimensions du monde
         self.x=x
         self.y=y
         self.dico={} #à chaque clé sera associé une Tuile
