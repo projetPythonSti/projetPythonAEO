@@ -14,9 +14,9 @@ class Tuile:
         return self.ressource
 
 class Monde:
-    def __init__(self, tuple):
-        self.x=tuple[0]
-        self.y=tuple[1]
+    def __init__(self,x,y):
+        self.x=x
+        self.y=y
         self.dico={} #à chaque clé sera associé une Tuile
         #les clés du dico seront de la forme "0,0"
 
@@ -32,7 +32,7 @@ class Monde:
                 print(self.dico[(x,y)],end="")
             print("",end="\n")
 '''
-monde=Monde((5,20))
+monde=Monde(5,20)
 monde.creer_monde()
 
 for i in range(1,3):
