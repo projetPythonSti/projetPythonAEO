@@ -1,5 +1,3 @@
-#Créé par Max le 27/09/2024
-
 from mmonde import *
 from random import *
 
@@ -25,16 +23,16 @@ def randomise(monde,richesse): #prend un monde, place des clusters de ressources
     for i in range(5+richesse*2):
         x=randint(0,monde.x-1)
         y=randint(0,monde.y-1)
-        placer(monde,(x,y),wood)
-        placer(monde,(monde.x-1-x,monde.y-1-y),wood) #symétrie centrale
+        placer(monde,(x,y),Wood())
+        placer(monde,(monde.x-1-x,monde.y-1-y),Wood()) #symétrie centrale
     #blocs de gold
     for i in range(1 + richesse):
         x = randint(0, monde.x - 1)
         y = randint(0, monde.y - 1)
-        placer(monde, (x, y), gold,30)
-        placer(monde, (monde.x-1-x,monde.y-1-y), gold, 30)
+        placer(monde, (x, y), Gold(),30)
+        placer(monde, (monde.x-1-x,monde.y-1-y), Gold(), 30)
     #gold au centre
-    placer(monde, (monde.x // 2, monde.y // 2), gold, 80)
+    placer(monde, (monde.x // 2, monde.y // 2), Gold(), 80)
 
 '''
 print(somme((1,1),(2,2)))
