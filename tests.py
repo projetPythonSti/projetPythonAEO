@@ -2,7 +2,7 @@
 
 from randommap import *
 
-monde=Monde(30,160)
+monde=World(30, 160)
 monde.creer_monde()
 
 randomise(monde,3)

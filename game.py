@@ -1,6 +1,6 @@
 import pygame as pg
 import sys
-from mmonde import Monde
+from mmonde import World
 from setup import TILE_SIZE
 
 class Game :
@@ -10,7 +10,7 @@ class Game :
         self.clock = clock
         self.width, self.height = self.screen.get_size()
 
-        self.monde = Monde(10,10)
+        self.monde = World(10, 10)
 
     def run (self):
         self.playing = True
