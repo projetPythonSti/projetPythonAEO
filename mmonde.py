@@ -30,7 +30,7 @@ class Monde:
     def afficher_console(self):
         for x in range(self.x):
             for y in range(self.y):
-                print(self.dico[(x,y)],end="")
+                print(self.dico[(x,y)].contains,end="")
             print("",end="\n")
 
     def update_unit_presence(self):
