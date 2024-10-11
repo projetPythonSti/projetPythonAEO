@@ -5,7 +5,6 @@ from randommap import *
 monde=Monde(30,160)
 monde.creer_monde()
 
-randomise(monde,2)
-placer(monde,(monde.x//2,monde.y//2),gold,80)
+randomise(monde,3)
 
 monde.afficher_console()

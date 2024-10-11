@@ -20,7 +20,7 @@ def placer(monde,cle,ressource,chance=50): #place un cluster d'une ressource aut
 #randomise pourrait être remplacé par une fonction de la même forme pour chaque archetype de maps (arabia,
 def randomise(monde,richesse): #prend un monde, place des clusters de ressources sur un cercle, +de clusters selon la richesse
     #blocs de wood
-    for i in range(3+richesse*2):
+    for i in range(5+richesse*2):
         x=min(randint(0,monde.x),randint(0,monde.x)) #faire cela permet d'éloigner les blocs du centre
         y=min(randint(0,monde.y),randint(0,monde.y))
         placer(monde,(x,y),wood)
@@ -29,10 +29,13 @@ def randomise(monde,richesse): #prend un monde, place des clusters de ressources
     for i in range(1 + richesse):
         x = min(randint(0, monde.x), randint(0, monde.x))
         y = min(randint(0, monde.y), randint(0, monde.y))
-        placer(monde, (x, y), gold)
-        placer(monde, (monde.x - x, monde.y - y), gold)
+        placer(monde, (x, y), gold,30)
+        placer(monde, (monde.x - x, monde.y - y), gold, 30)
+    #gold au centre
+    placer(monde, (monde.x // 2, monde.y // 2), gold, 80)
 
 '''
 print(somme((1,1),(2,2)))
 
 '''
+
