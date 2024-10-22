@@ -1,5 +1,3 @@
-#Créé par Max le 27/09/2024
-
 from mmonde import *
 from random import *
 
@@ -11,28 +9,30 @@ def somme(t1,t2): #somme((1,1),(2,2))=(3,3)
 
 def placer(monde,cle,ressource,chance=50): #place un cluster d'une ressource autour d'une tuile d'un monde
     #place le bloc initial
-    monde.dico[cle]=ressource
+    monde.dico[cle].contains=ressource
     #place peut être à côté, récursif
     for i in range(-1,2):
         for j in range(-1,2):
             if(randint(0,100)<=chance): #50% réplication -16% à chaque réplication
-                placer(monde,somme((i,j),cle),ressource,chance-16)
+                newkey=somme((i,j),cle)
+                if newkey[0]>=0 and newkey[0]<monde.x and newkey[1]>=0 and newkey[1]<monde.y:
+                    placer(monde,newkey,ressource,chance-16)
 #randomise pourrait être remplacé par une fonction de la même forme pour chaque archetype de maps (arabia,
 def randomise(monde,richesse): #prend un monde, place des clusters de ressources sur un cercle, +de clusters selon la richesse
     #blocs de wood
     for i in range(5+richesse*2):
-        x=min(randint(0,monde.x),randint(0,monde.x)) #faire cela permet d'éloigner les blocs du centre
-        y=min(randint(0,monde.y),randint(0,monde.y))
-        placer(monde,(x,y),wood)
-        placer(monde,(monde.x-x,monde.y-y),wood) #symétrie centrale
+        x=randint(0,monde.x-1)
+        y=randint(0,monde.y-1)
+        placer(monde,(x,y),Wood())
+        placer(monde,(monde.x-1-x,monde.y-1-y),Wood()) #symétrie centrale
     #blocs de gold
     for i in range(1 + richesse):
-        x = min(randint(0, monde.x), randint(0, monde.x))
-        y = min(randint(0, monde.y), randint(0, monde.y))
-        placer(monde, (x, y), gold,30)
-        placer(monde, (monde.x - x, monde.y - y), gold, 30)
+        x = randint(0, monde.x - 1)
+        y = randint(0, monde.y - 1)
+        placer(monde, (x, y), Gold(),30)
+        placer(monde, (monde.x-1-x,monde.y-1-y), Gold(), 30)
     #gold au centre
-    placer(monde, (monde.x // 2, monde.y // 2), gold, 80)
+    placer(monde, (monde.x // 2, monde.y // 2), Gold(), 80)
 
 '''
 print(somme((1,1),(2,2)))

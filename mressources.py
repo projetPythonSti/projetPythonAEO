@@ -1,5 +1,3 @@
-#Créé par Max le 27/09/2024
-
 class Ressource:
     def __init__(self,name,quantity):
         self.name=name
@@ -14,7 +12,14 @@ class Ressource:
     def __repr__(self): #affiche la première lettre du nom
         return self.name[0]
 
-#définition de toutes les ressources
-wood=Ressource("Wood",100)
-gold=Ressource("Gold",800)
-food=Ressource("Food",300) #à priori inutile ??
+class Wood(Ressource):
+    def __init__(self):
+        super().__init__("Wood",100)
+
+class Gold(Ressource):
+    def __init__(self):
+        super().__init__("Gold",800)
+
+class Food(Ressource):
+    def __init__(self):
+        super().__init__("Food",300)
