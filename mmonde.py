@@ -19,9 +19,10 @@ class Tile:
         #self.iso = [self.cart_to_iso(id[0], id[1]) for id[0], id[1] in self.rect]S
 
     def __repr__(self):
-        if self.unites!=[]:
-            return self.unites[0][0].lower() #lowered first letter of the first unit on the tile
-        return self.contains #ressource
+        if  len(self.unites) != 0:
+            return self.unites
+        return self.ressource
+
 
     def cart_to_iso (self, x, y):
         iso_x = x-y

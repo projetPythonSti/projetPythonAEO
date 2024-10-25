@@ -2,8 +2,8 @@ from Position import Position
 
 class Unity:
     
-    def __init__(self, id, name, cost, trainningTime, health, damage, speed, range):
-        self.id = id
+    def __init__(self, ident, name, cost, trainningTime, health, damage, speed, ranges):
+        self.id = ident
         self.name = name
         self.cost = cost
         self.trainningTime = trainningTime
@@ -11,7 +11,7 @@ class Unity:
         self.damage = damage
         self.speed = speed
         self.position = Position()
-        self.range = range
+        self.range = ranges
     
     def move(lastPosition):
         pass
@@ -19,9 +19,9 @@ class Unity:
     def attack(attackedObjet):
         pass
     
-    def __repr__(self):
-        return f"{self.id} {self.name}"
+    def getCost(self): return self.cost
     
-    def __eq__(self, other):
-        return self.__class__ == other.__class__
+    def __repr__(self): return f"{self.name[0]}"
+    
+    def __eq__(self, other): return self.__class__ == other.__class__
     
