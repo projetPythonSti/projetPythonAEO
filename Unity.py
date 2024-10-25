@@ -3,7 +3,7 @@ import objc
 
 class Unity:
     
-    def __init__(self, id, name, cost, trainningTime, health, damage, speed, range, target = objc.nil):
+    def __init__(self, id, name, cost, trainningTime, health, damage, speed, range, team, target = objc.nil, ):
         self.id = id
         self.name = name
         self.cost = cost
@@ -14,7 +14,7 @@ class Unity:
         self.position = Position()
         self.range = range
         self.target = target
-    
+        self.team  = team
     def move(lastPosition):
         pass
     
