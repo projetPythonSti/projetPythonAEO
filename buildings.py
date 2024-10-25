@@ -3,45 +3,41 @@ import time
 class Building:
     def __init__(self, name, cost, time_building, health, surface, population=0, spawn=None, dropPoint=False):
         self.name = name
-        self.cost = cost  # Dictionnaire avec type de ressource : quantité requise
-        self.time_building = time_building  # en secondes
+        self.cost = cost
+        self.time_building = time_building
         self.health = health
         self.surface = surface
-        self.is_built = False  # Le bâtiment commence non construit
+        self.is_built = False
         self.spawn = spawn
         self.dropPoint = dropPoint
         self.population = population
 
     def can_afford(self, player_resources):
-        # Vérifie si le joueur a assez de ressources pour construire le bâtiment
         for resource, amount_needed in self.cost.items():
             if player_resources.get(resource, 0) < amount_needed:
                 return False
         return True
 
     def deduct_resources(self, player_resources):
-        # Déduit les ressources nécessaires au joueur
         for resource, amount_needed in self.cost.items():
             player_resources[resource] -= amount_needed
         print(f"Ressources déduites pour {self.name}: {self.cost}")    
 
     def build(self, player_resources):
-        # Vérifie les ressources du joueur avant de construire
         if not self.can_afford(player_resources):
             print(f"Pas assez de ressources pour construire {self.name}.")
             return False
 
-        # Déduire les ressources et démarrer la construction
         self.deduct_resources(player_resources)
         print(f"Construction de {self.name} commencée...")
         for second in range(self.time_building):
             print(f"Construction en cours : {second + 1}/{self.time_building} secondes")
-            time.sleep(1)  # Simule le temps de construction (en secondes)
+            time.sleep(1)
 
-        # Fin de la construction
         self.is_built = True
         print(f"Construction de {self.name} terminée.")
         return True
+
 
 # Bâtiments spécifiques avec leurs caractéristiques
 def create_town_centre():
