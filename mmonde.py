@@ -9,7 +9,7 @@ class Tuile:
         self.unites={} #les cles seront les ids et les valeurs seront les instances Unite
 
     def __repr__(self):
-        if self.unites!={}:
+        if  len(self.unites) != 0:
             return self.unites
         return self.ressource
 

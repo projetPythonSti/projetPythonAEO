@@ -10,5 +10,5 @@ if __name__ == "__main__":
     archer1 = Archer("a2");
     
     print(horseman, archer)
-    print(horseman == Archer)
+    print(archer1 == archer)
     
