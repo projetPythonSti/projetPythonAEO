@@ -1,4 +1,6 @@
 #Créé par Max le 27/09/2024
+from symtable import Class
+
 
 class Ressource:
     def __init__(self,name,quantity):
@@ -18,3 +20,4 @@ class Ressource:
 wood=Ressource("Wood",100)
 gold=Ressource("Gold",800)
 food=Ressource("Food",300) #à priori inutile ??
+

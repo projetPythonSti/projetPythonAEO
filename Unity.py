@@ -1,8 +1,9 @@
 from Position import Position
+import objc
 
 class Unity:
     
-    def __init__(self, id, name, cost, trainningTime, health, damage, speed, range):
+    def __init__(self, id, name, cost, trainningTime, health, damage, speed, range, target = objc.nil):
         self.id = id
         self.name = name
         self.cost = cost
@@ -12,6 +13,7 @@ class Unity:
         self.speed = speed
         self.position = Position()
         self.range = range
+        self.target = target
     
     def move(lastPosition):
         pass
