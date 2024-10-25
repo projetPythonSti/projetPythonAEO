@@ -4,8 +4,8 @@ from Unity import Unity
 import mressources
 class Villager(Unity):
     carryMax = 25
-    def __init__(self,id, carry, buildingSpeed):
-        super().__init__(id,"V", {"food" : 50}, 25, 40, 4, 0.8, 1)
+    def __init__(self,id, carry, buildingSpeed, team):
+        super().__init__(id,"V", {"food" : 50}, 25, 40, 4, 0.8, 1, team=team)
         self.carry = carry
         self.buildingSpeed = buildingSpeed,
         self.resourcesDict = {
@@ -16,10 +16,10 @@ class Villager(Unity):
 
 
     # Function which collect a resource and add it to the resourcesDictionnary of the villager, at the end if carryMax is
-    # is reached, move
+    # is reached, move to the nearest drop point
     def collect(self , resource, neareastDP):
         aR = sum(self.resourcesDict[key] for key in self.resourcesDict)
-        collectedQuantity = resource.getQuantity
+        collectedQuantity = resource.getQuantity()
         print("ar = ",aR)
         if aR+collectedQuantity > self.carryMax :
             if aR > self.carryMax:
@@ -48,6 +48,7 @@ class Villager(Unity):
                 self.resourcesDict["gold"] += resource.getQuantity()
             resource.setQuantity(0)
         if aR+(collectedQuantity - resource.getQuantity()) > self.carryMax:
-            self.move(neareastDP)
+            pass
+            #self.move(neareastDP)
     def build(self):
         return 0
