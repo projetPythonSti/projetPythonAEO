@@ -9,6 +9,14 @@ class Tile:
         self.contains=" " #représente une tuile sans ressources, sera remplacé par une instance de Ressource
         #il suffira de changer le __repr__ de Ressource pour afficher la lettre correspondant à la ressource
         self.unites=[] #a list might be more relevant
+        self.rect = [
+            (id[0] * TILE_SIZE, id[1] * TILE_SIZE),
+            (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE),
+            (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE),
+            (id[0] * TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE)
+        ]
+
+        #self.iso = [self.cart_to_iso(id[0], id[1]) for id[0], id[1] in self.rect]S
 
     def __repr__(self):
         if self.unites!=[]:
@@ -64,16 +72,19 @@ def intkey(key): #turns a float key into an int key for dict indexation
     return (int(key[0]),int(key[1]))
 
 
-'''
-monde=Monde(5,20)
+
+monde=World(5,20)
 monde.creer_monde()
 
+'''
 for i in range(1,3):
     for j in range(4,13):
-        monde.dico[(i,j)]=wood
+        monde.dico[(i,j)]=Wood
 
 for j in range(2,9):
-    monde.dico[(4,j)]=gold
+    monde.dico[(4,j)]=Gold
 
 monde.afficher_console()
+
+
 '''
