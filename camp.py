@@ -1,4 +1,6 @@
 from buildings import Building
 
 class Camp(Building) :
-  def self.__innit(
+   def __init__(self):
+        super().__init__(
+          
