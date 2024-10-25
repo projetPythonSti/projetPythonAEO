@@ -1,9 +1,8 @@
 from Position import Position
-import objc
 
 class Unity:
     
-    def __init__(self, id, name, cost, trainningTime, health, damage, speed, range, team, target = objc.nil, ):
+    def __init__(self, id, name, cost, trainningTime, health, damage, speed, range, team, target = None, ):
         self.id = id
         self.name = name
         self.cost = cost
