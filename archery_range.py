@@ -1,6 +1,6 @@
 from buildings import Building
 
-class Archery_rage(Building) :
+class Archery_range(Building) :
   def __init__(self) :
     super().__ini__(
       name="Archery Range",
