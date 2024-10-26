@@ -1,7 +1,7 @@
 import time
 
 class Building:
-    def __init__(self, name, cost, time_building, health, surface, population=0, spawn=None, dropPoint=False):
+    def __init__(self, name, cost, time_building, health, surface, population=0, spawn='Unity', dropPoint=False):
         self.name = name
         self.cost = cost
         self.time_building = time_building
