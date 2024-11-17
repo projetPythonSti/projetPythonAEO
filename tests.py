@@ -3,10 +3,10 @@ from randommap import *
 from Archer import *
 from time import *
 import numpy as np
-monde=Monde(20,160)
+monde=Monde(400,400)
 monde.creer_monde()
 
-randomise(monde,0)
+randomise(monde,30)
 
 unit1=Archer(1, 1)
 unit1.position=(0,0)
@@ -31,5 +31,8 @@ if route.__class__ == bool:
     print("Found no short path")
 route = route + [start]
 route = route[::-1]
-
+print(f"position de {monde.units[0].name} : {monde.units[0].position}")
+monde.units[0].move(goal, route)
+print(f"position de {monde.units[0].name} : {monde.units[0].position}")
+monde.afficher_console()
 monde.afficher_route_console(route)
