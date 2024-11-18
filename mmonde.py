@@ -2,12 +2,22 @@ from mressources import *
 from Unity import *
 import numpy as np
 
+from setup import TILE_SIZE
+
+
 class Tile:
     def __init__(self,id): #id c'est le tuple (x,y)
         self.id=id
         self.contains=" " #représente une tuile sans ressources, sera remplacé par une instance de Ressource
         #il suffira de changer le __repr__ de Ressource pour afficher la lettre correspondant à la ressource
-        self.unites=[] #list of every unit on the tile, used for the map representation
+        self.unites=[]
+        self.rect = [
+            (id[0] * TILE_SIZE, id[1] * TILE_SIZE),
+            (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE),
+            (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE),
+            (id[0] * TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE)
+        ]
+        #list of every unit on the tile, used for the map representation
 
     def __repr__(self):
         if self.unites!=[]:
@@ -19,7 +29,24 @@ class Tile:
             return self.unites[0].name[0].lower() #lowered first letter of the first unit on the tile
         return self.contains #ressource
 
-class Monde:
+    def cart_to_iso(self, x, y):
+        iso_x = x - y
+        iso_y = (x + y) / 2
+        return iso_x, iso_y
+
+class Tile_gui (Tile) :
+    def __init__(self, id):
+        self.rect = [
+            (id[0] * TILE_SIZE, id[1] * TILE_SIZE),
+            (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE),
+            (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE),
+            (id[0] * TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE)
+        ]
+
+        self.iso = [self.cart_to_iso(id[0], id[1]) for id[0], id[1] in self.rect]
+
+
+class World:
     def __init__(self,x,y): #x et y dimensions du monde
         self.x=x
         self.y=y
@@ -39,6 +66,7 @@ class Monde:
             for y in range(self.y):
                 print(self.dico[(x, y)].affiche(),end="") #This one works
             print("",end="\n")
+
     def afficher_route_console(self,route):
         self.update_unit_presence() #updates this everytime we print the map
         for x in range(self.x):

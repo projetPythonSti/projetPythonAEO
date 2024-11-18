@@ -3,7 +3,7 @@ from randommap import *
 from Archer import *
 from time import *
 import numpy as np
-monde=Monde(400,400)
+monde=World(400, 400)
 monde.creer_monde()
 
 randomise(monde,30)

@@ -9,7 +9,7 @@ def jeu_terminal (world):
     playing = True
     pg.init()
     pg.mixer.init()
-    screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+    screen = pg.display.set_mode((720, 720))
     clock = pg.time.Clock()
     game = Game(screen, clock,world)
 
@@ -26,7 +26,7 @@ def main (world) :
 
     pg.init()
     pg.mixer.init()
-    screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
+    screen = pg.display.set_mode((0,0), )
     clock = pg.time.Clock()
     game = Game(screen, clock,world)
 
@@ -43,4 +43,5 @@ if __name__ == "__main__" :
     randomise(monde, 3)
     print("hi")
     #main()
-    jeu_terminal(monde)
+    monde.afficher_console()
+    main(monde)
