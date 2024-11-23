@@ -19,10 +19,14 @@ class Tile:
         #self.iso = [self.cart_to_iso(id[0], id[1]) for id[0], id[1] in self.rect]S
 
     def __repr__(self):
-        if  len(self.unites) != 0:
-            return self.unites
-        return self.ressource
+        if len(self.unites) != 0:
+            return self.unites[0].name[0] #First letter of the first unit class name
+        return self.contains
 
+    def affichage_magique(self):
+        if len(self.unites) != 0:
+            return self.unites[0].name[0].lower() #First letter of the first unit class name
+        return self.contains
 
     def cart_to_iso (self, x, y):
         iso_x = x-y
@@ -58,13 +62,13 @@ class World :
     def afficher_console(self):
         for x in range(self.x):
             for y in range(self.y):
-                print(self.dico[(x,y)].contains,end="")
+                print(self.dico[(x,y)].affichage_magique(),end="")
             print("",end="\n")
 
     def update_unit_presence(self):
         for x in range(self.x): #resets every tile's unit list
             for y in range(self.y):
-                self.dico[(x,y)].contains={}
+                self.dico[(x,y)].unites=[]
         for u in self.units: #puts every unit in their tile's unit list
             key=intkey(u.position)
             self.dico[key].unites.append(u)
