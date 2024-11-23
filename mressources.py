@@ -6,7 +6,7 @@ class Ressource:
     def getQuantity(self):
         return self.quantity
 
-    def __repr__(self): return self.name[0]
+    def __repr__(self): return self.name[0] #First letter of the resource
 
 
 class Wood(Ressource):

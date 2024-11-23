@@ -9,10 +9,14 @@ class Tile:
         self.unites=[] #a list might be more relevant
 
     def __repr__(self):
-        if  len(self.unites) != 0:
-            return self.unites
-        return self.ressource
+        if len(self.unites) != 0:
+            return self.unites[0].name[0] #First letter of the first unit class name
+        return self.contains
 
+    def affichage_magique(self):
+        if len(self.unites) != 0:
+            return self.unites[0].name[0].lower() #First letter of the first unit class name
+        return self.contains
 
 class Monde:
     def __init__(self,x,y): #x et y dimensions du monde
@@ -31,13 +35,13 @@ class Monde:
     def afficher_console(self):
         for x in range(self.x):
             for y in range(self.y):
-                print(self.dico[(x,y)].contains,end="")
+                print(self.dico[(x,y)].affichage_magique(),end="")
             print("",end="\n")
 
     def update_unit_presence(self):
         for x in range(self.x): #resets every tile's unit list
             for y in range(self.y):
-                self.dico[(x,y)].contains={}
+                self.dico[(x,y)].unites=[]
         for u in self.units: #puts every unit in their tile's unit list
             key=intkey(u.position)
             self.dico[key].unites.append(u)
