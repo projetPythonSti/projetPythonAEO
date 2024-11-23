@@ -46,8 +46,14 @@ class Monde:
             key=intkey(u.position)
             self.dico[key].unites.append(u)
 
+    def spawn(self,unitclass,x,y):
+        new_unit = unitclass(1)
+        new_unit.position = (x,y)
+        self.units.append(new_unit)
+
 def intkey(key): #turns a float key into an int key for dict indexation
     return (int(key[0]),int(key[1]))
+
 
 '''
 monde=Monde(5,20)
