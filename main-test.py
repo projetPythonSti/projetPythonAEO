@@ -2,6 +2,7 @@ import pygame as pg
 import time
 import os, sys
 from game import Game
+from game_term import Game_term
 from randommap import *
 
 def jeu_terminal (world):
@@ -9,18 +10,17 @@ def jeu_terminal (world):
     playing = True
     pg.init()
     pg.mixer.init()
-    screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
     clock = pg.time.Clock()
-    game = Game(screen, clock,world)
+    game_term = Game_term( clock,world)
 
     while running :
 
         while playing :
-            game.run_console()
+            game_term.run_term()
 
 
 
-def main (world) :
+def jeu_pygame (world) :
     running = True
     playing = True
 
@@ -37,8 +37,12 @@ def main (world) :
 
             game.run()
 
+def main () :
+    pass
+
+
 if __name__ == "__main__" :
-    monde = World(10, 10)
+    monde = World(100, 100)
     monde.creer_monde()
     randomise(monde, 3)
     print("hi")

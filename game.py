@@ -7,7 +7,7 @@ import time
 
 class Game :
 
-    def __init__(self, screen, clock,world):
+    def __init__(self, screen, clock, world):
         self.screen = screen
         self.clock = clock
         self.width, self.height = self.screen.get_size()
