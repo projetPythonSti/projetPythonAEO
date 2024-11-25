@@ -25,19 +25,20 @@ class Building:
             player_resources[resource] -= amount_needed
         print(f"Ressources déduites pour {self.name}: {self.cost}")
 
-    def set_time_building(self.time_building, villagers_list) :
-        n = len(villagers_list)
-        return 3*time_builing / (n+2)
+    def set_time_building(self) :
+        n = len(self.assigned_villagers)
+        return 3*self.time_builing / (n+2)
     
     def build(self, player_resources, assigned_villagers):
         n = len(assigned_vilagers)
         if not self.can_afford(player_resources):
             print(f"Pas assez de ressources pour construire {self.name}.")
             return False
-
+        self.assigned_villagers = assigned_villagers
         self.deduct_resources(player_resources)
         print(f"Construction de {self.name} commencée...")
-        for second in range(set_time_building(self.time_building)):
+        build_time = set_time_building(self.time_building
+        for second in range(build_time)):
             print(f"Construction en cours : {second + 1}/{self.time_building} secondes")
             time.sleep(1)
 
