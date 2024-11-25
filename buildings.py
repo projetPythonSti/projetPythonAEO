@@ -1,7 +1,9 @@
 import time
+import pygame as pg
+from Position import *
 
 class Building:
-    def __init__(self, name, cost, time_building, health, surface, population=0, spawn='Unity', dropPoint=False):
+    def __init__(self, name, team, cost, time_building, health, surface, population=0, spawn='Unity', dropPoint=False):
         self.name = name
         self.cost = cost
         self.time_building = time_building
@@ -11,6 +13,21 @@ class Building:
         self.spawn = spawn
         self.dropPoint = dropPoint
         self.population = population
+        self.team = team
+
+        self.position = Position()
+        self.grid_x = None  # To be set when placed in the world
+        self.grid_y = None
+        self.tiles_occupied = []
+
+    def update_tiles_occupied(self):
+        """Update the list of tiles occupied by this building based on grid_x and grid_y."""
+        if self.grid_x is not None and self.grid_y is not None:
+            self.tiles_occupied = [
+                (self.grid_x + dx, self.grid_y + dy)
+                for dx in range(self.size)
+                for dy in range(self.size)
+            ] #very nice comprehension expression btw
 
     def can_afford(self, player_resources):
         for resource, amount_needed in self.cost.items():

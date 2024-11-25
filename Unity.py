@@ -2,7 +2,7 @@ from Position import Position
 
 class Unity:
     
-    def __init__(self, ident, name, cost, trainningTime, health, damage, speed, ranges):
+    def __init__(self, ident, name, cost, trainningTime, health, damage, speed, ranges, team):
         self.id = ident
         self.name = name
         self.cost = cost
@@ -12,6 +12,7 @@ class Unity:
         self.speed = speed
         self.position = Position()
         self.range = ranges
+        self.team = team
     
     def move(lastPosition):
         pass
