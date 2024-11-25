@@ -3,10 +3,10 @@ from randommap import *
 from Archer import *
 from time import *
 import numpy as np
-monde=World(400, 400)
+monde=World(100, 100)
 monde.creer_monde()
 
-randomise(monde,30)
+randomise(monde,10)
 
 unit1=Archer(1, 1)
 unit1.position=(0,0)
