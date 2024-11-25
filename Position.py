@@ -7,7 +7,11 @@ class Position:
         self._y = y
     
     def setX(self, x) : self._x = x
-    def serY(self, y) : self._y = y
+    def setY(self, y) : self._y = y
     
     def getX(self): return self._x
     def getY(self): return self._y
+    
+    def __eq__(self, other): return self.getX() == other.getX() and self.getY() == other.getY()
+    
+    def __ne__(self, other): return self.getX() != other.getX() or self.getY() != other.getY()
