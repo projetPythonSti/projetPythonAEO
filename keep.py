@@ -7,5 +7,5 @@ class Keep(Building) :
       cost={"wood": 35, "gold": 125},
       time_building=80,
       health=800,
-      surface=1,  # 1x1
+      longueur=1,
     )
