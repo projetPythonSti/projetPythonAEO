@@ -1,12 +1,13 @@
 import time
 
 class Building:
-    def __init__(self, name, cost, time_building, health, surface, population=0, spawn='Unity', dropPoint=False, flag):
+    def __init__(self, name, cost, time_building, health, longueur, assigned_villagers, spawn='Unity', dropPoint=False, flag):
         self.name = name
         self.cost = cost
         self.time_building = time_building
         self.health = health
-        self.surface = surface
+        self.longueur = longueur
+        self.assigned_villagers = []
         self.is_built = False
         self.spawn = spawn
         self.dropPoint = dropPoint
@@ -38,3 +39,6 @@ class Building:
         self.is_built = True
         print(f"Construction de {self.name} terminée.")
         return True
+    def set_time_building(time_building, villagers_list) :
+        n = len(villagers_list)
+        return 3*time_builing / (n+2)
