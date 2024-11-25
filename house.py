@@ -7,6 +7,6 @@ class House(Building):
             cost={"wood": 25},
             time_building=25,
             health=200,
-            surface=4,  # 2x2
+            longueur=2,
             population=5
         )
