@@ -1,5 +1,6 @@
 from mressources import *
 from Unity import *
+from Position import *
 
 class Tile:
     def __init__(self,id): #id c'est le tuple (x,y)
@@ -43,16 +44,19 @@ class Monde:
             for y in range(self.y):
                 self.dico[(x,y)].unites=[]
         for u in self.units: #puts every unit in their tile's unit list
-            key=intkey(u.position)
+            key=floatkey_to_intkey(position_to_tuple(u.position))
             self.dico[key].unites.append(u)
 
-    def spawn(self,unitclass,x,y):
-        new_unit = unitclass(1)
-        new_unit.position = (x,y)
+    def spawn(self,unitclass,team,x,y):
+        new_unit = unitclass(1,team)
+        new_unit.position = Position(x,y)
         self.units.append(new_unit)
 
-def intkey(key): #turns a float key into an int key for dict indexation
+def floatkey_to_intkey(key): #turns a float key into an int key for dict indexation
     return (int(key[0]),int(key[1]))
+
+def position_to_tuple(position):
+    return (position.getX(),position.getY())
 
 
 '''
