@@ -7,6 +7,6 @@ class Archery_range(Building) :
       cost={"wood": 175},
       time_building=50,
       health=500,
-      surface=3,
+      longueur=3,
       spawn="Archer"
     )
