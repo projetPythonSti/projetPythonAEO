@@ -34,6 +34,18 @@ class Building:
         # Attack-related attributes for defensive buildings like "Keep"
         #self.attack = attack  # Attack power (if the building can attack)
         self.range = range  # Attack range in tiles (if the building can attack)
+        self.tiles_occupied = []
+
+
+    
+    def update_tiles_occupied(self):
+        """Update the list of tiles occupied by this building based on grid_x and grid_y."""
+        if self.grid_x is not None and self.grid_y is not None:
+            self.tiles_occupied = [
+                (self.grid_x + dx, self.grid_y + dy)
+                for dx in range(self.size[0])
+                for dy in range(self.size[1])
+            ]
 
     def update(self):
         now = pg.time.get_ticks()
