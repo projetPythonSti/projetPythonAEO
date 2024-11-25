@@ -1,7 +1,7 @@
 import time
 
 class Building:
-    def __init__(self, name, cost, time_building, health, surface, population=0, spawn='Unity', dropPoint=False):
+    def __init__(self, name, cost, time_building, health, surface, population=0, spawn='Unity', dropPoint=False, flag):
         self.name = name
         self.cost = cost
         self.time_building = time_building
@@ -11,6 +11,7 @@ class Building:
         self.spawn = spawn
         self.dropPoint = dropPoint
         self.population = population
+        self.flag = flag
 
     def can_afford(self, player_resources):
         for resource, amount_needed in self.cost.items():
