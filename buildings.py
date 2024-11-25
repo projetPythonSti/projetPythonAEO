@@ -11,7 +11,6 @@ class Building:
         self.is_built = False
         self.spawn = spawn
         self.dropPoint = dropPoint
-        self.population = population
         self.flag = flag
 
     def can_afford(self, player_resources):
@@ -45,4 +44,3 @@ class Building:
         self.is_built = True
         print(f"Construction de {self.name} terminée.")
         return True
-    
