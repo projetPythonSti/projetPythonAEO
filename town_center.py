@@ -7,7 +7,7 @@ class TownCenter(Building):
             cost={"wood": 350},
             time_building=150,
             health=1000,
-            surface=16,  # 4x4
+            longueur=4,
             population=5,
             dropPoint=True,
             spawn="Villager"
