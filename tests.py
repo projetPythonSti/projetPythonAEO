@@ -14,4 +14,5 @@ monde.spawn(Archer,3,3)
 
 monde.update_unit_presence()
 
+
 monde.afficher_console()
