@@ -26,6 +26,7 @@ class Monde:
         self.dico={} #à chaque clé sera associé une Tuile
         #les clés du dico seront de la forme (x,y)
         self.units=[] #unités de toute la map
+        self.buildings=[] #batiments de toute la map
 
     def creer_monde(self): #remplit de Tuile le dico du monde
         for x in range(self.x):
@@ -39,6 +40,8 @@ class Monde:
                 print(self.dico[(x,y)].affichage_magique(),end="")
             print("",end="\n")
 
+    #thoses two bastards below should only be used in extreme cases
+    #in an ideal world, units and buildings will update themselves
     def update_unit_presence(self):
         for x in range(self.x): #resets every tile's unit list
             for y in range(self.y):
@@ -46,11 +49,27 @@ class Monde:
         for u in self.units: #puts every unit in their tile's unit list
             key=floatkey_to_intkey(position_to_tuple(u.position))
             self.dico[key].unites.append(u)
+    #this one fucker shall not be used, for it tempers with the actual gameplay
+    def update_build_presence(self):
+        for u in self.buildings: #puts every building in the tile's contain they are in
+            for v in u.tiles_occupied:
+                key=floatkey_to_intkey(position_to_tuple(u.position))
+                self.dico[v].contains = u
 
-    def spawn(self,unitclass,team,x,y):
+    def spawn_unit(self,unitclass,team,x,y):
         new_unit = unitclass(1,team)
         new_unit.position = Position(x,y)
         self.units.append(new_unit)
+        return new_unit
+
+    def spawn_building(self,buildclass,team,x,y):
+        new_build = buildclass()
+        new_build.position=Position(x,y)
+        new_build.grid_x = new_build.position.getX()
+        new_build.grid_y = new_build.position.getY()
+        new_build.update_tiles_occupied()
+        self.buildings.append(new_build)
+        return new_build
 
 def floatkey_to_intkey(key): #turns a float key into an int key for dict indexation
     return (int(key[0]),int(key[1]))
