@@ -7,6 +7,6 @@ class Farm(Building) :
       cost={"wood": 100},
       time_building=25,
       health=200,
-      surface=2,
+      longueur=2,
       dropPoint=True
     )
