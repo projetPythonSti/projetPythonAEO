@@ -1,9 +1,14 @@
 import pygame as pg
 import time
 import os, sys
+
+from click import pause
+
 from game import Game
 from game_term import Game_term
 from randommap import *
+from Archer import *
+import asyncio
 
 def jeu_terminal (world):
     running = True
@@ -11,7 +16,7 @@ def jeu_terminal (world):
     pg.init()
     pg.mixer.init()
     clock = pg.time.Clock()
-    game_term = Game_term( clock,world)
+    game_term = Game_term(clock,world)
 
     while running :
 
@@ -45,6 +50,11 @@ if __name__ == "__main__" :
     monde = World(100, 100)
     monde.creer_monde()
     randomise(monde, 3)
-    print("hi")
+
+    a1 = Archer(1)
+    a1.position = (1, 2)
+    monde.units.append(a1)
+
     #main()
-    jeu_terminal(monde)
+    asyncio.run(jeu_terminal(monde))
+
