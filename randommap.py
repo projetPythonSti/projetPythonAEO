@@ -34,7 +34,6 @@ def randomise(monde,richesse): #prend un monde, place des clusters de ressources
     #gold au centre
     placer(monde, (monde.x // 2, monde.y // 2), Gold(), 80)
 
-
 '''
 print(somme((1,1),(2,2)))
 

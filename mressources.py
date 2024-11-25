@@ -13,7 +13,8 @@ class Ressource:
     def getPosition(self):
         return self._position
     
-    
+    def setQuantity(self, quantity):
+        self.quantity = quantity
 
     def __repr__(self): return self.name
     

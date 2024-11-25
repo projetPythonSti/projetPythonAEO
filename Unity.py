@@ -1,10 +1,13 @@
+from time import sleep
+
 from Position import Position
 import time
 
 class Unity:
+    population = 0
     
-    def __init__(self, ident, name, cost, trainningTime, health, damage, speed, ranges):
-        self.id = ident
+    def __init__(self, id, name, cost, trainningTime, health, damage, speed, visibility, team, target = None, ):
+        self.id = id
         self.name = name
         self.cost = cost
         self.trainningTime = trainningTime
@@ -12,32 +15,31 @@ class Unity:
         self.damage = damage
         self.speed = speed
         self.position = Position()
-        self.range = ranges
-        self.move(Position(10,30))
-    
-    def collapse(self, other):
-        pass
-    
-    def move(self, destination:Position):
-        while self.position != destination:
-            xPositionDifference = self.position.getX() - destination.getX()
-            yPositionDifference = self.position.getY() - destination.getY()
-            if xPositionDifference != 0 and yPositionDifference != 0:
-                self.position.setY(self.position.getY() + 1) if yPositionDifference > 0 else self.position.setY(self.position.getY() - 1)
-                self.position.setX(self.position.getX() + 0.5) if xPositionDifference > 0 else self.position.setX(self.position.getX() - 0.5)
-            else:   
-                if xPositionDifference == 0:
-                    self.position.setY(self.position.getY() + 1) if yPositionDifference > 0 else self.position.setY(self.position.getY() - 1)
-                if yPositionDifference == 0:  
-                    self.position.setX(self.position.getX() + 0.5) if xPositionDifference > 0 else self.position.setX(self.position.getX() - 0.5)
-
-            destination.setY(destination.getY() - 1)
-            destination.setX(destination.getY() - 0.5)
-            time.sleep(0.5)
+        self.range = visibility
+        self.target = target
+        self.team  = team
+        population += 1
         
-
-        
-    def attack(self, attackedObjet):
+    def move(self,destination, route):
+        i = 0
+        while(self.position != destination):
+            print(f"Still in {i}, position {self.position}")
+            if route[i+1][0] != self.position.getX():
+                print(route[i+1], "is the destination")
+                direction = 1 if self.position.getX() < route[i+1][0] else -1
+                self.position.setX(self.position.getX()+direction)
+                sleep(1.25)
+            elif route[i+1][1] != self.position.getY():
+                print(route[i+1], "is the destination")
+                direction = 1 if self.position.getY() < route[i + 1][1] else -1
+                self.position.setY(self.position.getY()+direction)
+                sleep(1.25)
+            if self.position == route[i+1]:
+                print("Got to the next point")
+                i += 1
+        print("Arrivé à destination")
+    
+    def attack(attackedObjet):
         pass
     
     def getCost(self): return self.cost
