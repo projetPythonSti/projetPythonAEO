@@ -17,7 +17,7 @@ class Villager(Unity):
 
     # Function which collect a resource and add it to the resourcesDictionnary of the villager, at the end if carryMax is
     # is reached, move to the nearest drop point
-    def collect(self , resource, neareastDP):
+    def collect(self , resource, route):
         aR = sum(self.resourcesDict[key] for key in self.resourcesDict)
         collectedQuantity = resource.getQuantity()
         print("ar = ",aR)
@@ -49,6 +49,9 @@ class Villager(Unity):
             resource.setQuantity(0)
         if aR+(collectedQuantity - resource.getQuantity()) > self.carryMax:
             pass
-            #self.move(neareastDP)
+            self.move(route[10], route)
     def build(self):
         return 0
+
+    def dropResources(self, dropPoint):
+        pass

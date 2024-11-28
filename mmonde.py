@@ -11,12 +11,7 @@ class Tile:
         self.contains=" " #représente une tuile sans ressources, sera remplacé par une instance de Ressource
         #il suffira de changer le __repr__ de Ressource pour afficher la lettre correspondant à la ressource
         self.unites=[]
-        self.rect = [
-            (id[0] * TILE_SIZE, id[1] * TILE_SIZE),
-            (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE),
-            (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE),
-            (id[0] * TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE)
-        ]
+
         #list of every unit on the tile, used for the map representation
 
     def __repr__(self):
@@ -34,7 +29,8 @@ class Tile:
         iso_y = (x + y) / 2
         return iso_x, iso_y
 
-class Tile_gui (Tile) :
+
+class TileGUI (Tile) :
     def __init__(self, id):
         self.rect = [
             (id[0] * TILE_SIZE, id[1] * TILE_SIZE),
