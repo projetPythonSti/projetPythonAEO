@@ -2,7 +2,7 @@ from mressources import *
 from Unity import *
 import numpy as np
 
-from setup import TILE_SIZE
+from utils.setup import TILE_SIZE
 
 
 class Tile:

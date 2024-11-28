@@ -6,7 +6,7 @@ import sys
 import mressources
 from mmonde import World
 from mressources import Ressource
-from setup import TILE_SIZE
+from utils.setup import TILE_SIZE
 import os, sys
 import time
 
