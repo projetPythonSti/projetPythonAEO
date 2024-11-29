@@ -41,7 +41,7 @@ class Monde:
             print("",end="\n")
 
         #print(f"\33[1;34m{"Texte bleu clair"}")
-        #print("\33[1;91mTexte rouge clair")
+        #print(f"\33[1;91mTexte rouge clair")
 
     #thoses two bastards below should only be used in extreme cases
     #in an ideal world, units and buildings will update themselves
