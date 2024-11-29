@@ -20,7 +20,6 @@ monde.units.append(unit3)
 monde.afficher_console()
 
 grid = monde.convertMapToGrid()
-
 start = (0,0)
 goal = (10,70)
 

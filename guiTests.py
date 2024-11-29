@@ -7,11 +7,8 @@ from randommap import *
 def jeu_terminal (world):
     running = True
     playing = True
-    pg.init()
-    pg.mixer.init()
-    screen = pg.display.set_mode((720, 720))
-    clock = pg.time.Clock()
-    game = Game(screen, clock,world)
+    clock = 0
+    game = Game(None, clock,world)
 
     while running :
 
@@ -24,11 +21,11 @@ def main (world) :
     running = True
     playing = True
 
-    pg.init()
-    pg.mixer.init()
+    #pg.init()
+    #pg.mixer.init()
     screen = pg.display.set_mode((0,0), )
     clock = pg.time.Clock()
-    game = Game(screen, clock,world)
+    game = Game(None, clock,world)
 
 
     while running :
@@ -41,7 +38,6 @@ if __name__ == "__main__" :
     monde = World(10, 10)
     monde.creer_monde()
     randomise(monde, 3)
-    print("hi")
     #main()
-    monde.afficher_console()
-    main(monde)
+    #monde.afficher_console()
+    jeu_terminal(monde)

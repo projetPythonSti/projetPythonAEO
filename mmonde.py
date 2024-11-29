@@ -8,11 +8,9 @@ from setup import TILE_SIZE
 class Tile:
     def __init__(self,id): #id c'est le tuple (x,y)
         self.id=id
-        self.contains=" " #représente une tuile sans ressources, sera remplacé par une instance de Ressource
+        self.contains= " " #représente une tuile sans ressources, sera remplacé par une instance de Ressource
         #il suffira de changer le __repr__ de Ressource pour afficher la lettre correspondant à la ressource
         self.unites=[]
-
-        #list of every unit on the tile, used for the map representation
 
     def __repr__(self):
         if self.unites!=[]:
@@ -29,8 +27,7 @@ class Tile:
         iso_y = (x + y) / 2
         return iso_x, iso_y
 
-
-class TileGUI (Tile) :
+class Tile_gui (Tile) :
     def __init__(self, id):
         self.rect = [
             (id[0] * TILE_SIZE, id[1] * TILE_SIZE),
@@ -73,6 +70,7 @@ class World:
                     print(self.dico[(x, y)].affiche(),end="") #This one works
 
             print("",end="\n")
+            
     def update_unit_presence(self):
         for x in range(self.x): #resets every tile's unit list
             for y in range(self.y):

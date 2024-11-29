@@ -8,6 +8,7 @@ from mmonde import World
 from mressources import Ressource
 from setup import TILE_SIZE
 import os, sys
+from consoledraw import Console
 import time
 
 class Game :
@@ -15,7 +16,7 @@ class Game :
     def __init__(self, screen, clock,world):
         self.screen = screen
         self.clock = clock
-        self.width, self.height = self.screen.get_size()
+        self.width, self.height = self.screen.get_size() if screen is not None else 0,0
         self.world = world
 
     def run (self):
@@ -29,8 +30,8 @@ class Game :
     def run_console (self):
         self.playing = True
         while self.playing:
-            self.clock.tick(3)
-            self.events()
+            #self.clock.tick(3)
+            #self.events()
             self.update()
             self.draw_term()
 
