@@ -1,7 +1,10 @@
 from Archer import Archer
+from pathfinding import Pathfinding
 from randommap import *
 from Unity import *
 from town_center import TownCenter
+
+import time
 
 print("\n\n\n\n\n")
 
@@ -18,3 +21,13 @@ monde.update_unit_presence()
 monde.update_build_presence()
 
 monde.afficher_console()
+
+print("\n\n\n\n\n")
+
+
+path = Pathfinding(monde.convertMapToGrid(),(0,0),(monde.x-1,monde.y-1))
+start = time.time()
+route = path.astar()
+end = time.time() - start
+monde.afficher_route_console(route)
+print(end)

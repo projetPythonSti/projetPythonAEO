@@ -2,6 +2,8 @@ from mressources import *
 from Unity import *
 from Position import *
 
+import numpy as np
+
 class Tile:
     def __init__(self,id): #id c'est le tuple (x,y)
         self.id=id
@@ -14,7 +16,7 @@ class Tile:
             return self.unites[0].name[0] #First letter of the first unit class name
         return self.contains
 
-    def affichage_magique(self):
+    def affichage_magique(self): #doesn't affiche anything
         if len(self.unites) != 0:
             return self.unites[0].name[0].lower() #First letter of the first unit class name
         return self.contains
@@ -35,6 +37,7 @@ class Monde:
                 self.dico[cle]=Tile(cle)
 
     def afficher_console(self):
+        self.update_unit_presence() #updates this everytime we print the map
         for x in range(self.x):
             for y in range(self.y):
                 print(self.dico[(x,y)].affichage_magique(),end="")
@@ -74,11 +77,31 @@ class Monde:
         self.buildings.append(new_build)
         return new_build
 
+    #TAHA'S THINGS
+    def afficher_route_console(self, route):
+        self.update_unit_presence()  # updates this everytime we print the map
+        for x in range(self.x):
+            for y in range(self.y):
+                if (x, y) in route:
+                    print("-", end="")
+                else:
+                    print(self.dico[(x, y)].affichage_magique(), end="")  # This one works
+
+            print("", end="\n")
+
+    def convertMapToGrid(self):
+        array_shape = (self.x, self.y)
+        binary_array = np.zeros(array_shape, dtype=int)
+        for i, (key, value) in enumerate(self.dico.items()):
+            binary_array[key[0], key[1]] = 0 if value.contains == " " else 1
+        return binary_array
+
 def floatkey_to_intkey(key): #turns a float key into an int key for dict indexation
     return (int(key[0]),int(key[1]))
 
 def position_to_tuple(position):
     return (position.getX(),position.getY())
+
 
 
 '''
