@@ -15,7 +15,7 @@ class Building:
         self.dropPoint = False
         self.dropPoint = dropPoint
         self.flag = flag
-        self.position = position if position else Position()
+        self.position = position
 
     def can_afford(self, resource_manager : RessourcesManager):
         for resource, amount_needed in self.cost.items():
