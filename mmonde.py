@@ -102,8 +102,6 @@ def floatkey_to_intkey(key): #turns a float key into an int key for dict indexat
 def position_to_tuple(position):
     return (position.getX(),position.getY())
 
-
-
 '''
 monde=Monde(5,20)
 monde.creer_monde()
