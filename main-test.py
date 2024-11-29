@@ -12,8 +12,6 @@ import asyncio
 def jeu_terminal (world):
     running = True
     playing = True
-    pg.init()
-    pg.mixer.init()
     clock = pg.time.Clock()
     game_term = Game_term(clock,world)
 
@@ -55,5 +53,5 @@ if __name__ == "__main__" :
     monde.units.append(a1)
 
     #main()
-    asyncio.run(jeu_terminal(monde))
+    jeu_terminal(monde)
 

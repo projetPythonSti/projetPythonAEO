@@ -1,4 +1,3 @@
-from pathfinding import astar
 from randommap import *
 from Archer import *
 from time import *
@@ -24,15 +23,3 @@ start = (0,0)
 goal = (10,70)
 
 
-route = astar(grid, start, goal)
-print(route)
-
-if route.__class__ == bool:
-    print("Found no short path")
-route = route + [start]
-route = route[::-1]
-print(f"position de {monde.units[0].name} : {monde.units[0].position}")
-monde.units[0].move(goal, route)
-print(f"position de {monde.units[0].name} : {monde.units[0].position}")
-monde.afficher_console()
-monde.afficher_route_console(route)
