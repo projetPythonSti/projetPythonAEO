@@ -56,5 +56,5 @@ if __name__ == "__main__" :
     monde.units.append(a1)
 
     #main()
-    asyncio.run(jeu_terminal(monde))
+    jeu_terminal(monde)
 

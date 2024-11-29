@@ -14,7 +14,7 @@ class Game_term :
         self.world = world
         self.playing = False
 
-    async def run_term (self):
+    def run_term (self):
         self.playing = True
         while self.playing:
             self.clock.tick(0.5)
@@ -41,7 +41,7 @@ class Game_term :
         os.system('cls' if os.name == 'nt' else 'clear')
         self.world.afficher_console()
 
-    async def pause (self) :
+    def pause (self) :
         while self.playing:
             test = input()
             if test == 'p' :
