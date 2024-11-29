@@ -3,7 +3,7 @@ from RessourcesManager import RessourcesManager
 
 
 class Building:
-    def __init__(self, name, cost, time_building, health, longueur, spawn, dropPoint, flag):
+    def __init__(self, name, cost, time_building, health, longueur, spawn, dropPoint, flag, position):
         self.name = name
         self.cost = cost
         self.time_building = time_building
@@ -14,6 +14,7 @@ class Building:
         self.dropPoint = False
         self.dropPoint = dropPoint
         self.flag = flag
+        self.position = position
 
     def can_afford(self, resource_manager : RessourcesManager):
         for resource, amount_needed in self.cost.items():
@@ -45,3 +46,8 @@ class Building:
         print(f"Construction de {self.name} terminée.")
         return True
 
+    def set_position(self, x, y):
+        # Définit la position du bâtiment
+        self.position.setX(x)
+        self.position.serY(y)
+        print(f"Position de {self.name} définie à ({x}, {y}).")
