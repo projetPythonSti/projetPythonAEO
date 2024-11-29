@@ -40,6 +40,9 @@ class Monde:
                 print(self.dico[(x,y)].affichage_magique(),end="")
             print("",end="\n")
 
+        #print(f"\33[1;34m{"Texte bleu clair"}")
+        #print("\33[1;91mTexte rouge clair")
+
     #thoses two bastards below should only be used in extreme cases
     #in an ideal world, units and buildings will update themselves
     def update_unit_presence(self):
