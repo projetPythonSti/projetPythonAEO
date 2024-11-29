@@ -18,8 +18,8 @@ class Unity:
         self.range = visibility
         self.target = target
         self.team  = team
-        population += 1
-        
+        # population += 1
+     
     def move(self,destination, route):
         i = 0
         while(self.position != destination):

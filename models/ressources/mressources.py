@@ -1,4 +1,4 @@
-from Position import Position
+from models.Position import Position
 
 
 class Ressource:

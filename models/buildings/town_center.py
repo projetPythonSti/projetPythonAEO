@@ -1,9 +1,9 @@
-from buildings import Building
+from buildings.buildings import Building
 
 class TownCenter(Building):
     def __init__(self):
         super().__init__(
-            name="Town Centre",
+            name="T",
             cost={"wood": 350},
             time_building=150,
             health=1000,

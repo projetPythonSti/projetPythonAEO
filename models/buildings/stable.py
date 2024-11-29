@@ -1,9 +1,9 @@
-from buildings import Building
+from buildings.buildings import Building
 
 class Stable(Building) :
   def __init__(self) :
     super().__init(
-      name="Stable",
+      name="S",
       cost={"wood": 175},
       time_building=50,
       health=500,
