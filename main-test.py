@@ -13,10 +13,8 @@ import asyncio
 def jeu_terminal (world):
     running = True
     playing = True
-    pg.init()
-    pg.mixer.init()
-    clock = pg.time.Clock()
-    game_term = Game_term(clock,world)
+    #clock = pg.time.Clock()
+    game_term = Game_term(world)
 
     while running :
 
