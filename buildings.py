@@ -4,12 +4,12 @@ from Position import *
 from RessourcesManager import RessourcesManager
 
 class Building:
-    def __init__(self, name, cost, time_building, health, longueur, spawn, dropPoint: bool(), flag, position):
+    def __init__(self, name, cost, time_building, health, lenght, spawn, dropPoint: bool(), flag, position):
         self.name = name
         self.cost = cost
         self.time_building = time_building
         self.health = health
-        self.longueur = longueur
+        self.lenght = lenght
         self.is_built = False
         self.spawn = spawn
         self.dropPoint = False
