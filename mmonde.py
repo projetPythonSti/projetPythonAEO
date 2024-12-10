@@ -1,5 +1,5 @@
-from mressources import *
-from Unity import *
+from ressources.mressources import *
+from unity.Unity import *
 import numpy as np
 
 from utils.setup import TILE_SIZE

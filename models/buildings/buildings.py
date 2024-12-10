@@ -12,6 +12,9 @@ class Building:
         self.dropPoint = dropPoint
         self.population = population
 
+    def get_cost(self):
+        return self.cost
+    
     def can_afford(self, player_resources):
         for resource, amount_needed in self.cost.items():
             if player_resources.get(resource, 0) < amount_needed:

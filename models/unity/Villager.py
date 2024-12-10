@@ -1,11 +1,11 @@
 from unity.Unity import Unity
 # import mressources
 from Pathfinding import Pathfinding
-from RessourcesManager import RessourcesManager
 
 class Villager(Unity):
-    villagerPopulation = 0
-    def __init__(self,uid, team):
+    def __init__(self, team):
+        community = team.get_community().get('v')
+        uid = len(community) if community else 0 # 0 if 
         super().__init__(uid,"V", {"food" : 50}, 25, 40, 4, 0.8, 1, team=team)
         self.carryMax = 25
         # self.buildingSpeed = buildingSpeed,
@@ -14,19 +14,17 @@ class Villager(Unity):
             "wood" : 0,
             "gold" : 0,
         }
-        # villagerPopulation += 1
 
     # Function which collect a resource and add it to the resourcesDictionnary of the villager, at the end if carryMax is
     # is reached, move to the nearest drop point
-    def collect(self , resource, route:Pathfinding):
+    def collect(self ,resource):
         allCollected = sum(self.resourcesDict.values())
         collectedQuantity = resource.getQuantity()
         print("allCollected = ",allCollected)
         if (allCollected + collectedQuantity) > self.carryMax :
             if allCollected > self.carryMax:
                 print("Trop de ressources")
-                self.move(route.getGoal(), route)
-                self.dropRessources()
+                
                 # return resource
             else :
                 if resource.__class__ == mressources.Food:
@@ -57,7 +55,8 @@ class Villager(Unity):
         """
             droping ressources in the village drop point
         """
-    def dropRessources(self, ressourcesManager:RessourcesManager):
+    def dropRessources(self, team):
+        team.add_ressources()
         ressourcesManager.setRessources(self.resourcesDict)
         for key in self.resourcesDict:
             self.resourcesDict[key] = 0
