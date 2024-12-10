@@ -4,7 +4,6 @@ from menu import StartMenu, GameMenu
 
 
 def main():
-
     running = True
 
     pg.init()
