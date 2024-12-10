@@ -1,58 +1,54 @@
 import time
 import pygame as pg
 from Position import *
+from RessourcesManager import RessourcesManager
 
 class Building:
-    def __init__(self, name, cost, time_building, health, surface, population=0, spawn='Unity', dropPoint=False):
+    def __init__(self, name, cost, time_building, health, lenght, spawn, dropPoint: bool(), flag, position):
         self.name = name
         self.cost = cost
         self.time_building = time_building
         self.health = health
-        self.surface = surface
+        self.lenght = lenght
         self.is_built = False
         self.spawn = spawn
+        self.dropPoint = False
         self.dropPoint = dropPoint
-        self.population = population
-        self.team = None
+        self.flag = flag
+        self.position = position
 
-        self.position = Position()
-        self.grid_x = None  # To be set when placed in the world
-        self.grid_y = None
-        self.tiles_occupied = []
-
-    def __repr__(self): return f"{self.name[0]}"
-
-    def update_tiles_occupied(self):
-        """Update the list of tiles occupied by this building based on grid_x and grid_y."""
-        if self.grid_x is not None and self.grid_y is not None:
-            self.tiles_occupied = [
-                (self.grid_x + dx, self.grid_y + dy)
-                for dx in range(self.surface)
-                for dy in range(self.surface)
-            ] #very nice comprehension expression btw
-
-    def can_afford(self, player_resources):
+    def can_afford(self, resource_manager : RessourcesManager):
         for resource, amount_needed in self.cost.items():
-            if player_resources.get(resource, 0) < amount_needed:
+            if resource_manager.resources.get(resource, 0) < amount_needed:
                 return False
         return True
 
-    def deduct_resources(self, player_resources):
+    def deduct_resources(self, resource_manager : RessourcesManager):
         for resource, amount_needed in self.cost.items():
-            player_resources[resource] -= amount_needed
-        print(f"Ressources déduites pour {self.name}: {self.cost}")    
+            resource_manager.resources[resource] -= amount_needed
+        print(f"Ressources déduites pour {self.name}: {self.cost}")
 
-    def build(self, player_resources):
-        if not self.can_afford(player_resources):
+    def set_time_building(self, resource_manager : RessourcesManager) :
+        n = resource_manager.resources.get("villagers", 0)
+        return 3*self.time_builing / (n+2)
+    
+    def build(self, resource_manager : RessourcesManager):
+        if not self.can_afford(resource_manager):
             print(f"Pas assez de ressources pour construire {self.name}.")
             return False
-
-        self.deduct_resources(player_resources)
+        self.deduct_resources(resource_manager)
         print(f"Construction de {self.name} commencée...")
-        for second in range(self.time_building):
+        build_time = int(self.set_time_building(resource_manager))
+        for second in range(build_time):
             print(f"Construction en cours : {second + 1}/{self.time_building} secondes")
             time.sleep(1)
 
         self.is_built = True
         print(f"Construction de {self.name} terminée.")
         return True
+
+    def set_position(self, x, y):
+        # Définit la position du bâtiment
+        self.position.setX(x)
+        self.position.serY(y)
+        print(f"Position de {self.name} définie à ({x}, {y}).")
