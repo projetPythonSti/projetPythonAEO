@@ -19,25 +19,24 @@ pause = False
 
 def on_press(key):
     try:
-        print('alphanumeric key {0} pressed'.format(
-            key.char))
+        print('alphanumeric key {0} pressed'.format(key.char))
 
     except AttributeError:
-        print('special key {0} pressed'.format(
-            key))
+        print('special key {0} pressed'.format(key))
 
 def on_release(key):
-    print('{0} released'.format(
-        key))
+    global pause
+
+    print('{0} released'.format(key))
+
     if key == keyboard.Key.esc:
         # Stop listener
-        global pause
         pause = True
         return False
 
-    if key == keyboard.Key.esc:
-        global pause
+    if key == keyboard.KeyCode('q'):
         pause = True
+        return False
 
 
 #########################################
@@ -56,9 +55,11 @@ class Game_term :
 
     def run_term (self):
         self.playing = True
-        while self.playing:
+        listener = keyboard.Listener(on_press=on_press, on_release=on_release)
+        listener.start()
+        while self.playing and (not pause):
 
-            #self.clock.tick(0.5)
+            self.clock.tick(0.5)
             now = datetime.now()
             delta = now - self.ltick
             ig_delta = delta * self.speed

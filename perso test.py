@@ -18,12 +18,12 @@ def on_release(key):
         key))
     if key == keyboard.Key.esc:
         # Stop listener
-        global pause
+        #global pause
         pause = True
         return False
 
     if key == keyboard.Key.esc:
-        global pause
+        #global pause
         pause = True
 
 
