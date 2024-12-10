@@ -3,6 +3,7 @@ from random import *
 from town_center import TownCenter
 from Archer import Archer
 from Unity import *
+from Villager import Villager
 
 def somme(t1,t2): #somme((1,1),(2,2))=(3,3)
     total=()

@@ -3,7 +3,7 @@ from gc import collect
 from Unity import Unity
 import mressources
 from pathfinding import Pathfinding
-from RessourcesManager import RessourcesManager
+from models.RessourcesManager import RessourcesManager
 
 class Villager(Unity):
     villagerPopulation = 0

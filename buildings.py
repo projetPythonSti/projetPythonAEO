@@ -1,7 +1,7 @@
 import time
 import pygame as pg
 from Position import *
-from RessourcesManager import RessourcesManager
+from models.RessourcesManager import RessourcesManager
 
 class Building:
     def __init__(self, name, cost, time_building, health, lenght, spawn, dropPoint: bool(), flag, position):

@@ -26,7 +26,7 @@ monde.afficher_console()
 
 print("\n\n\n\n\n")
 
-path = Pathfinding(monde.convertMapToGrid(),(0,0),(monde.x-1,monde.y-1))
+path = Pathfinding(monde.convertMapToGrid(),(0,0),(2,2))
 start = time.time()
 route = path.astar()
 end = time.time()
@@ -36,8 +36,3 @@ print(f"Astar took {end-start} seconds")
 print(f"Affichage took {end2-end} seconds")
 print(route[::-1])
 
-''' me trying to find nicer path for units
-for i in len(route)-2: #search for turns
-    if (route[i][0]!=route[i+1][0] and route[i+1][1]!=route[i+2][1]) or \
-        (route[i][1]!=route[i+1][1] and route[i+1][0]!=route[i+2][0]):
-'''
