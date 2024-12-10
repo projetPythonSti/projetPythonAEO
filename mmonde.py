@@ -86,6 +86,7 @@ class World:
             binary_array[key[0], key[1]] = 0 if value.contains == " " else 1
         return binary_array
 
+
 def intkey(key): #turns a float key into an int key for dict indexation
     return (int(key[0]),int(key[1]))
 
