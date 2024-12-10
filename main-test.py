@@ -2,8 +2,6 @@ import pygame as pg
 import time
 import os, sys
 
-from click import pause
-
 from game import Game
 from game_term import Game_term
 from randommap import *
@@ -13,8 +11,8 @@ import asyncio
 def jeu_terminal (world):
     running = True
     playing = True
-    #clock = pg.time.Clock()
-    game_term = Game_term(world)
+    clock = pg.time.Clock()
+    game_term = Game_term(world,clock)
 
     while running :
 
