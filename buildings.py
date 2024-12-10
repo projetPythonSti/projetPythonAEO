@@ -29,7 +29,7 @@ class Building:
 
     def set_time_building(self, resource_manager : RessourcesManager) :
         n = resource_manager.resources.get("villagers", 0)
-        return 3*self.time_builing / (n+2)
+        return max(1, int(3 * self.time_building / (n + 2)))
     
     def build(self, resource_manager : RessourcesManager):
         if not self.can_afford(resource_manager):
