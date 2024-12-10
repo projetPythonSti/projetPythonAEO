@@ -48,12 +48,12 @@ def randomise(monde,richesse): #prend un monde, place des clusters de ressources
     monde.spawn_building(TownCenter,"blue",x,y)
     monde.spawn_building(TownCenter, "red", monde.x-x-4, monde.y-y-4)
     #villagers adjacent to town centers
-    monde.spawn_unit(Archer,"blue",x,y+4)
-    monde.spawn_unit(Archer, "blue", x + 1, y+4)
-    monde.spawn_unit(Archer, "blue", x + 2, y+4)
-    monde.spawn_unit(Archer, "red", monde.x-x-4, monde.y-y-5)
-    monde.spawn_unit(Archer, "red", monde.x-x-3, monde.y-y-5)
-    monde.spawn_unit(Archer, "red", monde.x-x-2, monde.y-y-5)
+    monde.spawn_unit(Villager,"blue",x,y+4)
+    monde.spawn_unit(Villager, "blue", x + 1, y+4)
+    monde.spawn_unit(Villager, "blue", x + 2, y+4)
+    monde.spawn_unit(Villager, "red", monde.x-x-1, monde.y-y-5)
+    monde.spawn_unit(Villager, "red", monde.x-x-3, monde.y-y-5)
+    monde.spawn_unit(Villager, "red", monde.x-x-2, monde.y-y-5)
 
 '''
 print(somme((1,1),(2,2)))
