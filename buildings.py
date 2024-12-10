@@ -51,3 +51,9 @@ class Building:
         self.position.setX(x)
         self.position.serY(y)
         print(f"Position de {self.name} définie à ({x}, {y}).")
+
+
+
+class Population:
+    def __init__(self, population):
+        self.population = population
