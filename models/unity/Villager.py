@@ -1,14 +1,12 @@
-from gc import collect
-
 from Unity import Unity
-import mressources
-from pathfinding import Pathfinding
+# import mressources
+from models.Pathfinding import Pathfinding
 from models.RessourcesManager import RessourcesManager
 
 class Villager(Unity):
     villagerPopulation = 0
-    def __init__(self,id, team):
-        super().__init__(id,"V", {"food" : 50}, 25, 40, 4, 0.8, 1, team=team)
+    def __init__(self,uid, team):
+        super().__init__(uid,"V", {"food" : 50}, 25, 40, 4, 0.8, 1, team=team)
         self.carryMax = 25
         # self.buildingSpeed = buildingSpeed,
         self.resourcesDict = {
@@ -16,6 +14,7 @@ class Villager(Unity):
             "wood" : 0,
             "gold" : 0,
         }
+        # villagerPopulation += 1
 
     # Function which collect a resource and add it to the resourcesDictionnary of the villager, at the end if carryMax is
     # is reached, move to the nearest drop point

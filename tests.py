@@ -1,17 +1,18 @@
 from time import perf_counter
 
-from Archer import Archer
-from pathfinding import Pathfinding
+from models.unity.Archer import Archer
+from models.Pathfinding import Pathfinding
 from randommap import *
 from Unity import *
-from town_center import TownCenter
+from models.buildings.town_center import TownCenter
+from mmonde import *
 
 import time
 
 print("\n\n\n\n\n")
 
 #creates a 30 by 160 world composed of 30x160 tiles
-monde=Monde(30,160)
+monde=World(30,160)
 monde.creer_monde()
 
 #puts resources and town centers and villagers on the map

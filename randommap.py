@@ -1,9 +1,9 @@
 from mmonde import *
 from random import *
-from town_center import TownCenter
-from Archer import Archer
+from models.buildings.town_center import TownCenter
+from models.unity.Archer import Archer
 from Unity import *
-from Villager import Villager
+from models.unity.Villager import Villager
 
 def somme(t1,t2): #somme((1,1),(2,2))=(3,3)
     total=()

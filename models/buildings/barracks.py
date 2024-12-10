@@ -1,12 +1,12 @@
 from buildings import Building
 
-class Archery_range(Building) :
+class Barracks(Building) :
   def __init__(self) :
     super().__init__(
-      name="Archery Range",
+      name="B",
       cost={"wood": 175},
       time_building=50,
       health=500,
-      surface=9,  # 3x3
-      spawn="Archer"
+      length=3,  # 3x3
+      spawn="Swordsman"
     )
