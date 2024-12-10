@@ -18,13 +18,14 @@ monde.creer_monde()
 #puts resources and town centers and villagers on the map
 #two players symmetrical map
 randomise(monde,0)
-
+'''
 monde.update_unit_presence()
 
 monde.update_build_presence()
 
 monde.afficher_console()
-
+'''
+'''
 print("\n\n\n\n\n")
 
 path = Pathfinding(monde.convertMapToGrid(),(0,0),(2,2))
@@ -36,4 +37,4 @@ end2 = time.time()
 print(f"Astar took {end-start} seconds")
 print(f"Affichage took {end2-end} seconds")
 print(route[::-1])
-
+'''

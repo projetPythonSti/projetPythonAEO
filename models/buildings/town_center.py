@@ -1,4 +1,4 @@
-from buildings import Building
+from models.buildings.buildings import Building
 
 class TownCenter(Building):
     def __init__(self):

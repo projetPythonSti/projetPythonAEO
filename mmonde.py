@@ -1,6 +1,7 @@
 from mressources import *
 from Unity import *
 import numpy as np
+from models.buildings.buildings import *
 
 from utils.setup import TILE_SIZE
 
@@ -69,7 +70,7 @@ class World:
                     print(self.dico[(x, y)].affiche(),end="") #This one works
 
             print("",end="\n")
-            
+
     def update_unit_presence(self):
         for x in range(self.x): #resets every tile's unit list
             for y in range(self.y):
@@ -85,8 +86,24 @@ class World:
             binary_array[key[0], key[1]] = 0 if value.contains == " " else 1
         return binary_array
 
+    def spawn_unit(self, unitclass, team, x, y):
+        new_unit = unitclass(1, team)
+        new_unit.position = Position(x, y)
+        self.units.append(new_unit)
+        return new_unit
+
+    def spawn_building(self, buildclass, team, x, y):
+        new_build = buildclass()
+        new_build.position = Position(x, y)
+        new_build.grid_x = new_build.position.getX()
+        new_build.grid_y = new_build.position.getY()
+        new_build.update_tiles_occupied()
+        self.buildings.append(new_build)
+        return new_build
+
 def intkey(key): #turns a float key into an int key for dict indexation
     return (int(key[0]),int(key[1]))
+
 
 '''
 monde=Monde(5,20)
