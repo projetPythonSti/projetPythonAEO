@@ -2,7 +2,7 @@ import pygame as pg
 import random
 import noise
 from settings import TILE_SIZE
-from buildings import Building
+from buildings import Building, TownCentre, House, Camp, Farm, Barracks, Stable, ArcheryRange, Keep
 from workers import Worker  
 
 
@@ -30,12 +30,22 @@ class World:
         self.temp_tile = None
         self.examine_tile = None
 
-    def compute_screen_position(self, render_pos, object_height, camera):
-        """Compute the screen position of a tile or object based on camera position and object height."""
-        return (
-            render_pos[0] + self.grass_tiles.get_width() / 2 + camera.scroll.x,
-            render_pos[1] - (object_height - TILE_SIZE) + camera.scroll.y
-        )
+    def compute_screen_position(self, grid_x, grid_y):
+        """
+        Compute the screen position for a building based on grid position.
+        """
+        # Convert grid position to cartesian coordinates
+        cart_x = grid_x * TILE_SIZE
+        cart_y = grid_y * TILE_SIZE
+
+        # Convert cartesian to isometric coordinates
+        iso_x, iso_y = self.cart_to_iso(cart_x, cart_y)
+
+        # Center the map
+        screen_x = iso_x + self.grass_tiles.get_width() / 2
+        screen_y = iso_y
+
+        return screen_x, screen_y
 
     def cart_to_iso(self, x, y):
         iso_x = x - y
@@ -47,8 +57,9 @@ class World:
         cart_y = (2 * iso_y - iso_x) / 2
         return int(cart_x), int(cart_y)
 
-    def can_place_building(self, grid_x, grid_y, building):
-        size_x, size_y = map(int, building.size.split('x'))
+    def can_place_building(self, grid_x, grid_y, size):
+        """Check if a building of given size can be placed at the grid position."""
+        size_x, size_y = size
         if grid_x + size_x > self.grid_length_x or grid_y + size_y > self.grid_length_y:
             return False
 
@@ -57,15 +68,10 @@ class World:
                 if not self.is_tile_available(grid_x + dx, grid_y + dy):
                     return False
         return True
-    
-    
 
     def is_tile_available(self, x, y):
         return (0 <= x < self.grid_length_x) and (0 <= y < self.grid_length_y) and self.grid[x][y] is None
 
-
-
-    
     def select_tile(self, grid_pos):
         """Select a tile to place a worker or examine."""
         print(f"Selected tile: {grid_pos}")
@@ -78,7 +84,7 @@ class World:
             self.workers[grid_pos[0]][grid_pos[1]] = worker
 
     def handle_tile_examination(self, mouse_pos, camera, mouse_action):
-        grid_pos = self.mouse_to_grid(mouse_pos[0], mouse_pos[1], camera.scroll)
+        grid_pos = self.mouse_to_grid(mouse_pos[0], mouse_pos[1], camera)
         if self.can_place_tile(grid_pos):
             building = self.buildings[grid_pos[0]][grid_pos[1]]
             if mouse_action[0] and building is not None:
@@ -91,7 +97,7 @@ class World:
             self.hud.examined_tile = None
 
     def handle_tile_selection(self, mouse_pos, camera, mouse_action):
-        grid_pos = self.mouse_to_grid(mouse_pos[0], mouse_pos[1], camera.scroll)
+        grid_pos = self.mouse_to_grid(mouse_pos[0], mouse_pos[1], camera)
         if self.can_place_tile(grid_pos):
             self.prepare_temp_tile(grid_pos)
             if mouse_action[0] and not self.world[grid_pos[0]][grid_pos[1]]["collision"]:
@@ -112,88 +118,103 @@ class World:
             "collision": collision
         }
 
+    def can_place_tile(self, grid_pos):
+        """Check if the tile can be placed and a building is selected."""
+        if (0 <= grid_pos[0] < self.grid_length_x and
+                0 <= grid_pos[1] < self.grid_length_y):
+            if self.hud.selected_tile is None:
+                return False
 
-
-    def draw(self, screen, camera):
-        """Render the world, including buildings."""
-        #print("Drawing the world and buildings...")
-        
-        # Drawing grass tiles
-        #print(f"Blitting grass tiles at camera scroll position ({camera.scroll.x}, {camera.scroll.y})")
-        screen.blit(self.grass_tiles, (camera.scroll.x, camera.scroll.y))
-        
-        drawn_buildings = set()  # To track drawn buildings
-
-        for x in range(self.grid_length_x):
-            for y in range(self.grid_length_y):
-                render_pos = self.world[x][y]["render_pos"]
-
-                # Draw world tiles
-                #print(f"Drawing world tile at grid ({x}, {y}) at render position {render_pos}")
-                self.draw_world_tile(screen, render_pos, x, y, camera)
-
-                # Draw buildings if they exist and haven't been drawn yet
-                building = self.buildings[x][y]
-                if building is not None and building not in drawn_buildings:
-                    size_x, size_y = map(int, building.size.split('x'))
-
-                    # Only draw the building once, at its top-left grid corner
-                    if (x == building.grid_x and y == building.grid_y):
-                        building_render_pos = self.compute_screen_position(render_pos, building.image.get_height(), camera)
-                        
-                        # Debugging: Print the render position and building details
-                        print(f"Rendering {building.name} at grid ({x}, {y}) with size {building.size}. Screen position: {building_render_pos}")
-                        
-                        screen.blit(building.image, building_render_pos)
-
-                        # Mark the building as drawn to prevent re-rendering
-                        drawn_buildings.add(building)
-
-                        # Print out that the building has been marked as drawn
-                        print(f"{building.name} at grid ({x}, {y}) has been marked as drawn.")
-                        
-                        # Draw outline if examining the building
-                        if self.examine_tile is not None and (x == self.examine_tile[0]) and (y == self.examine_tile[1]):
-                            print(f"Drawing outline for {building.name} at grid ({x}, {y})")
-                            self.draw_building_outline(screen, building, render_pos, camera)
-                    else:
-                        print(f"Skipping drawing for building {building.name} at ({x}, {y}), not its top-left corner.")
-
-
+            selected_building_name = self.hud.selected_tile["name"]
+            if selected_building_name in self.hud.building_classes:
+                building_info = self.hud.building_classes[selected_building_name]
+                size_x, size_y = building_info["size"]
+                return self.can_place_building(grid_pos[0], grid_pos[1], size=(size_x, size_y))
+        return False
 
     def draw_grass_tiles(self, screen, camera):
         """Draw the grass tiles in the background."""
-        screen.blit(self.grass_tiles, (camera.scroll.x, camera.scroll.y))
+        # Scale the grass tiles surface
+        scaled_grass_tiles = pg.transform.scale(
+            self.grass_tiles,
+            (
+                int(self.grass_tiles.get_width() * camera.zoom),
+                int(self.grass_tiles.get_height() * camera.zoom)
+            )
+        )
+        # Adjust position according to zoom and scroll
+        screen.blit(
+            scaled_grass_tiles,
+            (camera.scroll.x * camera.zoom, camera.scroll.y * camera.zoom)
+        )
+
+    def draw_world_tiles(self, screen, camera):
+        for x in range(self.grid_length_x):
+            for y in range(self.grid_length_y):
+                render_pos = self.world[x][y]["render_pos"]
+                self.draw_world_tile(screen, render_pos, x, y, camera)
+
+                # Debug grid lines
+                cart_rect = self.world[x][y]["cart_rect"]
+                iso_poly = [self.cart_to_iso(c[0], c[1]) for c in cart_rect]
+                iso_poly_screen = [(int(c[0] + camera.scroll.x + self.grass_tiles.get_width() / 2),
+                                    int(c[1] + camera.scroll.y)) for c in iso_poly]
+                pg.draw.polygon(screen, (255, 0, 0), iso_poly_screen, 1)
 
     def draw_world_tile(self, screen, render_pos, x, y, camera):
-        """Draw a tile at the given render position."""
+        """Draw a single world tile at the specified position."""
         tile = self.world[x][y]["tile"]
         if tile != "":
-            screen.blit(self.tiles[tile],
-                        (render_pos[0] + self.grass_tiles.get_width() / 2 + camera.scroll.x,
-                        render_pos[1] - (self.tiles[tile].get_height() - TILE_SIZE) + camera.scroll.y))
-            
+            # Scale the tile image
+            scaled_tile = pg.transform.scale(
+                self.tiles[tile],
+                (
+                    int(self.tiles[tile].get_width() * camera.zoom),
+                    int(self.tiles[tile].get_height() * camera.zoom)
+                )
+            )
+            # Adjust position according to zoom and scroll
+            screen.blit(
+                scaled_tile,
+                (
+                    (render_pos[0] + self.grass_tiles.get_width() / 2) * camera.zoom + camera.scroll.x * camera.zoom,
+                    (render_pos[1] - (self.tiles[tile].get_height() - TILE_SIZE)) * camera.zoom + camera.scroll.y * camera.zoom
+                )
+            )
 
+    def draw_building(self, screen, building, camera):
+        """Draw the building using its isometric position."""
+        # Compute the screen position
+        building_render_pos = self.compute_screen_position(building.grid_x, building.grid_y)
 
-    def draw_building(self, screen, building, render_pos, camera):
-        """Draw the building at its render position."""
+        # Apply camera displacement and zoom
         building_render_pos = (
-            render_pos[0] + self.grass_tiles.get_width() / 2 + camera.scroll.x,
-            render_pos[1] - (building.image.get_height() - TILE_SIZE) + camera.scroll.y
+            (building_render_pos[0] + camera.deplacement.x) * camera.get_zoom(),
+            (building_render_pos[1] + camera.deplacement.y) * camera.get_zoom()
         )
-        screen.blit(building.image, building_render_pos)
 
-    def draw_building_outline(self, screen, building, render_pos, camera):
-        """Draw an outline around the building if it is being examined."""
-        mask = pg.mask.from_surface(building.image).outline()
-        mask = [(x + render_pos[0] + self.grass_tiles.get_width() / 2 + camera.scroll.x,
-                y + render_pos[1] - (building.image.get_height() - TILE_SIZE) + camera.scroll.y) for x, y in mask]
-        pg.draw.polygon(screen, (255, 255, 255), mask, 1000)
+        # Adjust for the building image size
+        building_render_pos = (
+            building_render_pos[0] - (building.image.get_width() * camera.get_zoom()),
+            building_render_pos[1] - (building.image.get_height() * camera.get_zoom())
+        )
+
+        # Double the building image size and apply zoom
+        doubled_building_image = pg.transform.scale(
+            building.image,
+            (
+                int(building.image.get_width() * 2 * camera.get_zoom()),
+                int(building.image.get_height() * 2 * camera.get_zoom())
+            )
+        )
+
+        # Draw the doubled building image at the adjusted position
+        screen.blit(doubled_building_image, building_render_pos)
 
     def update(self, camera):
         """Update the game world state, handle input for building placement and examination."""
-        mouse_pos = pg.mouse.get_pos()  # Get the current mouse position
-        mouse_action = pg.mouse.get_pressed()  # Check for mouse clicks (left, right, etc.)
+        mouse_pos = pg.mouse.get_pos()
+        mouse_action = pg.mouse.get_pressed()
 
         # Handle right-click to reset examined tile and HUD selection
         self.handle_mouse_right_click(mouse_action)
@@ -208,10 +229,12 @@ class World:
             # No building selected, handle examination of existing tiles
             self.handle_tile_examination(mouse_pos, camera, mouse_action)
 
-        # Update all entities (buildings, workers, etc.)
-        for entity in self.entities:
-            entity.update()
-
+        # Remove redundant entity updates
+        # for entity in self.entities:
+        #     entity.update()
+        
+        # Debugging: Log the update call
+        # print("World update called")
 
     def create_world(self):
         world = []
@@ -258,11 +281,19 @@ class World:
         }
 
     def create_collision_matrix(self):
-        return [[1 if not self.world[x][y]["collision"] else 0 for y in range(self.grid_length_y)] for x in range(self.grid_length_x)]
+        collision_matrix = [[1 if not self.world[x][y]["collision"] else 0 for y in range(self.grid_length_y)]
+                            for x in range(self.grid_length_x)]
+        print("Collision Matrix:")
+        for row in collision_matrix:
+            print(row)
+        return collision_matrix
 
-    def mouse_to_grid(self, x, y, scroll):
-        world_x = x - scroll.x - self.grass_tiles.get_width() / 2
-        world_y = y - scroll.y
+    def mouse_to_grid(self, x, y, camera):
+        """Convert mouse position to grid coordinates, accounting for zoom."""
+        adjusted_x = (x - camera.scroll.x * camera.zoom - (self.grass_tiles.get_width() / 2) * camera.zoom) / camera.zoom
+        adjusted_y = (y - camera.scroll.y * camera.zoom) / camera.zoom
+        world_x = adjusted_x
+        world_y = adjusted_y
         cart_y = (2 * world_y - world_x) / 2
         cart_x = cart_y + world_x
         grid_x = int(cart_x // TILE_SIZE)
@@ -279,57 +310,48 @@ class World:
             print(f"Error loading image: {e}")
         return images
 
-    def can_place_tile(self, grid_pos):
-        """Check if the tile can be placed (e.g., no collision)."""
-        if (0 <= grid_pos[0] < self.grid_length_x and
-                0 <= grid_pos[1] < self.grid_length_y):
-            tile = self.world[grid_pos[0]][grid_pos[1]]
-            return not tile["collision"]
-        return False
+    def draw(self, screen, camera):
+        """Render the world, including buildings."""
+        self.draw_grass_tiles(screen, camera)
+        self.draw_world_tiles(screen, camera)
+        self.draw_buildings(screen, camera)
 
 
+    def draw_buildings(self, screen, camera):
+        """Draw all the buildings in the world."""
+        for building in self.entities:
+            if isinstance(building, Building):
+                # Ensure the building is placed at its top-left grid position
+                if building.grid_x is not None and building.grid_y is not None:
+                    self.draw_building(screen, building, camera)
 
     def place_building(self, grid_pos):
-        """Place the selected building at the specified grid position."""
+        """Place un bâtiment à l'emplacement spécifié si possible."""
         selected_building_name = self.hud.selected_tile["name"]
-
-        if selected_building_name in self.hud.buildings:
-            building_data = self.hud.buildings[selected_building_name]
-
-            # Create the Building object
-            ent = Building(
+        if selected_building_name in self.hud.building_classes:
+            building_class = self.hud.building_classes[selected_building_name]["class"]
+            building = building_class(
                 pos=self.world[grid_pos[0]][grid_pos[1]]["render_pos"],
-                name=building_data.name,
-                image_path=building_data.image,
-                size=building_data.size
+                resource_manager=self.resource_manager
             )
+            building.grid_x = grid_pos[0]
+            building.grid_y = grid_pos[1]
 
-            # Set grid_x and grid_y for the building's top-left corner position
-            ent.grid_x = grid_pos[0]
-            ent.grid_y = grid_pos[1]
+            size_x, size_y = building.size
+            print(f"Attempting to place {building.name} at ({grid_pos[0]}, {grid_pos[1]}) with size ({size_x}, {size_y})")
 
-            # Debugging: Print the grid position and size of the building
-            print(f"Attempting to place building {building_data.name} of size {building_data.size} at {grid_pos}")
+            if self.can_place_building(grid_pos[0], grid_pos[1], size=building.size):
+                # Ajout du bâtiment aux entités
+                self.entities.append(building)
+                building.update_tiles_occupied()
 
-            # Get the size of the building
-            size_x, size_y = map(int, building_data.size.split('x'))
-
-            # Check if we can place the building
-            if self.can_place_building(grid_pos[0], grid_pos[1], building_data):
-                self.entities.append(ent)
-
-                # Mark all the tiles that the building occupies as "collision"
+                # Mettre à jour la grille et le statut de collision
                 for dx in range(size_x):
                     for dy in range(size_y):
-                        if grid_pos[0] + dx < self.grid_length_x and grid_pos[1] + dy < self.grid_length_y:
-                            self.buildings[grid_pos[0] + dx][grid_pos[1] + dy] = ent
-                            self.world[grid_pos[0] + dx][grid_pos[1] + dy]["collision"] = True
-                            print(f"Marking tile at ({grid_pos[0] + dx}, {grid_pos[1] + dy}) as occupied.")
+                        self.buildings[grid_pos[0] + dx][grid_pos[1] + dy] = building
+                        self.world[grid_pos[0] + dx][grid_pos[1] + dy]["collision"] = True
 
-                # Debugging: Confirm successful placement
-                print(f"Successfully placed {building_data.name} at ({grid_pos[0]}, {grid_pos[1]})")
-
-                # Reset the HUD after placement
                 self.hud.selected_tile = None
+                print(f"Placed {building.name} successfully!")
             else:
-                print(f"Cannot place {building_data.name} at {grid_pos}, collision detected or not enough space.")
+                print(f"Cannot place {building.name} at ({grid_pos[0]}, {grid_pos[1]}): Collision or out of bounds.")

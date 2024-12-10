@@ -1,6 +1,6 @@
 import pygame as pg
 from utils import draw_text
-from buildings import Building
+from buildings import Building, TownCentre, House, Camp, Farm, Barracks, Stable, ArcheryRange, Keep
 
 class Hud:
     def __init__(self, resource_manager, width, height):
@@ -17,8 +17,8 @@ class Hud:
 
         # Load images and define buildable buildings
         self.images = self.load_images()
-        self.buildings = self.create_buildings()
-        self.tiles = self.create_build_hud()
+        self.create_buildings()
+        self.tiles = self.create_build_hud()  # Assign the returned value to self.tiles
 
         self.selected_tile = None
         self.examined_tile = None
@@ -32,18 +32,18 @@ class Hud:
 
 
     def create_build_hud(self):
-        """Creates the build HUD icons for buildings that have images."""
+        """Creates HUD icons for buildings."""
         render_pos = [self.width * 0.84 + 10, self.height * 0.74 + 10]
         object_width = self.build_surface.get_width() // 5
         tiles = []
 
-        for image_name, image in self.images.items():
-            building = self.buildings.get(image_name)
-            if building:
+        for building_name, building_info in self.building_classes.items():
+            image = self.load_image_for_building(building_name)
+            if image:
                 image_scaled = self.scale_image(image.copy(), w=object_width)
                 rect = image_scaled.get_rect(topleft=render_pos.copy())
                 tiles.append({
-                    "name": image_name,
+                    "name": building_name,
                     "icon": image_scaled,
                     "image": image,
                     "rect": rect,
@@ -51,7 +51,7 @@ class Hud:
                 })
                 render_pos[0] += image_scaled.get_width() + 10
 
-        return tiles
+        return tiles  # Return the list of tiles
     
     def load_images(self):
         images = {}
@@ -73,17 +73,18 @@ class Hud:
     
 
     def update(self):
-        """Allow selection of buildings without checking resources."""
         mouse_pos = pg.mouse.get_pos()
         mouse_action = pg.mouse.get_pressed()
 
         if mouse_action[2]:
-            self.selected_tile = None  # Reset selection
+            print("Resetting selection")
+            self.selected_tile = None
 
         for tile in self.tiles:
             if tile["rect"].collidepoint(mouse_pos):
                 if mouse_action[0]:  # Left click
                     self.selected_tile = tile
+                    print(f"Selected building: {tile['name']} with size {tile['image'].get_width()}x{tile['image'].get_height()}")
 
     def draw(self, screen):
         """Draw the HUD and the selected building information."""
@@ -113,30 +114,47 @@ class Hud:
 
 
     def create_buildings(self):
-        """Defines all the available buildings with their properties."""
-        return {
-            "Town Centre": Building(pos=(0, 0),  name="Town Centre",
-                                    image_path="assets/graphics/town_centre.png", 
-                                    size="4x4"),
-            "House": Building(pos=(0, 0),  name="House",
-                              image_path="assets/graphics/house.png", 
-                               size="2x2"),
-            "Camp": Building(pos=(0, 0),  name="Camp",
-                             image_path="assets/graphics/camp.png", 
-                              size="2x2"),
-            "Farm": Building(pos=(0, 0),  name="Farm",
-                             image_path="assets/graphics/farm.png", 
-                              size="2x2"),
-            "Barracks": Building(pos=(0, 0),  name="Barracks",
-                                 image_path="assets/graphics/barracks.png", 
-                                  size="3x3"),
-            "Stable": Building(pos=(0, 0),  name="Stable",
-                               image_path="assets/graphics/stable.png", 
-                                size="3x3"),
-            "Archery Range": Building(pos=(0, 0),  name="Archery Range",
-                                      image_path="assets/graphics/archery_range.png", 
-                                       size="3x3"),
-            "Keep": Building(pos=(0, 0),  name="Keep",
-                             image_path="assets/graphics/keep.png", 
-                              size="1x1")
+        """Stores references to building classes and their sizes."""
+        self.building_classes = {
+            "Town Centre": {
+                "class": TownCentre,
+                "size": (4, 4)
+            },
+            "House": {
+                "class": House,
+                "size": (2, 2)
+            },
+            "Camp": {
+                "class": Camp,
+                "size": (2, 2)
+            },
+            "Farm": {
+                "class": Farm,
+                "size": (2, 2)
+            },
+            "Barracks": {
+                "class": Barracks,
+                "size": (3, 3)
+            },
+            "Stable": {
+                "class": Stable,
+                "size": (3, 3)
+            },
+            "Archery Range": {
+                "class": ArcheryRange,
+                "size": (3, 3)
+            },
+            "Keep": {
+                "class": Keep,
+                "size": (3, 3)
+            }
         }
+
+    def load_image_for_building(self, building_name):
+        try:
+            image = pg.image.load(f"assets/graphics/{building_name.lower().replace(' ', '_')}.png").convert_alpha()
+            self.images[building_name] = image
+            return image
+        except FileNotFoundError as e:
+            print(f"Error loading image for {building_name}: {e}")
+            return None

@@ -27,7 +27,9 @@ class Game:
 
         # world
         self.world = World(self.resource_manager, self.entities, self.hud, 50, 50, self.width, self.height)
-        for _ in range(10): Worker(self.world.world[25][25], self.world)
+        for _ in range(10):
+            worker = Worker(tile=self.world.world[25][25], world=self.world)
+            self.entities.append(worker)  # Add worker to entities
 
         # camera
         self.camera = Camera(self.width, self.height)
@@ -51,7 +53,9 @@ class Game:
 
     def update(self):
         self.camera.update()
-        for e in self.entities: e.update()
+        # Entities are updated in world.update(), so we can remove this line
+        # for e in self.entities:
+        #     e.update()
         self.hud.update()
         self.world.update(self.camera)
 

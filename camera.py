@@ -53,4 +53,7 @@ class Camera:
    
         self.zoom= max(0.1,min(3.0,self.zoom))
 
-        
+    def get_zoom(self):
+        return self.zoom
+
+

@@ -1,4 +1,3 @@
-
 import pygame as pg
 from game import Game
 from menu import StartMenu, GameMenu
@@ -21,14 +20,13 @@ def main():
     game = Game(screen, clock)
 
     while running:
-
-        # start menu goes here
+        # start menu
         playing = start_menu.run()
 
         while playing:
-            # game loop here
+            # game loop
             game.run()
-            # pause loop here
+            # pause loop
             playing = game_menu.run()
 
 if __name__ == "__main__":
