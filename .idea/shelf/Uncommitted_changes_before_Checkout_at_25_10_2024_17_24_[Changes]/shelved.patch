@@ -1,0 +1,119 @@
+Index: tests.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from randommap import *\r\nfrom Archer import *\r\nfrom time import *\r\n\r\nmonde=Monde(20,160)\r\nmonde.creer_monde()\r\n\r\nrandomise(monde,0)\r\n\r\nunit1=Archer(1)\r\nunit1.position=(5,5)\r\nunit2=Archer(2)\r\nunit2.position=(6,6)\r\nunit3=Archer(3)\r\nunit3.position=(5,6)\r\nmonde.units.append(unit1)\r\nmonde.units.append(unit2)\r\nmonde.units.append(unit3)\r\n\r\nmonde.afficher_console()
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/tests.py b/tests.py
+--- a/tests.py	(revision 409c92c5c2269de2ccd0566a8c9ca01b51c1e3ee)
++++ b/tests.py	(date 1729869589709)
+@@ -5,7 +5,7 @@
+ monde=Monde(20,160)
+ monde.creer_monde()
+ 
+-randomise(monde,0)
++randomise(monde,2)
+ 
+ unit1=Archer(1)
+ unit1.position=(5,5)
+@@ -17,4 +17,7 @@
+ monde.units.append(unit2)
+ monde.units.append(unit3)
+ 
+-monde.afficher_console()
+\ No newline at end of file
++monde.afficher_console()
++
++print("\33[1;34mTexte bleu clair")
++print("\33[1;91mTexte rouge clair")
+\ No newline at end of file
+Index: mmonde.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from mressources import *\r\nfrom Unity import *\r\n\r\nclass Tile:\r\n    def __init__(self,id): #id c'est le tuple (x,y)\r\n        self.id=id\r\n        self.contains=\" \" #représente une tuile sans ressources, sera remplacé par une instance de Ressource\r\n        #il suffira de changer le __repr__ de Ressource pour afficher la lettre correspondant à la ressource\r\n        self.unites=[] #list of every unit on the tile, used for the map representation\r\n\r\n    def __repr__(self):\r\n        if self.unites!=[]:\r\n            return self.unites[0].name[0].lower() #lowered first letter of the first unit on the tile\r\n        return self.contains #ressource\r\n\r\n    def affiche(self): #magic method repr wasn't doing me right, made a non-magic method    #KillAllWizards\r\n        if self.unites!=[]:\r\n            return self.unites[0].name[0].lower() #lowered first letter of the first unit on the tile\r\n        return self.contains #ressource\r\n\r\nclass Monde:\r\n    def __init__(self,x,y): #x et y dimensions du monde\r\n        self.x=x\r\n        self.y=y\r\n        self.dico={} #à chaque clé sera associé une Tuile\r\n        #les clés du dico seront de la forme (x,y)\r\n        self.units=[] #every unit on the map, a list seems better to me\r\n\r\n    def creer_monde(self): #remplit de Tuile le dico du monde\r\n        for x in range(self.x):\r\n            for y in range(self.y):\r\n                cle=(x,y)\r\n                self.dico[cle]=Tile(cle)\r\n\r\n    def afficher_console(self):\r\n        self.update_unit_presence() #updates this everytime we print the map\r\n        for x in range(self.x):\r\n            for y in range(self.y):\r\n                #print(self.dico[(x,y)].contains,end=\"\") #I am struggling with the units, this is the old line w/ only ressources\r\n                print(self.dico[(x, y)].affiche(),end=\"\")\r\n            print(\"\",end=\"\\n\")\r\n\r\n    def update_unit_presence(self):\r\n        for x in range(self.x): #resets every tile's unit list\r\n            for y in range(self.y):\r\n                self.dico[(x,y)].unites=[]\r\n        for u in self.units: #puts every unit in their tile's unit list\r\n            key=intkey(u.position)\r\n            self.dico[key].unites.append(u)\r\n\r\ndef intkey(key): #turns a float key into an int key for dict indexation\r\n    return (int(key[0]),int(key[1]))\r\n\r\n'''\r\nmonde=Monde(5,20)\r\nmonde.creer_monde()\r\n\r\nfor i in range(1,3):\r\n    for j in range(4,13):\r\n        monde.dico[(i,j)]=wood\r\n\r\nfor j in range(2,9):\r\n    monde.dico[(4,j)]=gold\r\n\r\nmonde.afficher_console()\r\n'''
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/mmonde.py b/mmonde.py
+--- a/mmonde.py	(revision 409c92c5c2269de2ccd0566a8c9ca01b51c1e3ee)
++++ b/mmonde.py	(date 1729869858073)
+@@ -13,7 +13,7 @@
+             return self.unites[0].name[0].lower() #lowered first letter of the first unit on the tile
+         return self.contains #ressource
+ 
+-    def affiche(self): #magic method repr wasn't doing me right, made a non-magic method    #KillAllWizards
++    def to_affiche(self): #magic method repr wasn't doing me right, made a non-magic method    #KillAllWizards
+         if self.unites!=[]:
+             return self.unites[0].name[0].lower() #lowered first letter of the first unit on the tile
+         return self.contains #ressource
+@@ -37,9 +37,16 @@
+         for x in range(self.x):
+             for y in range(self.y):
+                 #print(self.dico[(x,y)].contains,end="") #I am struggling with the units, this is the old line w/ only ressources
+-                print(self.dico[(x, y)].affiche(),end="")
++                print(self.dico[(x, y)].to_affiche(),end="")
++                #preparing for color >:)
++                #temp = self.dico[(x, y)].to_affiche()
++                #if temp is Unity:
++                #   if temp.team
+             print("",end="\n")
+ 
++    #print("\33[1;34mTexte bleu clair")
++    #print("\33[1;91mTexte rouge clair")
++
+     def update_unit_presence(self):
+         for x in range(self.x): #resets every tile's unit list
+             for y in range(self.y):
+Index: mressources.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>class Ressource:\r\n    def __init__(self,name,quantity):\r\n        self.name=name\r\n        self.quantity=quantity\r\n\r\n    def getQuantity(self):\r\n        return self.quantity\r\n\r\n    def getName(self):\r\n        return self.name\r\n\r\n    def __repr__(self): #affiche la première lettre du nom\r\n        return self.name[0]\r\n\r\nclass Wood(Ressource):\r\n    def __init__(self):\r\n        super().__init__(\"Wood\",100)\r\n\r\nclass Gold(Ressource):\r\n    def __init__(self):\r\n        super().__init__(\"Gold\",800)\r\n\r\nclass Food(Ressource):\r\n    def __init__(self):\r\n        super().__init__(\"Food\",300)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/mressources.py b/mressources.py
+--- a/mressources.py	(revision 409c92c5c2269de2ccd0566a8c9ca01b51c1e3ee)
++++ b/mressources.py	(date 1729868707593)
+@@ -6,6 +6,9 @@
+     def getQuantity(self):
+         return self.quantity
+ 
++    def setQuantity(self,q):
++        self.quantity=q
++
+     def getName(self):
+         return self.name
+ 
+Index: randommap.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from mmonde import *\r\nfrom random import *\r\n\r\ndef somme(t1,t2): #somme((1,1),(2,2))=(3,3)\r\n    total=()\r\n    for i in range(0,len(t1)):\r\n        total+=(t1[i]+t2[i],) #virgule permet d'avoir un tuple\r\n    return total\r\n\r\ndef placer(monde,cle,ressource,chance=50): #place un cluster d'une ressource autour d'une tuile d'un monde\r\n    #place le bloc initial\r\n    monde.dico[cle].contains=ressource\r\n    #place peut être à côté, récursif\r\n    for i in range(-1,2):\r\n        for j in range(-1,2):\r\n            if(randint(0,100)<=chance): #50% réplication -16% à chaque réplication\r\n                newkey=somme((i,j),cle)\r\n                if newkey[0]>=0 and newkey[0]<monde.x and newkey[1]>=0 and newkey[1]<monde.y:\r\n                    placer(monde,newkey,ressource,chance-16)\r\n#randomise pourrait être remplacé par une fonction de la même forme pour chaque archetype de maps (arabia,\r\ndef randomise(monde,richesse): #prend un monde, place des clusters de ressources sur un cercle, +de clusters selon la richesse\r\n    #blocs de wood\r\n    for i in range(5+richesse*2):\r\n        x=randint(0,monde.x-1)\r\n        y=randint(0,monde.y-1)\r\n        placer(monde,(x,y),Wood())\r\n        placer(monde,(monde.x-1-x,monde.y-1-y),Wood()) #symétrie centrale\r\n    #blocs de gold\r\n    for i in range(1 + richesse):\r\n        x = randint(0, monde.x - 1)\r\n        y = randint(0, monde.y - 1)\r\n        placer(monde, (x, y), Gold(),30)\r\n        placer(monde, (monde.x-1-x,monde.y-1-y), Gold(), 30)\r\n    #gold au centre\r\n    placer(monde, (monde.x // 2, monde.y // 2), Gold(), 80)\r\n\r\n'''\r\nprint(somme((1,1),(2,2)))\r\n\r\n'''\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/randommap.py b/randommap.py
+--- a/randommap.py	(revision 409c92c5c2269de2ccd0566a8c9ca01b51c1e3ee)
++++ b/randommap.py	(date 1729869453166)
+@@ -29,10 +29,18 @@
+     for i in range(1 + richesse):
+         x = randint(0, monde.x - 1)
+         y = randint(0, monde.y - 1)
+-        placer(monde, (x, y), Gold(),30)
+-        placer(monde, (monde.x-1-x,monde.y-1-y), Gold(), 30)
++        placer(monde, (x, y), Gold(),32)
++        placer(monde, (monde.x-1-x,monde.y-1-y), Gold(), 32)
+     #gold au centre
+-    placer(monde, (monde.x // 2, monde.y // 2), Gold(), 80)
++    placer(monde, (monde.x // 2, monde.y // 2), Gold(), 60)
++    #clears two spots for the town centers
++    x = randint(0, monde.x // 4) #rather far from center
++    y = randint(0, monde.y // 4)
++    for i in range(x,x+6): #clears a 6x6 since town center is 4x4
++        for j in range(y,y+6):
++            monde.dico[(i, j)].contains = "O"
++            monde.dico[(monde.x-i-1, monde.y-j-1)].contains = "O"
++
+ 
+ '''
+ print(somme((1,1),(2,2)))

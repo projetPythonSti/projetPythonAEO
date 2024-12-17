@@ -1,0 +1,47 @@
+Index: Unity.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from Position import Position\r\n\r\nclass Unity:\r\n    \r\n    def __init__(self, id, name, cost, trainningTime, health, damage, speed, range):\r\n        self.id = id\r\n        self.name = name\r\n        self.cost = cost\r\n        self.trainningTime = trainningTime\r\n        self.health = health\r\n        self.damage = damage\r\n        self.speed = speed\r\n        self.position = Position()\r\n        self.range = range\r\n    \r\n    def move(lastPosition):\r\n        pass\r\n    \r\n    def attack(attackedObjet):\r\n        pass\r\n    \r\n    def __repr__(self):\r\n        return f\"{self.id} {self.name}\"\r\n    \r\n    def __eq__(self, other):\r\n        return self.__class__ == other.__class__\r\n    
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Unity.py b/Unity.py
+--- a/Unity.py	(revision 409c92c5c2269de2ccd0566a8c9ca01b51c1e3ee)
++++ b/Unity.py	(date 1729870131453)
+@@ -1,8 +1,10 @@
+ from Position import Position
++import objc
++
+ 
+ class Unity:
+-    
+-    def __init__(self, id, name, cost, trainningTime, health, damage, speed, range):
++
++    def __init__(self, id, name, cost, trainningTime, health, damage, speed, range, team, target=objc.nil, ):
+         self.id = id
+         self.name = name
+         self.cost = cost
+@@ -12,16 +14,17 @@
+         self.speed = speed
+         self.position = Position()
+         self.range = range
+-    
++        self.target = target
++        self.team = team
++
+     def move(lastPosition):
+         pass
+-    
++
+     def attack(attackedObjet):
+         pass
+-    
++
+     def __repr__(self):
+         return f"{self.id} {self.name}"
+-    
++
+     def __eq__(self, other):
+         return self.__class__ == other.__class__
+-    
+\ No newline at end of file

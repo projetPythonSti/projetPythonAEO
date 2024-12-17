@@ -1,0 +1,65 @@
+Index: randommap.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from mmonde import *\r\nfrom random import *\r\nfrom town_center import TownCenter\r\nfrom Archer import Archer\r\nfrom Unity import *\r\n\r\ndef somme(t1,t2): #somme((1,1),(2,2))=(3,3)\r\n    total=()\r\n    for i in range(0,len(t1)):\r\n        total+=(t1[i]+t2[i],) #virgule permet d'avoir un tuple\r\n    return total\r\n\r\ndef placer(monde,cle,ressource,chance=50,reduction=16): #place un cluster d'une ressource autour d'une tuile d'un monde\r\n    #place le bloc initial\r\n    monde.dico[cle].contains=ressource\r\n    #place peut être à côté, récursif\r\n    for i in range(-1,2):\r\n        for j in range(-1,2):\r\n            if(randint(0,100)<=chance): #50% réplication -16% à chaque réplication\r\n                newkey=somme((i,j),cle)\r\n                if newkey[0]>=0 and newkey[0]<monde.x and newkey[1]>=0 and newkey[1]<monde.y:\r\n                    placer(monde,newkey,ressource,chance-reduction)\r\n#randomise pourrait être remplacé par une fonction de la même forme pour chaque archetype de maps (arabia,\r\ndef randomise(monde,richesse): #prend un monde, place des clusters de ressources sur un cercle, +de clusters selon la richesse\r\n    #blocs de wood\r\n    for i in range(5+richesse*2):\r\n        x=randint(0,monde.x-1)\r\n        y=randint(0,monde.y-1)\r\n        placer(monde,(x,y),Wood())\r\n        placer(monde,(monde.x-1-x,monde.y-1-y),Wood()) #symétrie centrale\r\n    #blocs de gold\r\n    for i in range(1 + richesse):\r\n        x = randint(0, monde.x - 1)\r\n        y = randint(0, monde.y - 1)\r\n        placer(monde, (x, y), Gold(),30)\r\n        placer(monde, (monde.x-1-x,monde.y-1-y), Gold(), 30, 9)\r\n    #gold au centre\r\n    placer(monde, (monde.x // 2, monde.y // 2), Gold(), 80,40)\r\n    #clear some space for town centers, far from center\r\n    x = randint(1, (monde.x - 1) // 3)\r\n    y = randint(1, (monde.y - 1) // 3)\r\n    for i in range(-1,5):\r\n        for j in range(-1,5):\r\n            monde.dico[x+i,y+j].contains=\" \"\r\n            monde.dico[monde.x-x-i-1, monde.y-y-j-1].contains = \" \"\r\n    #towns centers not adjacent to borders\r\n    monde.spawn_building(TownCenter,\"blue\",x,y)\r\n    monde.spawn_building(TownCenter, \"red\", monde.x-x-4, monde.y-y-4)\r\n    #villagers adjacent to town centers\r\n    monde.spawn_unit(Archer,\"blue\",x,y+4)\r\n    monde.spawn_unit(Archer, \"blue\", x + 1, y+4)\r\n    monde.spawn_unit(Archer, \"blue\", x + 2, y+4)\r\n    monde.spawn_unit(Archer, \"red\", monde.x-x-4, monde.y-y-5)\r\n    monde.spawn_unit(Archer, \"red\", monde.x-x-3, monde.y-y-5)\r\n    monde.spawn_unit(Archer, \"red\", monde.x-x-2, monde.y-y-5)\r\n\r\n'''\r\nprint(somme((1,1),(2,2)))\r\n\r\n'''\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/randommap.py b/randommap.py
+--- a/randommap.py	(revision f9e38007b4b5ffc796433701ca4b38c2f6a68aba)
++++ b/randommap.py	(date 1733835089113)
+@@ -3,6 +3,7 @@
+ from town_center import TownCenter
+ from Archer import Archer
+ from Unity import *
++from Villager import Villager
+ 
+ def somme(t1,t2): #somme((1,1),(2,2))=(3,3)
+     total=()
+@@ -47,7 +48,7 @@
+     monde.spawn_building(TownCenter,"blue",x,y)
+     monde.spawn_building(TownCenter, "red", monde.x-x-4, monde.y-y-4)
+     #villagers adjacent to town centers
+-    monde.spawn_unit(Archer,"blue",x,y+4)
++    monde.spawn_unit(Villager,"blue",x,y+4)
+     monde.spawn_unit(Archer, "blue", x + 1, y+4)
+     monde.spawn_unit(Archer, "blue", x + 2, y+4)
+     monde.spawn_unit(Archer, "red", monde.x-x-4, monde.y-y-5)
+Index: Villager.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from gc import collect\r\n\r\nfrom Unity import Unity\r\nimport mressources\r\nfrom pathfinding import Pathfinding\r\nfrom RessourcesManager import RessourcesManager\r\n\r\nclass Villager(Unity):\r\n    villagerPopulation = 0\r\n    def __init__(self,id, team):\r\n        super().__init__(id,\"V\", {\"food\" : 50}, 25, 40, 4, 0.8, 1, team=team)\r\n        self.carryMax = 25\r\n        # self.buildingSpeed = buildingSpeed,\r\n        self.resourcesDict = {\r\n            \"food\" : 0,\r\n            \"wood\" : 0,\r\n            \"gold\" : 0,\r\n        }\r\n\r\n    # Function which collect a resource and add it to the resourcesDictionnary of the villager, at the end if carryMax is\r\n    # is reached, move to the nearest drop point\r\n    def collect(self , resource, route:Pathfinding):\r\n        allCollected = sum(self.resourcesDict.values())\r\n        collectedQuantity = resource.getQuantity()\r\n        print(\"allCollected = \",allCollected)\r\n        if (allCollected + collectedQuantity) > self.carryMax :\r\n            if allCollected > self.carryMax:\r\n                print(\"Trop de ressources\")\r\n                self.move(route.getGoal(), route)\r\n                self.dropRessources()\r\n                # return resource\r\n            else :\r\n                if resource.__class__ == mressources.Food:\r\n                    print(\"FOOD resources\")\r\n                    self.resourcesDict[\"food\"] += collectedQuantity-self.carryMax-allCollected\r\n                elif resource.__class__ == mressources.Wood:\r\n                    print(\"WOOD Resource\")\r\n                    self.resourcesDict[\"wood\"] += resource.getQuantity()-self.carryMax-allCollected\r\n                elif resource.__class__ == mressources.Gold:\r\n                    print(\"GOLD Resource\")\r\n                    self.resourcesDict[\"gold\"] += resource.getQuantity()-self.carryMax-allCollected\r\n                resource.setQuantity(collectedQuantity - (collectedQuantity - self.carryMax - allCollected))\r\n        else:\r\n            if resource.__class__ == mressources.Food:\r\n                print(\"FOOD resources\")\r\n                self.resourcesDict[\"food\"] += resource.getQuantity()\r\n            elif resource.__class__ == mressources.Wood:\r\n                print(\"WOOD Resource\")\r\n                self.resourcesDict[\"wood\"] += resource.getQuantity()\r\n            elif resource.__class__ == mressources.Gold:\r\n                print(\"GOLD Resource\")\r\n                self.resourcesDict[\"gold\"] += resource.getQuantity()\r\n            resource.setQuantity(0)\r\n        if allCollected+(collectedQuantity - resource.getQuantity()) > self.carryMax:\r\n            pass\r\n            #self.move(neareastDP)\r\n    \r\n        \"\"\"\r\n            droping ressources in the village drop point\r\n        \"\"\"\r\n    def dropRessources(self, ressourcesManager:RessourcesManager):\r\n        ressourcesManager.setRessources(self.resourcesDict)\r\n        for key in self.resourcesDict:\r\n            self.resourcesDict[key] = 0\r\n    \r\n    def build(self):\r\n        return 0\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Villager.py b/Villager.py
+--- a/Villager.py	(revision f9e38007b4b5ffc796433701ca4b38c2f6a68aba)
++++ b/Villager.py	(date 1733835061254)
+@@ -3,7 +3,7 @@
+ from Unity import Unity
+ import mressources
+ from pathfinding import Pathfinding
+-from RessourcesManager import RessourcesManager
++#from RessourcesManager import RessourcesManager
+ 
+ class Villager(Unity):
+     villagerPopulation = 0
+Index: tests.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from time import perf_counter\r\n\r\nfrom Archer import Archer\r\nfrom pathfinding import Pathfinding\r\nfrom randommap import *\r\nfrom Unity import *\r\nfrom town_center import TownCenter\r\n\r\nimport time\r\n\r\nprint(\"\\n\\n\\n\\n\\n\")\r\n\r\n#creates a 30 by 160 world composed of 30x160 tiles\r\nmonde=Monde(30,160)\r\nmonde.creer_monde()\r\n\r\n#puts resources and town centers and villagers on the map\r\n#two players symmetrical map\r\nrandomise(monde,0)\r\n\r\nmonde.update_unit_presence()\r\n\r\nmonde.update_build_presence()\r\n\r\nmonde.afficher_console()\r\n\r\nprint(\"\\n\\n\\n\\n\\n\")\r\n\r\npath = Pathfinding(monde.convertMapToGrid(),(0,0),(monde.x-1,monde.y-1))\r\nstart = time.time()\r\nroute = path.astar()\r\nend = time.time()\r\nmonde.afficher_route_console(route)\r\nend2 = time.time()\r\nprint(f\"Astar took {end-start} seconds\")\r\nprint(f\"Affichage took {end2-end} seconds\")\r\nprint(route[::-1])\r\n\r\n''' me trying to find nicer path for units\r\nfor i in len(route)-2: #search for turns\r\n    if (route[i][0]!=route[i+1][0] and route[i+1][1]!=route[i+2][1]) or \\\r\n        (route[i][1]!=route[i+1][1] and route[i+1][0]!=route[i+2][0]):\r\n'''
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/tests.py b/tests.py
+--- a/tests.py	(revision f9e38007b4b5ffc796433701ca4b38c2f6a68aba)
++++ b/tests.py	(date 1733834269450)
+@@ -26,7 +26,7 @@
+ 
+ print("\n\n\n\n\n")
+ 
+-path = Pathfinding(monde.convertMapToGrid(),(0,0),(monde.x-1,monde.y-1))
++path = Pathfinding(monde.convertMapToGrid(),(0,0),(2,2))
+ start = time.time()
+ route = path.astar()
+ end = time.time()
