@@ -3,18 +3,18 @@ from Position import Position
 from Ressource import Ressource
 
 class Building:
-    def __init__(self, name, cost, time_building, health, longueur, spawn, dropPoint, flag, position):
+    def __init__(self, name, cost, time_building, health, longueur, spawn=False, dropPoint=False, flag=False, position=None, population=0):
         self.name = name
-        self.cost = cost
+        self.cost = cost  # Dictionnaire {"Wood": 100, "Gold": 200, ...}
         self.time_building = time_building
         self.health = health
         self.longueur = longueur
         self.is_built = False
         self.spawn = spawn
-        self.dropPoint = False
         self.dropPoint = dropPoint
         self.flag = flag
-        self.position = position
+        self.position = position if position else Position(0, 0)
+        self.population = population  # Ajout de population
 
     def can_afford(self, resources: list):
         for res_name, amount_needed in self.cost.items():
@@ -56,8 +56,3 @@ class Building:
         self.position.setX(x)
         self.position.setY(y)
         print(f"Position de {self.name} définie à ({x}, {y}).")
-
-
-class Population:
-    def __init__(self, population):
-        self.population = population
