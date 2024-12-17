@@ -1,11 +1,11 @@
 import time
 from Position import Position
-from Ressource import Wood, Gold, Food  # Import des ressources spécifiques
+from Ressource import Ressource
 
 class Building:
     def __init__(self, name, cost, time_building, health, longueur, spawn, dropPoint, flag, position):
         self.name = name
-        self.cost = cost  # Dictionnaire {"Wood": 100, "Gold": 200, ...}
+        self.cost = cost
         self.time_building = time_building
         self.health = health
         self.longueur = longueur
