@@ -9,7 +9,8 @@ import time as t
 import datetime as dt
 from Archer import *
 import asyncio
-from pynput import keyboard
+from pynput import keyboard #Enlever dans le futur
+from blessed import Terminal #A implementer
 
 ################################
 ## Partie input
