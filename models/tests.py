@@ -1,9 +1,11 @@
-from pathfinding import astar
 from randommap import *
-from Archer import *
+from model import Model
+from unity.Archer import Archer
 from time import *
 import numpy as np
-monde=World(100, 100)
+
+village1 = Model()
+monde = World(100, 100)
 monde.creer_monde()
 
 randomise(monde,10)

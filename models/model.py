@@ -10,6 +10,7 @@ from buildings.farm import Farm
 from buildings.house import House
 from buildings.keep import Keep
 from buildings.stable import Stable
+from ressources.ressources import Ressource, Gold, Wood, Food
 # from ressources.mressources import *
 
 #faut-il l'importer et le faire hériter pour pouvoir utiliser fire_change ?
@@ -19,10 +20,10 @@ from collections import defaultdict
 
 
 
-class Model():
+class Model:
     
     def __init__(self, name):
-        # Dictionary of human and materiel ressources of the village
+        # Dictionary of human, materiel and ressources of the village
         self.community = defaultdict(dict)
         self.resources = defaultdict(int)
         self.name = name
@@ -66,12 +67,23 @@ class Model():
         for i in range(stables):
             self.community["s"][str(i)] = Stable(team=self)
 
+        for i in range(wood):
+            self.community["wood"][str(i)] = Wood(team=self)
+        
+        for i in range(stables):
+            self.community["food"][str(i)] = Food(team=self)
+        
+        for i in range(stables):
+            self.community["gold"][str(i)] = Gold(team=self)
+        
         self.resources["wood"] += wood
-        self.resources["food"] += food 
         self.resources["gold"] += gold
+        self.resources["food"] += food
         
         
-        
+    #return a tuple that contains à dict of all village content and the length of it
+    def population(self):
+        return self.community
     """
         unit: Unity
         cost_dict : dict

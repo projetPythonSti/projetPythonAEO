@@ -3,8 +3,8 @@ from Position import Position
 class Unity:
     population = 0
     
-    def __init__(self, id, name, cost, trainningTime, health, damage, speed, visibility, team, target = None, ):
-        self.id = id
+    def __init__(self, uid, name, cost, trainningTime, health, damage, speed, visibility, team, target = None, ):
+        self.uid = uid
         self.name = name
         self.cost = cost
         self.trainningTime = trainningTime
@@ -19,6 +19,8 @@ class Unity:
     
     def move_unit(self, destination:Position):
         self.position = destination
+    
+    
     
     def attack(attackedObjet):
         pass
