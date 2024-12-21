@@ -1,0 +1,2 @@
+class CLIView():
+    pass

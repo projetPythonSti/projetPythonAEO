@@ -1,8 +1,8 @@
-from Position import Position
+from models.Position import Position
 
 
 class Ressource:
-    def __init__(self,name,quantity):
+    def __init__(self, name, quantity):
         self.name=name
         self.quantity=quantity
         self._position = Position()
