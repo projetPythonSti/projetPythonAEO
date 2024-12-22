@@ -2,13 +2,6 @@
 class Tile:
     def __init__(self): #id c'est le tuple (x,y)
         self.contains = None #tile with nothing inside
-        #il suffira de changer le __repr__ de Ressource pour afficher la lettre correspondant à la ressource
-        self.unites=[]
-
-    # def __repr__(self):
-    #     if self.unites!=[]:
-    #         return self.unites[0].name[0].lower() #lowered first letter of the first unit on the tile
-    #     return self.contains #ressource
 
     def set_contains(self, contains):
         self.contains = contains

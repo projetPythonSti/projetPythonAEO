@@ -1,65 +1,53 @@
+# This file contains the Villager class which is a subclass of Unity
 from unity.Unity import Unity
-# import mressources
-from Pathfinding import Pathfinding
 
 class Villager(Unity):
     def __init__(self, team):
         community = team.get_community().get('v')
         uid = len(community) if community else 0 # 0 if 
-        super().__init__(uid,"V", {"food" : 50}, 25, 40, 4, 0.8, 1, team=team)
-        self.carryMax = 25
+        super().__init__(uid,"V", {"fo" : 50}, 25, 40, 4, 0.8, 1, team=team)
+        self.carry_max = 25
         # self.buildingSpeed = buildingSpeed,
-        self.resourcesDict = {
-            "food" : 0,
-            "wood" : 0,
-            "gold" : 0,
+        self.ressources_dict = {
+            "fo" : 0,
+            "w" : 0,
+            "g" : 0,
         }
-
-    # Function which collect a resource and add it to the resourcesDictionnary of the villager, at the end if carryMax is
-    # is reached, move to the nearest drop point
-    def collect(self ,resource):
-        allCollected = sum(self.resourcesDict.values())
-        collectedQuantity = resource.getQuantity()
-        print("allCollected = ",allCollected)
-        if (allCollected + collectedQuantity) > self.carryMax :
-            if allCollected > self.carryMax:
-                print("Trop de ressources")
-                
-                # return resource
-            else :
-                if resource.__class__ == mressources.Food:
-                    print("FOOD resources")
-                    self.resourcesDict["food"] += collectedQuantity-self.carryMax-allCollected
-                elif resource.__class__ == mressources.Wood:
-                    print("WOOD Resource")
-                    self.resourcesDict["wood"] += resource.getQuantity()-self.carryMax-allCollected
-                elif resource.__class__ == mressources.Gold:
-                    print("GOLD Resource")
-                    self.resourcesDict["gold"] += resource.getQuantity()-self.carryMax-allCollected
-                resource.setQuantity(collectedQuantity - (collectedQuantity - self.carryMax - allCollected))
-        else:
-            if resource.__class__ == mressources.Food:
-                print("FOOD resources")
-                self.resourcesDict["food"] += resource.getQuantity()
-            elif resource.__class__ == mressources.Wood:
-                print("WOOD Resource")
-                self.resourcesDict["wood"] += resource.getQuantity()
-            elif resource.__class__ == mressources.Gold:
-                print("GOLD Resource")
-                self.resourcesDict["gold"] += resource.getQuantity()
-            resource.setQuantity(0)
-        if allCollected+(collectedQuantity - resource.getQuantity()) > self.carryMax:
-            pass
-            #self.move(neareastDP)
+        
     
-        """
-            droping ressources in the village drop point
-        """
-    def dropRessources(self, team):
-        team.add_ressources()
-        ressourcesManager.setRessources(self.resourcesDict)
-        for key in self.resourcesDict:
-            self.resourcesDict[key] = 0
+    """
+        droping ressources in the village drop point
+    """
+    def collect(self, ressource):
+        all_collected = sum(self.ressources_dict.values())
+        # quantity_to_collect = ressource.get_quantity()
+        rest = self.carry_max - all_collected
+        quantity_to_collect = rest if rest < ressource.get_quantity() else ressource.get_quantity()
+        
+        if all_collected >= self.carry_max:
+            self.drop_ressources()
+        else:
+            ressource.extract(quantity_to_collect)
+            self.ressources_dict[ressource.get_name().lower()] += quantity_to_collect
+            if all_collected + quantity_to_collect == self.carry_max: # if the villager is full
+                self.drop_ressources()
+            else:
+                #he has to do other things
+                pass
+        if ressource.get_quantity() == 0:
+            ressource.remove()
+        else:
+            #he has to come back to the ressource to finish collecting
+            # self.move(ressource.get_position())
+            self.collect(ressource)
+    
+    def drop_ressources(self):
+        for key, quantity in self.ressources_dict.items():
+            self.team.add_ressources(key, quantity)
+            self.ressources_dict[key] = 0
+    """
+        droping ressources in the village drop point
+    """
     
     def build(self):
         return 0
