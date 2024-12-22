@@ -1,10 +1,18 @@
 # This file contains the Villager class which is a subclass of Unity
-from unity.Unity import Unity
+# This file contains the Villager class which is a subclass of Unity
+from models.unity.Unity import Unity
+
 
 class Villager(Unity):
+
+    """
+        22/12/2024@tahakhetib : J'ai apporté des modifications à ce fichier sur ce que @amadou_yaya_diallo a écrit
+            - Changé la définition de l'UID du villageois -> Passage à une string basé sur le numéro d'équipe + la taille de la communauté.
+    """
     def __init__(self, team):
-        community = team.get_community().get('v')
-        uid = len(community) if community else 0 # 0 if 
+        community = team.get_pplCount()
+        villageName = team.get_name()
+        uid = f"eq{villageName}p{community}" # 0 if
         super().__init__(uid,"V", {"fo" : 50}, 25, 40, 4, 0.8, 1, team=team)
         self.carry_max = 25
         # self.buildingSpeed = buildingSpeed,
@@ -14,7 +22,8 @@ class Villager(Unity):
             "g" : 0,
         }
         
-    
+    def __repr__(self):
+        return f"Villageois ID  : {self.uid} - Position {self.position}"
     """
         droping ressources in the village drop point
     """

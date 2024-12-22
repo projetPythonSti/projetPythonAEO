@@ -1,25 +1,40 @@
-from Horseman import Horseman
-from Archer import Archer
-from Villager import Villager
-from mressources import Food
-from Swordsman import Swordsman
+from models.Position import Position
+from models.maps.Tile import Tile
+from models.model import Model
+import models.unity
+from models.World import World
+from models.gameManager import GameManager
+from models.unity.Villager import Villager
+
 
 if __name__ == "__main__":
-    horseman = Horseman("h1",1);
-    archer = Archer("a1",1);
-
-    food = Food()
-
-    horseman1 = Horseman("h2",2)
-    archer1 = Archer("a2",2)
-    villager1 = Villager(id = "v1", buildingSpeed=20, carry=0, team=1)
-    print(horseman, archer)
-    print(horseman == Archer)
-    print("Ressources avant")
-    print(villager1.resourcesDict)
-    villager1.collect(food, 2)
-    print("Ressources Apres")
-    print(villager1.resourcesDict)
-
-    tupleE = (2, 1)
-    print(tupleE[1])
+    monde = World(100, 100)
+    village1 = Model("1", monde)
+    village2 = Model("2", monde)
+    village1.initialize_villages(1, 2, 3, gold=200, wood=100, food=300)
+    village2.initialize_villages(4, 5, 6, gold=2, wood=1, food=3)
+    v = Villager(village1)
+    village1.add_unit(v)
+    v.ressources_dict["w"] = 3
+    v.ressources_dict["g"] = 2
+    monde.fill_world()
+    monde.fill_ressources(10)
+    print(village1.population())
+    print(monde.get_ressources())
+    print("Before : ", village1.get_ressources())
+    fo = monde.get_ressources()["fo"]["0"]
+    v.drop_ressources()
+    v.collect(fo)
+    print("After : ", village1.get_ressources())
+    print(v.ressources_dict)
+    community = village1.get_community()
+    # print(village2.population())
+    print(monde.get_ressources())
+    print(v)
+    print(community)
+    gm = GameManager(speed=1, world=monde)
+    gm.addUnitToMoveDict(v, Position(40, 40))
+    gm.addUnitToMoveDict()
+    print(gm.unitToMove)
+    # print(monde.filled_tiles, len(monde.filled_tiles))
+    # monde.show_world()

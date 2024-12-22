@@ -1,5 +1,5 @@
 # this class is the parent class of all the unities in the game
-from Position import Position
+from models.Position import Position
 import random as rd
 
 class Unity:

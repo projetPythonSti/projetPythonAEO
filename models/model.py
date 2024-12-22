@@ -1,16 +1,17 @@
-from unity.Archer import Archer
-from unity.Horseman import Horseman
-from unity.Swordsman import Swordsman
-from unity.Villager import Villager
-from buildings.town_center import TownCenter
-from buildings.archery_range import ArcheryRange
-from buildings.barracks import Barracks
-from buildings.camp import Camp
-from buildings.farm import Farm
-from buildings.house import House
-from buildings.keep import Keep
-from buildings.stable import Stable
-from ressources.ressources import Ressource, Gold, Wood, Food
+
+from models.unity.Archer import  Archer
+from models.unity.Horseman import Horseman
+from models.unity.Swordsman import Swordsman
+from models.unity.Villager import Villager
+from models.buildings.town_center import TownCenter
+from models.buildings.archery_range import ArcheryRange
+from models.buildings.barracks import Barracks
+from models.buildings.camp import Camp
+from models.buildings.farm import Farm
+from models.buildings.house import House
+from models.buildings.keep import Keep
+from models.buildings.stable import Stable
+from models.ressources.ressources import Ressource, Gold, Wood, Food
 # from ressources.mressources import *
 
 #faut-il l'importer et le faire hériter pour pouvoir utiliser fire_change ?
@@ -21,11 +22,19 @@ from collections import defaultdict
 
 
 class Model:
-    
+    """
+            22/12/2024@tahakhetib - J'ai apporté des modifications à ce fichier sur ce que @amadou_yaya_diallo a écrit
+            - Ajouté une fonction get_name afin d'obtenir le nom d'équipe (utilisé dans Villager.py).
+            - Changé la manière dont les unités sont ajoutées dans initialize_villages() pour faire en sorte que les nouveaux ID soient utilisés
+            - Ajouté un compteur de population pour directement avoir accès au nombre de personnes faisant partie du village (avec le getter associé)
+
+    """
     def __init__(self, name, world = None):
+
         # Dictionary of human, materiel and ressources of the village
         self.community = defaultdict(dict)
         self.ressources = defaultdict(int)
+        self.peopleCount = 0
         self.name = name
         self.world = world
         self.world.add_village(self)
@@ -34,21 +43,29 @@ class Model:
                             stables = 0, keeps = 0, houses = 0, farms = 0, camps = 0, barracks = 0, 
                             archery_ranger = 0, wood = 0, food = 0, gold = 0):
         for i in range(archers):
-            self.community["a"][str(i)] = Archer(team=self)
+            self.peopleCount += 1
+            a = Archer(team=self)
+            self.community["a"][a.uid] = a
 
         for i in range(horsmen):
-            self.community["hm"][str(i)] = Horseman(team = self)
+            self.peopleCount += 1
+            h = Horseman(team=self)
+            self.community["hm"][h.uid] = h
    
         for i in range(villages):
-            self.community["v"][str(i)] = Villager(team=self)
+            self.peopleCount += 1
+            v = Villager(team=self)
+            self.community["v"][v.uid] = v
         
         for i in range(swordsmen):
-            self.community["sm"][str(i)] = Swordsman(team=self)
+            self.peopleCount += 1
+            s = Swordsman(team=self)
+            self.community["sm"][s.uid] = s
         
         for i in range(town_center):
             self.community["t"][str(i)] = TownCenter(team=self)
         
-        for i in range(archery_ranger): 
+        for i in range(archery_ranger):
             self.community["ar"][str(i)] = ArcheryRange(team=self)
 
         for i in range(barracks):
@@ -154,7 +171,10 @@ class Model:
     
     def get_community(self):
         return self.community
-    
+    def get_name(self):
+        return self.name
+    def get_pplCount(self):
+        return self.peopleCount
     def get_ressources(self):
         return self.ressources
 

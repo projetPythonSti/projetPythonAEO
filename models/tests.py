@@ -1,6 +1,6 @@
 from randommap import *
-from model import Model
-from unity.Archer import Archer
+from models.model import Model
+from models.unity.Archer import Archer
 from time import *
 import numpy as np
 

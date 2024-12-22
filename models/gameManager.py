@@ -1,10 +1,15 @@
 from collections import defaultdict
+from datetime import datetime
 
-from controllers.Game_controller import Game_controller
+from pygame.examples.music_drop_fade import starting_pos
+
 from models.Pathfinding import Pathfinding
+from models.World import World
+from models.unity.Unity import Unity
 
 
 class GameManager:
+        tick = datetime.today()
         unitToMove = defaultdict()
         '''
             Syntaxe du dictionnaire
@@ -18,23 +23,29 @@ class GameManager:
             } 
                     
         '''
-        def __init__(self, speed, controller: Game_controller ):
+        def __init__(self, speed, world: World ):
             self.gameSpeed = speed
-            self.controller = controller
-
+            self.world = world
 
         def moveUnit(self):
             pass
 
         def checkUnitsToMove(self):
             for k in self.unitToMove:
-                    self.controller.model
-            pass
+                print(k.key)
 
-        def addUnitToMoveDict(self):
-            pass
+        def addUnitToMoveDict(self, unit : Unity, destination):
+            grid = self.world.convertMapToGrid()
+            pathFinding  = Pathfinding(mapGrid=grid, statingPoint= (unit.position.getX(), unit.position.getY()), goal=(40,40))
+            path = pathFinding.astar()
+            if path.__class__ == bool:
+                print("Found no short path")
+            path = path + [pathFinding.startingPoint]
+            path = path[::-1]
+            self.unitToMove |= {unit.uid : path}
 
 
 
-
+if __name__ == "__main__":
+    pass
 
