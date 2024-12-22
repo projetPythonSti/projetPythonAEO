@@ -1,6 +1,10 @@
 from views.Cli import *
 from models.model import Model
 
+"""
+le controleur doit gerer l'interaction des utilisateur du jeu avec le jeu
+"""
+
 class Game_controller:
     def __init__(self, model:Model, view):
         self.model = model  

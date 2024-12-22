@@ -1,31 +1,11 @@
-from ressources.mressources import *
-from unity.Unity import *
+from models.maps.Tile import Tile
+from models.ressources.ressources import *
+from models.unity.Unity import *
 import numpy as np
 
 from utils.setup import TILE_SIZE
 
 
-class Tile:
-    def __init__(self,id): #id c'est le tuple (x,y)
-        self.id=id
-        self.contains= " " #représente une tuile sans ressources, sera remplacé par une instance de Ressource
-        #il suffira de changer le __repr__ de Ressource pour afficher la lettre correspondant à la ressource
-        self.unites=[]
-
-    def __repr__(self):
-        if self.unites!=[]:
-            return self.unites[0].name[0].lower() #lowered first letter of the first unit on the tile
-        return self.contains #ressource
-
-    def affiche(self): #magic method repr wasn't doing me right, made a non-magic method    #KillAllWizards
-        if self.unites!=[]:
-            return self.unites[0].name[0].lower() #lowered first letter of the first unit on the tile
-        return self.contains #ressource
-
-    def cart_to_iso(self, x, y):
-        iso_x = x - y
-        iso_y = (x + y) / 2
-        return iso_x, iso_y
 
 class Tile_gui (Tile) :
     def __init__(self, id):
@@ -85,7 +65,6 @@ class World:
         for i, (key, value) in enumerate(self.dico.items()):
             binary_array[key[0], key[1]] = 0 if value.contains == " " else 1
         return binary_array
-
 
 def intkey(key): #turns a float key into an int key for dict indexation
     return (int(key[0]),int(key[1]))
