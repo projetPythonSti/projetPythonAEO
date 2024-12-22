@@ -16,28 +16,6 @@ from blessed import Terminal #A implementer
 ## Partie input
 ################################
 
-pause = False
-
-def on_press(key):
-    try:
-        print('alphanumeric key {0} pressed'.format(key.char))
-
-    except AttributeError:
-        print('special key {0} pressed'.format(key))
-
-def on_release(key):
-    global pause
-
-    print('{0} released'.format(key))
-
-    if key == keyboard.Key.esc:
-        # Stop listener
-        pause = True
-        return False
-
-    if key == keyboard.KeyCode('q'):
-        pause = True
-        return False
 
 
 #########################################
@@ -55,12 +33,45 @@ class Game_term :
         self.game_duration = 0
 
     def run_term (self):
+        speed = 10
         self.playing = True
-        listener = keyboard.Listener(on_press=on_press, on_release=on_release)
-        listener.start()
-        while self.playing and (not pause):
 
-            self.clock.tick(0.5)
+        while self.playing :
+            term = Terminal()
+            print("press 'q' to quit.")
+            with term.cbreak():
+                val = ''
+                while val.lower() != 'q':
+                    val = term.inkey(timeout=0.00001)
+                    if not val:
+                        self.Turn(speed)
+                    elif val.lower() == '+':
+                        if speed < 20:
+                            speed += 1
+                        print(speed)
+                    elif val.lower() == '-':
+                        if speed > 5:
+                            speed -= 1
+                        print(speed)
+                    elif val.lower() == 'p':
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        print("Nous sommes en pause : ")
+                        print("Appuyez sur z pour quitter")
+                        print("Appuyez sur r pour reprendre")
+                        with term.cbreak():
+                            val2 = ''
+                            while val2.lower() != 'r':
+                                val2 = term.inkey()
+                                if val2.lower() == 'z' :
+                                    quit()
+                    elif val.lower() == 'q':
+                        quit()
+
+                print(f'bye!{term.normal}')
+
+
+
+            self.clock.tick(0.5 * speed)
             now = datetime.now()
             delta = now - self.ltick
             ig_delta = delta * self.speed
@@ -72,10 +83,22 @@ class Game_term :
             #self.events()
             #self.update()
             self.world.update_unit_presence()
-
-
-
             self.draw_term()
+
+    def Turn (self,speed) :
+        self.clock.tick(0.5 * (speed/10))
+        now = datetime.now()
+        delta = now - self.ltick
+        ig_delta = delta * self.speed
+        self.game_duration = self.game_duration + ig_delta.seconds
+        self.ltick = now
+
+        # t.sleep(2)
+        self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
+        # self.events()
+        # self.update()
+        self.world.update_unit_presence()
+        self.draw_term()
 
     def Horloge(self):
         pass
