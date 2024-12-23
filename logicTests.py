@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from models.Position import Position
 from models.maps.Tile import Tile
 from models.model import Model
@@ -29,12 +31,23 @@ if __name__ == "__main__":
     print(v.ressources_dict)
     community = village1.get_community()
     # print(village2.population())
-    print(monde.get_ressources())
-    print(v)
-    print(community)
+    #print(monde.get_ressources())
+    #print(v)
+    #print(community)
     gm = GameManager(speed=1, world=monde)
-    gm.addUnitToMoveDict(v, Position(40, 40))
-    gm.addUnitToMoveDict()
-    print(gm.unitToMove)
+    print("Launched GameManager")
+    #gm.addUnitToMoveDict(v, Position(40, 40))
+    print("Added unit to move dict")
+    gm.addUnitToMoveDict(community["sm"]["eq1p4"], Position(10,20))
+    print("Added 2nd unit to move dict")
+    #print(gm.checkUnitsToMove())
+    #Boucle pour tester le game manager
+    n = 0
+
+    while n<500:
+        gm.checkUnitsToMove()
+        tick = datetime.now()
+        n += 1
+
     # print(monde.filled_tiles, len(monde.filled_tiles))
     # monde.show_world()
