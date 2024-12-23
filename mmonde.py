@@ -92,7 +92,7 @@ class World:
     def update_unit_presence(self):
         for x in range(self.x): #resets every tile's unit list
             for y in range(self.y):
-                self.dico[(x,y)].unites=[]
+                self.dico[(x, y)].unites = []
         for u in self.units: #puts every unit in their tile's unit list
             key=floatkey_to_intkey(position_to_tuple(u.position))
             #key=intkey(u.position) #Attention je ne sais pas lequel mettre
