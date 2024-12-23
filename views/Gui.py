@@ -1,0 +1,2 @@
+class GUIView:
+    pass
