@@ -8,7 +8,7 @@ class Pathfinding:
         self.startingPoint = statingPoint
         self.goal = goal
 
-    def heuristic(self, a, b):
+    def heuristic(self,a, b):
         return np.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)
 
 

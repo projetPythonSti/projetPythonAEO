@@ -1,4 +1,4 @@
-from buildings import Building
+from models.buildings.buildings import Building
 
 class House(Building):
     def __init__(self):
@@ -7,6 +7,6 @@ class House(Building):
             cost={"wood": 25},
             time_building=25,
             health=200,
-            length=2,  # 2x2
+            surface=4,  # 2x2
             population=5
         )

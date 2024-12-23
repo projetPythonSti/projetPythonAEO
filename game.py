@@ -4,6 +4,7 @@ import pygame as pg
 import sys
 
 import mressources
+import models.ressources.ressources
 from mmonde import World
 from setup import TILE_SIZE
 from mressources import Ressource
@@ -69,7 +70,7 @@ class Game :
 
                 #pg.draw.rect(self.screen, (0,0,255),rect,1)
 
-        pg.display.flip()
+        #pg.display.flip()
 
     def draw_term (self):
         self.world.afficher_console()
