@@ -103,13 +103,13 @@ class World:
 
     #         print("",end="\n")
 
-    def update_unit_presence(self):
-         for x in range(self.width): #resets every tile's unit list
-             for y in range(self.height):
-                 self.tiles_dico[(x,y)].unites=[]
-         for u in self.units: #puts every unit in their tile's unit list
-             key= self.intkey(u.position)
-             self.dico[key].unites.append(u)
+    #def update_unit_presence(self):
+    #     for x in range(self.width): #resets every tile's unit list
+    #         for y in range(self.height):
+    #             self.tiles_dico[(x,y)].unites=[]
+    #     for u in self.units: #puts every unit in their tile's unit list
+    #         key= self.intkey(u.position)
+    #         self.dico[key].unites.append(u)
 
     def convertMapToGrid(self):
         array_shape = (self.width+1, self.height+1)
@@ -118,8 +118,8 @@ class World:
             binary_array[key[0], key[1]] = 0 if value.contains == None else 1
         return binary_array
 
-    def intkey(key): #turns a float key into an int key for dict indexation
-         return (int(key[0]),int(key[1]))
+    #def intkey(key): #turns a float key into an int key for dict indexation
+    #     return (int(key[0]),int(key[1]))
 
 
 if __name__ == "__main__":

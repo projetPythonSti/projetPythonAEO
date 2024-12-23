@@ -26,6 +26,10 @@ class CLIView():
         
         # stdscr.getch()
 
+    def start_menu (self) :
+        pass
+
+
 if __name__ == "__main__":
     cli = CLIView()
     curses.wrapper(cli.affichage)
