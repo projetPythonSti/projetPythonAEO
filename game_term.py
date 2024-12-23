@@ -7,7 +7,7 @@ from setup import TILE_SIZE
 import os, sys
 import time as t
 import datetime as dt
-from Archer import *
+from models.unity.Archer import *
 import asyncio
 from pynput import keyboard #Enlever dans le futur
 from blessed import Terminal #A implementer
@@ -71,20 +71,6 @@ class Game_term :
 
 
 
-            self.clock.tick(0.5 * speed)
-            now = datetime.now()
-            delta = now - self.ltick
-            ig_delta = delta * self.speed
-            self.game_duration = self.game_duration + ig_delta.seconds
-            self.ltick = now
-
-            #t.sleep(2)
-            self.world.units[0].position = (self.world.units[0].position[0]+1,self.world.units[0].position[1])
-            #self.events()
-            #self.update()
-            self.world.update_unit_presence()
-            self.draw_term()
-
     def Turn (self,speed) :
         self.clock.tick(0.5 * (speed/10))
         now = datetime.now()
@@ -94,10 +80,10 @@ class Game_term :
         self.ltick = now
 
         # t.sleep(2)
-        self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
+        #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
         # self.events()
         # self.update()
-        self.world.update_unit_presence()
+        #self.world.update_unit_presence()
         self.draw_term()
 
     def Horloge(self):
@@ -124,7 +110,8 @@ class Game_term :
 
     def draw_term (self):
         os.system('cls' if os.name == 'nt' else 'clear')
-        self.world.afficher_console()
+        #self.world.afficher_console()
+        self.world.show_world()
         print("Durée de la partie " + str(self.game_duration) + "s ")
 
 

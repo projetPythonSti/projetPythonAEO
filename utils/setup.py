@@ -1,3 +1,3 @@
-from pygame.examples.grid import TILE_SIZE
+#from pygame.examples.grid import TILE_SIZE
 
 TILE_SIZE = 64

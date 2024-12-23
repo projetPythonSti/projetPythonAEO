@@ -1,5 +1,5 @@
-from mressources import *
-from Unity import *
+from models.ressources.mressources import *
+from models.unity.Unity import *
 import numpy as np
 from models.buildings.buildings import *
 

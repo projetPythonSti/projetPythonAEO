@@ -1,7 +1,6 @@
 from collections import defaultdict
 from datetime import datetime
 
-from pygame.examples.music_drop_fade import starting_pos
 
 from models.Pathfinding import Pathfinding
 from models.World import World
