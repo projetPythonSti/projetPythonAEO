@@ -57,6 +57,17 @@ class World:
         cart_y = (2 * iso_y - iso_x) / 2
         return int(cart_x), int(cart_y)
 
+    def is_entity_collision(self, grid_x, grid_y, size):
+        """Check if placing a building at the given position collides with existing entities."""
+        size_x, size_y = size
+        for entity in self.entities:
+            if isinstance(entity, Building):
+                for dx in range(size_x):
+                    for dy in range(size_y):
+                        if (grid_x + dx, grid_y + dy) in entity.tiles_occupied:
+                            return True
+        return False
+
     def can_place_building(self, grid_x, grid_y, size):
         """Check if a building of given size can be placed at the grid position."""
         size_x, size_y = size
@@ -67,10 +78,25 @@ class World:
             for dy in range(size_y):
                 if not self.is_tile_available(grid_x + dx, grid_y + dy):
                     return False
+
+        if self.is_entity_collision(grid_x, grid_y, size):
+            return False
+
         return True
 
     def is_tile_available(self, x, y):
-        return (0 <= x < self.grid_length_x) and (0 <= y < self.grid_length_y) and self.grid[x][y] is None
+        if not (0 <= x < self.grid_length_x and 0 <= y < self.grid_length_y):
+            return False
+
+        # Check if there's already a building here
+        if self.buildings[x][y] is not None:
+            return False
+
+        # Check if the tile is marked as a collision in the world (e.g., tree, rock)
+        if self.world[x][y]["collision"]:
+            return False
+
+        return True
 
     def select_tile(self, grid_pos):
         """Select a tile to place a worker or examine."""
@@ -159,7 +185,13 @@ class World:
                 iso_poly = [self.cart_to_iso(c[0], c[1]) for c in cart_rect]
                 iso_poly_screen = [(int(c[0] + camera.scroll.x + self.grass_tiles.get_width() / 2),
                                     int(c[1] + camera.scroll.y)) for c in iso_poly]
-                pg.draw.polygon(screen, (255, 0, 0), iso_poly_screen, 1)
+
+                if self.world[x][y]["collision"]:
+                    color = (255, 0, 0)  # Red outline if colliding
+                else:
+                    color = (0, 255, 0)  # Green outline if free
+
+                pg.draw.polygon(screen, color, iso_poly_screen, 1)
 
     def draw_world_tile(self, screen, render_pos, x, y, camera):
         """Draw a single world tile at the specified position."""
@@ -233,8 +265,26 @@ class World:
         # for entity in self.entities:
         #     entity.update()
         
-        # Debugging: Log the update call
-        # print("World update called")
+        #super().update(camera)
+        
+        for entity in self.entities:
+            if isinstance(entity, Keep):
+                # Example: Attack the closest worker
+                target = entity.find_closest_target(self.entities)  # Pass entities list
+                if target:
+                    entity.attack(target.pos)
+
+    def find_closest_target(self, building):
+        closest = None
+        min_distance = float('inf')
+        for entity in self.entities:
+            if isinstance(entity, Building):  # Example target
+                distance = building.pos.distance_to(entity.pos)
+                if distance < building.range * TILE_SIZE and distance < min_distance:
+                    closest = entity
+                    min_distance = distance
+        return closest
+
 
     def create_world(self):
         world = []
