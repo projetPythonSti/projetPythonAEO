@@ -1,10 +1,56 @@
 import pygame as pg
 from settings import TILE_SIZE  # Add this import
 
+class Projectile:
+    def __init__(self, start_pos, target_pos, speed=5):
+        self.pos = pg.Vector2(start_pos)
+        self.target = pg.Vector2(target_pos)
+        self.speed = speed
+        self.active = False
+
+    def update(self):
+        if not self.active:
+            return
+
+        # Move towards the target
+        direction = (self.target - self.pos).normalize()
+        self.pos += direction * self.speed
+
+        # Deactivate if close to the target
+        if self.pos.distance_to(self.target) < 5:
+            self.active = False
+
+    def draw(self, screen):
+        if self.active:
+            pg.draw.circle(screen, (255, 0, 0), (int(self.pos.x), int(self.pos.y)), 5)
+
+class ProjectilePool:
+    def __init__(self, max_projectiles):
+        self.pool = [Projectile((0, 0), (0, 0)) for _ in range(max_projectiles)]
+
+    def get_projectile(self, start_pos, target_pos):
+        for projectile in self.pool:
+            if not projectile.active:
+                projectile.pos = pg.Vector2(start_pos)
+                projectile.target = pg.Vector2(target_pos)
+                projectile.active = True
+                return projectile
+        return None  # No available projectile
+
+    def update(self):
+        for projectile in self.pool:
+            if projectile.active:
+                projectile.update()
+
+    def draw(self, screen):
+        for projectile in self.pool:
+            projectile.draw(screen)
+
+
 class Building:
-    def __init__(self, pos, name, image, size, resource_manager=None, resource_type=None, cost=None, build_time=None, hp=None, attack=None, range_=None):
+    def __init__(self, pos, name, image, size, resource_manager=None, resource_type=None, cost=None, build_time=None, hp=None, attack_power=None, range_=None):
         self.name = name  
-        self.pos = pos
+        self.pos = pg.Vector2(pos)
         if isinstance(image, pg.Surface):
             self.image = image  # Use the pre-loaded surface directly
         else:
@@ -25,7 +71,7 @@ class Building:
         self.cost = cost
         self.build_time = build_time
         self.hp = hp
-        self.attack = attack
+        self.attack_power = attack_power  # Renamed from attack
         self.range = range_
 
     def update_tiles_occupied(self):
@@ -38,7 +84,6 @@ class Building:
             ]
             print(f"{self.name} occupies tiles: {self.tiles_occupied}")
 
-<<<<<<< HEAD
         # Attack-related attributes for defensive buildings like "Keep"
         #self.attack = attack  # Attack power (if the building can attack)
         self.range = range  # Attack range in tiles (if the building can attack)
@@ -54,8 +99,6 @@ class Building:
                 for dx in range(self.size[0])
                 for dy in range(self.size[1])
             ]
-=======
->>>>>>> c9d4631 (Fixed size renderring and zoom working)
 
     def update(self):
         now = pg.time.get_ticks()
@@ -64,7 +107,54 @@ class Building:
         #     self.resource_manager.resources[self.resource_type] += 1
         #     self.resource_cooldown = now
 
-    
+class Keep(Building):
+    def __init__(self, pos, resource_manager):
+        super().__init__(
+            pos=pos,
+            name="Keep",
+            image=pg.image.load("assets/graphics/keep.png").convert_alpha(),
+            size=(3, 3),
+            resource_manager=resource_manager,
+            resource_type=None,
+            cost={"Wood": 35, "Gold": 125},
+            build_time=80,
+            hp=800,
+            attack_power=5,  # Updated attribute name
+            range_=8
+        )
+        self.attack_cooldown = 12 * 1000  # 5 attacks per minute
+        self.last_attack_time = 0
+        self.projectile_pool = ProjectilePool(10)
+
+    def attack(self, target_pos):
+        now = pg.time.get_ticks()
+        if now - self.last_attack_time >= self.attack_cooldown:
+            self.last_attack_time = now
+            projectile = self.projectile_pool.get_projectile(
+                start_pos=self.pos,
+                target_pos=target_pos
+            )
+            if projectile:
+                print(f"{self.name} fires a projectile at {target_pos}")
+
+    def update(self):
+        super().update()
+        self.projectile_pool.update()
+
+    def draw(self, screen):
+        super().draw(screen)
+        self.projectile_pool.draw(screen)
+
+    def find_closest_target(self, entities):
+        closest = None
+        min_distance = float('inf')
+        for entity in entities:
+            if entity != self and not isinstance(entity, Keep):
+                distance = self.pos.distance_to(entity.pos)
+                if distance < self.range * TILE_SIZE and distance < min_distance:
+                    closest = entity
+                    min_distance = distance
+        return closest
 
 class TownCentre(Building):
     def __init__(self, pos, resource_manager):
@@ -171,22 +261,7 @@ class ArcheryRange(Building):
             hp=500
         )
 
-class Keep(Building):
-    def __init__(self, pos, resource_manager):
-        image = pg.image.load("assets/graphics/keep.png").convert_alpha()
-        super().__init__(
-            pos=pos,
-            name="Keep",
-            image=image,
-            size=(3, 3),
-            resource_manager=resource_manager,
-            resource_type="defense",
-            cost={"Wood": 35, "Gold": 125},
-            build_time=80,
-            hp=800,
-            attack=5,
-            range_=8
-        )
+
 
 
 class Lumbermill:
@@ -224,5 +299,3 @@ class Stonemasonry:
         if now - self.resource_cooldown > 2000:
             self.resource_manager.resources["stone"] += 1
             self.resource_cooldown = now
-
-
