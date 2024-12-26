@@ -17,11 +17,11 @@ from models.gameManager import GameManager
 from models.unity.Villager import Villager
 from datetime import datetime
 
-def jeu_terminal (world):
+def jeu_terminal (world, gm:GameManager):
     running = True
     playing = True
     clock = pg.time.Clock()
-    game_term = Game_term(world,clock)
+    game_term = Game_term(world,clock,gm)
 
     while running :
 
@@ -92,14 +92,14 @@ if __name__ == "__main__":
     #print(community)
     gm = GameManager(speed=1, world=monde)
     print("Launched GameManager")
-    #gm.addUnitToMoveDict(v, Position(40, 40))
+    gm.addUnitToMoveDict(v, Position(40, 40))
     print("Added unit to move dict")
     gm.addUnitToMoveDict(community["sm"]["eq1p4"], Position(10,20))
     print("Added 2nd unit to move dict")
     #print(gm.checkUnitsToMove())
     #Boucle pour tester le game manager
     n = 0
-    jeu_terminal(monde)
+    jeu_terminal(monde,gm)
 
 
 

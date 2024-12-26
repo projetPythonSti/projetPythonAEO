@@ -1,21 +1,40 @@
 from datetime import datetime
 
-import pygame as pg
 import sys
 from mmonde import World
-from utils.setup import TILE_SIZE
 import os, sys
 import time as t
 import datetime as dt
 from models.unity.Archer import *
 import asyncio
-from pynput import keyboard #Enlever dans le futur
-from blessed import Terminal
+from pynput import keyboard
 
 ################################
 ## Partie input
 ################################
 
+pause = False
+
+def on_press(key):
+    try:
+        print('alphanumeric key {0} pressed'.format(
+            key.char))
+
+    except AttributeError:
+        print('special key {0} pressed'.format(
+            key))
+
+def on_release(key):
+    global pause
+    print('{0} released'.format(
+        key))
+    if key == keyboard.Key.esc:
+        # Stop listener
+        pause = True
+        return False
+
+    if key == keyboard.Key.esc:
+        pause = True
 
 
 #########################################
@@ -24,8 +43,9 @@ from blessed import Terminal
 
 class Game_term :
 
-    def __init__(self, world,clock):
+    def __init__(self, world,clock, gm):
         self.ltick = datetime.now()
+        self.gm = gm
         self.clock = clock
         self.speed = 1
         self.world = world
@@ -33,7 +53,6 @@ class Game_term :
         self.game_duration = 0
 
     def run_term (self):
-        speed = 10
         self.playing = True
 
         while self.playing :
@@ -78,11 +97,11 @@ class Game_term :
         ig_delta = delta * self.speed
         self.game_duration = self.game_duration + ig_delta.seconds
         self.ltick = now
-
         # t.sleep(2)
         #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
         # self.events()
         # self.update()
+        self.gm.checkUnitsToMove()
         #self.world.update_unit_presence()
         self.draw_term()
 
