@@ -153,7 +153,7 @@ class CLIView():
 
 
         # j'ai la flemme je rajouterais la suite plus tard
-        #verif
+        #verif1
         pass
         #rajouté code
 
