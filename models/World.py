@@ -2,7 +2,7 @@ import numpy as np
 from models.maps.Tile import  Tile
 from models.model import Model  # delete it after finish testing the class World
 from models.unity.Villager import Villager  # delete it after finish testing the class World
-from models.ressources.ressources import Gold, Wood, Food
+from models.ressources.ressources import Gold, Wood, Food, Ressource
 from collections import defaultdict
 import random as rd
 
@@ -15,6 +15,9 @@ class World:
             - Réglé les erreurs d'exécution lors de l'appel à la fonction remove_element, passage de monde à self
             - changé la manière dont on traite les tiles remplies
             - Décommenté la fonction convertMapToGrid afin de la réutiliser avec GameManager
+        26/12/2024@tahakhetib : J'ai apporté des modifs sur ce que @amadou_yaya_diallo
+            - Changé le type de l'attribut filled_tiles vers un dictionnaire
+            - Modifié les fonctions place_element() et remove_element() pour qu'elle s'adapte au changement de filled_tiles
     """
     def __init__(self, width, height):  # dict of villages in the world
         self.width = width
@@ -22,7 +25,7 @@ class World:
         self.villages = list()
         self.ressources = defaultdict(dict)
         self.tiles_dico = defaultdict(int)  # à chaque clé sera associé une Tuile
-        self.filled_tiles = list()  #
+        self.filled_tiles = defaultdict(tuple)  #
         self.initialise_world()
         # les clés du dico seront de la forme (x,y)
         # self.units  #every unit on the map, a list seems better to me
@@ -73,16 +76,19 @@ class World:
 
     def place_element(self, element):
         place = (element.position.getX(), element.position.getY())
-        if (place not in self.filled_tiles):
+        if (place not in self.filled_tiles.values()):
+            print("adding element")
             self.tiles_dico[place].set_contains(element)
-            self.filled_tiles.append(place)
+            self.filled_tiles[place] = place
             # update the view of the element
 
     def remove_element(self, element):
         place = (element.position.getX(), element.position.getY())
         self.tiles_dico[place].set_contains(None)
-        #self.filled_tiles.remove(place)
-        self.ressources[element.name.lower()].pop(str(element.uid))
+        self.filled_tiles.pop(place)
+        if (type(element) == Ressource or type(element) == Wood or type(element) == Food or type(element) == Gold):
+            self.ressources[element.name.lower()].pop(str(element.uid))
+
         # update the view of the element
 
     # def afficher_console(self):

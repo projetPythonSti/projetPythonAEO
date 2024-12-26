@@ -46,9 +46,10 @@ class Villager(Unity):
         if ressource.get_quantity() == 0:
             ressource.remove()
         else:
+            print("nothing to do")
             #he has to come back to the ressource to finish collecting
             # self.move(ressource.get_position())
-            self.collect(ressource)
+            #self.collect(ressource)
     
     def drop_ressources(self):
         for key, quantity in self.ressources_dict.items():

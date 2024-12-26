@@ -35,7 +35,7 @@ class Ressource:
 
     def __repr__(self): return self.name
     
-    def __eq__(self, other): return self.__class__ == other.__class__ #it gonna be useful maybe
+    def __eq__(self, other): return self.__class__ == other.__class__ # it could be useful
 
 class Wood(Ressource):
     

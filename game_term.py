@@ -104,6 +104,7 @@ class Game_term :
         # self.events()
         # self.update()
         self.gm.checkUnitsToMove()
+        print(self.world.filled_tiles)
         #self.world.update_unit_presence()
         self.draw_term()
 
