@@ -50,16 +50,13 @@ if __name__ == "__main__":
     time.sleep(2)
     # Record the start time
     print("started main loop")
-    start_time = timeit.default_timer()
     elapsedTime = 0
     while True:
-        gm.tick = timeit.default_timer()
-        elapsedTime += (timeit.default_timer() - start_time)
+        start_time = timeit.default_timer()
         print(elapsedTime)
-        if elapsedTime > 1.25:
-            print("Time's up! Stopping the loop.")
-            break
         gm.checkUnitsToMove()
+        endTime = timeit.default_timer()
+        gm.tick = endTime-start_time
 
 
     # monde.show_world()

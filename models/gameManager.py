@@ -3,8 +3,11 @@ from collections import defaultdict
 from datetime import datetime
 import time
 import re
+from importlib.resources import Resource
+
 from models.Pathfinding import Pathfinding
 from models.World import World
+from models.buildings.buildings import Building
 from models.unity.Unity import Unity
 
 
@@ -40,8 +43,11 @@ class GameManager:
             #print("time elapsed : ", unit["timeElapsed"])
             if unit["timeElapsed"] >= (unit["timeToTile"]):
                 unit["moveQueue"] = unit["moveQueue"][1::]
-                self.world.tiles_dico[(unit["currentTile"][0],unit["currentTile"][1])].contains = ""
-                self.world.tiles_dico[(unit["nextTile"][0], unit["nextTile"][0])].contains = self.world.villages[(unit["team"]-1)].community[id]
+                self.world.tiles_dico[(unit["currentTile"][0],unit["currentTile"][1])].contains = None
+                print()
+                print(type(self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][id]))
+
+                self.world.tiles_dico[(unit["nextTile"][0], unit["nextTile"][0])].contains = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][id]
                 unit["currentTile"] = unit["moveQueue"][0]
                 print("Got to the next tile in", (unit["timeElapsed"]))
                 unit["timeElapsed"] = 0
@@ -76,13 +82,14 @@ class GameManager:
             path = path[::-1]
 
             self.unitToMove[unit.uid] = {
-                "group" : [],
+                "group"     : [],
                 "timeToTile" : 1/(unit.speed),
                 "timeElapsed" : 0,
                 "nextTile" : path[1],
                 "currentTile": path[0],
                 "estimatedPos" : path[0],
                 "team": teamNumber,
+                "type" : unit.name,
                 "moveQueue": path,
             }
 
