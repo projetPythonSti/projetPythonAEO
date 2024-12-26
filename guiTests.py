@@ -96,6 +96,7 @@ if __name__ == "__main__":
     print("Added unit to move dict")
     gm.addUnitToMoveDict(community["sm"]["eq1p4"], Position(10,20))
     print("Added 2nd unit to move dict")
+    print(monde.filled_tiles)
     #print(gm.checkUnitsToMove())
     #Boucle pour tester le game manager
     n = 0

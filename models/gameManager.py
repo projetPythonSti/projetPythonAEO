@@ -12,6 +12,12 @@ from models.unity.Unity import Unity
 
 
 class GameManager:
+
+
+        """
+            26/12/2024@tahakhetib : J'ai apporté les modifications suivantes
+                - Adaptation de la fonction moveUnit() pour que celle-ci fasse bien bouger les unités sur la carte
+        """
         tick = timeit.default_timer()
         unitToMove = defaultdict(dict)
         '''
@@ -43,11 +49,9 @@ class GameManager:
             #print("time elapsed : ", unit["timeElapsed"])
             if unit["timeElapsed"] >= (unit["timeToTile"]):
                 unit["moveQueue"] = unit["moveQueue"][1::]
-                self.world.tiles_dico[(unit["currentTile"][0],unit["currentTile"][1])].contains = None
-                print()
-                print(type(self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][id]))
-
-                self.world.tiles_dico[(unit["nextTile"][0], unit["nextTile"][0])].contains = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][id]
+                unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][id]
+                self.world.remove_element(unitObj)
+                self.world.place_element(unitObj)
                 unit["currentTile"] = unit["moveQueue"][0]
                 print("Got to the next tile in", (unit["timeElapsed"]))
                 unit["timeElapsed"] = 0
@@ -72,6 +76,9 @@ class GameManager:
 
 
         def addUnitToMoveDict(self, unit : Unity, destination):
+            if (unit.position.toTuple() not in self.world.filled_tiles.values()):
+                print("position not in filled_tiles, adding it")
+                self.world.filled_tiles[unit.position.toTuple()] = unit.position.toTuple()
             grid = self.world.convertMapToGrid()
             teamNumber = self.getTeamNumber(unit.uid)
             pathFinding  = Pathfinding(mapGrid=grid, statingPoint= (unit.position.getX(), unit.position.getY()), goal=(destination.getX(), destination.getY()))

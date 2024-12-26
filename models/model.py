@@ -156,6 +156,7 @@ class Model:
         
     def remove_unit(self, unit):
         self.community[unit.name.lower()].pop(str(unit.uid))
+        self.world.remove_element(unit)
         if(issubclass(unit.__class__, Ressource)):
             self.ressources[unit.name.lower()] -= 1
 
