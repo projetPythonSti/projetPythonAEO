@@ -3,7 +3,7 @@ from buildings import Building
 class Keep(Building) :
   def __init__(self) :
     super().__init__(
-      name="Keep",
+      name="K",
       cost={"wood": 35, "gold": 125},
       time_building=80,
       health=800,
