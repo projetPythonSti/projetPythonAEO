@@ -3,14 +3,14 @@ from datetime import datetime
 import pygame as pg
 import sys
 from mmonde import World
-from setup import TILE_SIZE
+from utils.setup import TILE_SIZE
 import os, sys
 import time as t
 import datetime as dt
 from models.unity.Archer import *
 import asyncio
 from pynput import keyboard #Enlever dans le futur
-from blessed import Terminal #A implementer
+from blessed import Terminal
 
 ################################
 ## Partie input
@@ -91,7 +91,8 @@ class Game_term :
 
     def events (self): #inutile il me semble
 
-        def on_press(key):
+        """
+            def on_press(key):
             try:
                 print('alphanumeric key {0} pressed'.format(key.char))
             except AttributeError:
@@ -103,6 +104,7 @@ class Game_term :
             if key == keyboard.Key.esc:
                 # Stop listener
                 return False
+        """
 
     def update(self):
         pass
