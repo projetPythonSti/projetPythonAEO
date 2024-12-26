@@ -8,6 +8,7 @@ import datetime as dt
 from models.unity.Archer import *
 import asyncio
 from pynput import keyboard
+from blessed import Terminal
 
 ################################
 ## Partie input
@@ -54,6 +55,7 @@ class Game_term :
 
     def run_term (self):
         self.playing = True
+        speed = 10
 
         while self.playing :
             term = Terminal()
