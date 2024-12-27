@@ -9,35 +9,33 @@ from models.unity.Archer import *
 import asyncio
 from pynput import keyboard
 from blessed import Terminal
+import json
 
 ################################
-## Partie input
+## Partie json
 ################################
 
-pause = False
-
-def on_press(key):
-    try:
-        print('alphanumeric key {0} pressed'.format(
-            key.char))
-
-    except AttributeError:
-        print('special key {0} pressed'.format(
-            key))
-
-def on_release(key):
-    global pause
-    print('{0} released'.format(
-        key))
-    if key == keyboard.Key.esc:
-        # Stop listener
-        pause = True
-        return False
-
-    if key == keyboard.Key.esc:
-        pause = True
+def world_to_dict(world):
+        """Convert the World object to a dictionary for JSON serialization."""
+        return {
+        "width": world.width,
+        "height": world.height,
+        "villages": [village.name for village in world.villages],  # Assuming villages have a `name` attribute
+        "ressources": {
+            key: {k: v.__dict__ for k, v in value.items()}
+            for key, value in world.ressources.items()
+        },
+        "tiles_dico": {
+            str(k): v.__dict__ if v else None for k, v in world.tiles_dico.items()
+        },
+        "filled_tiles": {str(k): str(v) for k, v in world.filled_tiles.items()},
+        }
 
 
+def save_world_to_json(world, filename="world.json"):
+    """Save the World object to a JSON file."""
+    with open(filename, "w") as f:
+        json.dump(world_to_dict(world), f, indent=4)
 #########################################
 ## Jeu
 #########################################
