@@ -1,13 +1,14 @@
 from buildings.buildings import Building
 
 class Camp(Building) :
-   def __init__(self):
+   def __init__(self, team) :
         super().__init__(
            name="C",
-           cost={"wood": 100},
+           cost={"w": 100},
            time_building=25,
            health=200,
-           surface=4,  # 2x2
-           dropPoint=True
+           surface=(2,2),  # 2x2
+           dropPoint=True,
+           team=team
        )
           

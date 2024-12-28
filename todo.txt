@@ -1,0 +1,12 @@
+- Finir place_element dans des tiles non occupées : partially done(it left implementing if tile is occupied, to place it in another place instead of doing nothing)
+
+- Revoir la manière dont la fonction initialize_village est définie, elle peut être ameliorée en ajoutant une ligne dans le constructeur de Unity et modifier cette ligne pour ajouter directement l'element dans le dictionnaire du model  ou créer une fonction qui le fait sans condition de ressource
+- Discuter les autres sur la quantité dans un wood, food ou ressources. On ajoute 1 ou son get_quantity à chaque fois
+- remettre les filled_tiles en dictionnaire
+- la confusion des lettres, et le mettre dans toutes les methodes
+
+A modifier
+- Food (through farms only) (F), 300 per farm
+- generation two type of map (esources dotted across the map, all the gold is at the centre of the map)
+- a villager Can collect resources at rate of 25/minute
+- 1 attack per second for all units

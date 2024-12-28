@@ -1,12 +1,13 @@
 from buildings.buildings import Building
 
 class Barracks(Building) :
-  def __init__(self) :
+  def __init__(self, team) :
     super().__init__(
       name="B",
-      cost={"wood": 175},
+      cost={"w": 175},
       time_building=50,
       health=500,
-      surface=9,  # 3x3
-      spawn="Swordsman"
+      surface=(3,3),  # 3x3
+      spawn="Swordsman",
+      team=team
     )

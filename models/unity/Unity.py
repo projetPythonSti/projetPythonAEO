@@ -5,7 +5,7 @@ import random as rd
 class Unity:
     population = 0
     
-    def __init__(self, uid, name, cost, trainningTime, health, damage, speed, visibility, team, position=None, target = None ):
+    def __init__(self, uid, name, cost, trainningTime, health, damage, speed, visibility, team, position=None, target = None):
         self.uid = uid
         self.name = name
         self.cost = cost
@@ -14,7 +14,7 @@ class Unity:
         self.damage = damage
         self.speed = speed
         self.team  = team
-        self.position = position if position else Position(rd.randint(0, self.team.world.width), rd.randint(0, self.team.world.height))
+        self.position = position if position else Position(rd.randint(0, self.team.world.width - 1), rd.randint(0, self.team.world.height - 1))
         self.range = visibility
         self.target = target
         # self.team.add_unit(self)
@@ -36,6 +36,7 @@ class Unity:
         return self.name
     
     def attack(self, enemy):
+        #1 attack per second for all units
         enemy.set_health(enemy.get_health() - self.damage)
     
     def die(self):

@@ -5,18 +5,18 @@ class Villager(Unity):
     def __init__(self, team):
         community = team.get_community().get('v')
         uid = len(community) if community else 0 # 0 if 
-        super().__init__(uid,"V", {"fo" : 50}, 25, 40, 4, 0.8, 1, team=team)
-        self.carry_max = 25
+        super().__init__(uid,"v", {"f" : 50}, 25, 40, 2, 0.8, 1, team=team)
+        self.carry_max = 20
         # self.buildingSpeed = buildingSpeed,
         self.ressources_dict = {
-            "fo" : 0,
+            "f" : 0,
             "w" : 0,
             "g" : 0,
         }
-        
     
     """
         droping ressources in the village drop point
+        To do : a villager Can collect resources at rate of 25/minute
     """
     def collect(self, ressource):
         all_collected = sum(self.ressources_dict.values())
