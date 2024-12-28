@@ -2,6 +2,7 @@ from maps.Tile import Tile
 from model import Model #delete it after finish testing the class World
 from unity.Villager import Villager #delete it after finish testing the class World
 from buildings.buildings import Building
+from buildings.town_center import TownCenter #delete it after finish testing the class World
 from ressources.ressources import Gold, Wood, Food
 from collections import defaultdict
 import random as rd
@@ -33,8 +34,8 @@ class World:
         for i in range(rd.randint(0, max_ressource//2)):
            self.ressources["g"][str(i)] = Gold(world=self)
         
-        for i in range(rd.randint(0, max_ressource)):
-           self.ressources["f"][str(i)] = Food(world=self)
+        # for i in range(rd.randint(0, max_ressource)):
+        #    self.ressources["f"][str(i)] = Food(world=self)
         
         self.place_ressources()
     
@@ -67,13 +68,15 @@ class World:
         place = (element.position.getX(), element.position.getY())
         if place not in self.filled_tiles and place[0] <= self.width and place[1] <= self.height:
             if issubclass(element.__class__, Building) and all(tile not in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
-                for x in range(element.surface[0]):
-                    for y in range(element.surface[1]):
-                        try:
-                            self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(element)
-                        except KeyError:
-                            pass
-                        self.filled_tiles.append((place[0] + x, place[1] + y))
+                #check if the building can be placed
+                if element.surface[0] + place[0] <= self.width and element.surface[1] + place[1] <= self.height:
+                    for x in range(element.surface[0]):
+                        for y in range(element.surface[1]):
+                            try:
+                                self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(element)
+                            except KeyError:
+                                pass
+                            self.filled_tiles.append((place[0] + x, place[1] + y))
             elif not issubclass(element.__class__, Building):       
                 self.tiles_dico[place].set_contains(element)
                 self.filled_tiles.append(place)
@@ -81,9 +84,18 @@ class World:
     
     def remove_element(self, element):
         place = (element.position.getX(), element.position.getY())
-        self.tiles_dico[place].set_contains(None)
-        self.filled_tiles.remove(place)
-        monde.ressources[element.name.lower()].pop(str(element.uid))
+        if(issubclass(element.__class__, Building)) and all(tile in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
+            for x in range(element.surface[0]):
+                for y in range(element.surface[1]):
+                    self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(None)
+                    self.filled_tiles.remove((place[0] + x, place[1] + y))
+        elif not issubclass(element.__class__, Building):           
+            self.tiles_dico[place].set_contains(None)
+            self.filled_tiles.remove(place)
+            monde.ressources[element.name].pop(str(element.uid))
+        
+        #removing element from its team also
+        element.team.remove_unit(element)
         #update the view of the element
         
     # def afficher_console(self):
@@ -126,12 +138,14 @@ if __name__ == "__main__":
     monde = World(30,30)
     village1 = Model("fabulous", monde)
     village2 = Model("hiraculous", monde)
-    village1.initialize_villages(1,2,3, gold=200, wood=100, food=300, town_center=1, keeps=2, houses=5, camps=3)
+    village1.initialize_villages(1,2,3, gold=200, wood=400, food=300, town_center=1, keeps=2, houses=5, camps=3)
     village2.initialize_villages(4,5,6, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
     # v = Villager(village1)
     # village1.add_unit(v)
     # v.ressources_dict["w"] = 3
     # v.ressources_dict["g"] = 2
+    town_center = TownCenter(village1)
+    village1.add_building(town_center)
     monde.fill_world()
     # monde.fill_ressources(10)
     # print(village1.population())
@@ -145,6 +159,12 @@ if __name__ == "__main__":
     # print(village2.population())
     # print(monde.get_ressources())
     # print(sorted(monde.filled_tiles, key=lambda x: x[0]), len(monde.filled_tiles))
+    monde.show_world()
+    # village1.remove_unit(town_center)
+    # print(town_center.get_occupied_tiles())
+    # print(sorted(set(monde.filled_tiles) & set(town_center.get_occupied_tiles()), key=lambda x: (x[0], x[1])))
+    monde.remove_element(town_center)
+    print("After removing town center")
     monde.show_world()
 
     

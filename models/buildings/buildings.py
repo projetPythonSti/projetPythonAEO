@@ -3,7 +3,8 @@ from Position import Position
 import random as rd
 
 class Building:
-    def __init__(self, name, cost, time_building, health, surface, spawn="", population=0, dropPoint=False, position=None, team=None):
+    def __init__(self, uid, name, cost, time_building, health, surface, spawn="", population=0, dropPoint=False, position=None, team=None):
+        self.uid = uid
         self.name = name
         self.cost = cost
         self.time_building = time_building

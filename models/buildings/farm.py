@@ -3,7 +3,10 @@ from ressources.ressources import Food
 
 class Farm(Building):
   def __init__(self, team):
+    community = team.get_community().get('F')
+    uid = len(community) if community else 0 # 0 if it doesn't exist yet
     super().__init__(
+      uid,
       name = "F",
       cost = {"w": 60},
       time_building = 10,

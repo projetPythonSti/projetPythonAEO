@@ -120,6 +120,7 @@ class Model:
             for ressource, cost in unit.get_cost().items():
                 self.ressources[ressource] -= cost
     
+    # I have to confirm wheter i will delete this method or not
     def add_building(self, building):
         if(self.has_enough_resources(building.get_cost())):
             self.community[building.name][str(building.uid)] = building
