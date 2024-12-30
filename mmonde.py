@@ -116,17 +116,18 @@ def floatkey_to_intkey(key): #turns a float key into an int key for dict indexat
 def position_to_tuple(position):
     return (position.getX(),position.getY())
 
+from math import sqrt
 
-'''
-monde=Monde(5,20)
-monde.creer_monde()
+def dist(pos1,pos2): #gives the distance between two positions
+    return sqrt(abs(pos2.getX()-pos1.getX())**2+abs(pos2.getY()-pos1.getY())**2)
 
-for i in range(1,3):
-    for j in range(4,13):
-        monde.dico[(i,j)]=wood
+def closest_position(my_pos,list_pos): #finds the closest position between a position and a list of position
+    closest = list_pos[0]
+    for i in list_pos[1:]:
+        if dist(my_pos,i) < dist(my_pos,closest): #position plus proche trouvée
+            closest = i
+    return closest
 
-for j in range(2,9):
-    monde.dico[(4,j)]=gold
-
-monde.afficher_console()
-'''
+print("dist entre 0,0 et 2,2 = ",dist(Position(0,0),Position(2,2)))
+print("dist entre 4,4 et 2,2 = ",dist(Position(4,4),Position(2,2)))
+print("position la plus proche à 2,2 est ",position_to_tuple(closest_position(Position(2,2),[Position(0,0),Position(1,3),Position(5,5)])))

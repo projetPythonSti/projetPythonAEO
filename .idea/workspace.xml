@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="fichiers et dossiers refaits&#10;tout est réparé&#10;j'ai juré je refait plus ça" />
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="fichiers et dossiers refaits&#10;tout est réparé&#10;j'ai juré je refait plus ça">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_12_2024_13_52_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_12_2024_13_52__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Unity.py" beforeDir="false" afterPath="$PROJECT_DIR$/Unity.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mmonde.py" beforeDir="false" afterPath="$PROJECT_DIR$/mmonde.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -20,7 +27,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="ELABBARI_Khalid" />
+        <entry key="$PROJECT_DIR$" value="etan" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -369,7 +376,8 @@
     <MESSAGE value="i took amadou's work" />
     <MESSAGE value="CORRECTING THINGS" />
     <MESSAGE value="fichiers et dossiers refaits&#10;tout est réparé&#10;j'ai juré je refait plus ça" />
-    <option name="LAST_COMMIT_MESSAGE" value="fichiers et dossiers refaits&#10;tout est réparé&#10;j'ai juré je refait plus ça" />
+    <MESSAGE value="j'ai des &quot;unversioned files&quot; à commit ça m'empêchait de checkout j'espère pas tout casser" />
+    <option name="LAST_COMMIT_MESSAGE" value="j'ai des &quot;unversioned files&quot; à commit ça m'empêchait de checkout j'espère pas tout casser" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
