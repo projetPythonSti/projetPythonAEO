@@ -5,9 +5,10 @@ from models.unity.Villager import Villager  # delete it after finish testing the
 from models.ressources.ressources import Gold, Wood, Food, Ressource
 from collections import defaultdict
 import random as rd
+from save import JSONSerializable
 
 
-class World:
+class World(JSONSerializable):
 
 
     """

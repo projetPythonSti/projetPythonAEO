@@ -1,10 +1,12 @@
 import json
+
 from collections import defaultdict
 
 class JSONSerializable:
     """Mixin class to enable JSON serialization of objects."""
     def to_dict(self):
         """Convert object attributes to a dictionary."""
+        print(f"je to_dict {self}")
         result = {}
         for attr, value in self.__dict__.items():
             if isinstance(value, (list, dict, tuple, set)):
@@ -18,6 +20,7 @@ class JSONSerializable:
     @staticmethod
     def _serialize_collection(collection):
         """Serialize lists, dictionaries, sets, or tuples."""
+        print(f"je _serialize_collection {collection}")
         if isinstance(collection, list):
             return [item.to_dict() if hasattr(item, "to_dict") else item for item in collection]
         elif isinstance(collection, (dict, defaultdict)):

@@ -1,8 +1,8 @@
 # this class is the parent class of all the unities in the game
 from models.Position import Position
 import random as rd
-
-class Unity:
+from save import JSONSerializable
+class Unity(JSONSerializable):
     population = 0
     
     def __init__(self, uid, name, cost, trainningTime, health, damage, speed, visibility, team, position=None, target = None ):

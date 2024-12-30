@@ -18,10 +18,11 @@ from models.ressources.ressources import Ressource, Gold, Wood, Food
 # from controllers import Game_controller
 # from unity import Unity
 from collections import defaultdict
+from save import JSONSerializable
 
 
 
-class Model:
+class Model(JSONSerializable):
     """
             22/12/2024@tahakhetib - J'ai apporté des modifications à ce fichier sur ce que @amadou_yaya_diallo a écrit
             - Ajouté une fonction get_name afin d'obtenir le nom d'équipe (utilisé dans Villager.py).

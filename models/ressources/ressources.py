@@ -1,9 +1,10 @@
 # This file contains the ressources classes, which are the objects that the player can collect in the game.
 from models.Position import Position
 import random as rd
+from save import JSONSerializable
 
 
-class Ressource:
+class Ressource(JSONSerializable):
     def __init__(self, uid, name, quantity, world):
         self.name = name
         self.quantity=quantity

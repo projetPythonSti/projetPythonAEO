@@ -1,4 +1,4 @@
-
+from save import JSONSerializable
 class Tile:
     def __init__(self): #id c'est le tuple (x,y)
         self.contains = None #tile with nothing inside

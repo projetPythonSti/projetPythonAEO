@@ -1,4 +1,5 @@
-class Position:
+from save import JSONSerializable
+class Position(JSONSerializable):
     """
         26/12/2024@tahakhetib : j'ai apporté des modifs sur ce que @amadou_yaya_diallo a écrit
             - Ajout d'une méthode toTuple() pour faciliter la conversion des positions en tuple

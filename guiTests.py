@@ -101,7 +101,7 @@ if __name__ == "__main__":
     #Boucle pour tester le game manager
     n = 0
     #jeu_terminal(monde,gm)
-    #monde.to_json("world.json")
+    monde.to_json("world.json")
     print("World saved to 'world.json'")
 
 
