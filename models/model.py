@@ -10,12 +10,8 @@ from buildings.farm import Farm
 from buildings.house import House
 from buildings.keep import Keep
 from buildings.stable import Stable
-from ressources.ressources import Ressource, Gold, Wood, Food
-# from ressources.mressources import *
-
-#faut-il l'importer et le faire hériter pour pouvoir utiliser fire_change ?
-# from controllers import Game_controller
-# from unity import Unity
+from buildings.buildings import Building
+from ressources.ressources import Ressource
 from collections import defaultdict
 
 
@@ -109,28 +105,20 @@ class Model:
       
     #return a tuple that contains à dict of all village content and the length of it
     def population(self):
-        return self.community
+        return self.community  
     """
         unit: Unity
         cost_dict : dict
     """
     def add_unit(self, unit):    
         if(self.has_enough_resources(unit.get_cost())):
+            # if issubclass(unit.__class__, Building):
+            #     unit.build()
+                
             self.community[unit.name][str(unit.uid)] = unit
             for ressource, cost in unit.get_cost().items():
                 self.ressources[ressource] -= cost
-    
-    # I have to confirm wheter i will delete this method or not
-    def add_building(self, building):
-        if(self.has_enough_resources(building.get_cost())):
-            self.community[building.name][str(building.uid)] = building
-            for ressource, cost in building.get_cost().items():
-                self.ressources[ressource] -= cost
-            return True
-        return False
-    
-    
-               
+              
     """
         takes ressources to add, and update the village ressources
     """

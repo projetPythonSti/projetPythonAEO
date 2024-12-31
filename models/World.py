@@ -145,7 +145,7 @@ if __name__ == "__main__":
     # v.ressources_dict["w"] = 3
     # v.ressources_dict["g"] = 2
     town_center = TownCenter(village1)
-    village1.add_building(town_center)
+    village1.add_unit(town_center)
     monde.fill_world()
     # monde.fill_ressources(10)
     # print(village1.population())

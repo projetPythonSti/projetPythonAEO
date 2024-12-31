@@ -2,10 +2,11 @@
 __pycache__/
 *.py[cod]
 *$py.class
+todo.txt
 
 # C extensions
 *.so
-todo.txt
+
 # Distribution / packaging
 .Python
 build/

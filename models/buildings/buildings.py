@@ -57,9 +57,8 @@ class Building:
         # print(f"Construction de {self.name} commencée...")
         self.time_building = 3*self.time_building/(self.builders + 2)
         for second in range(self.time_building):
-            print(f"Construction en cours : {second + 1}/{self.time_building} secondes")
             time.sleep(1)
-
+            
         self.is_built = True
         print(f"Construction de {self.name} terminée.")
         return True

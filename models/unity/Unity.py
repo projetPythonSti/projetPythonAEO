@@ -41,7 +41,7 @@ class Unity:
     
     def die(self):
         self.position = None
-        self.team.remove_unit(self)
+        self.team.world.remove_element(self)
     
     def get_cost(self): return self.cost
     
