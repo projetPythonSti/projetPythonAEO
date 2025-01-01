@@ -9,4 +9,4 @@ class Horseman(Unity):
         community = team.get_pplCount()
         villageName = team.get_name()
         uid = f"eq{villageName}p{community}"  # 0 if
-        super().__init__(uid, "HM", { "food" : 30, "gold" : 20}, 20, 45, 4, 1.2, 1, team=team)
+        super().__init__(uid, "h", { "f" : 30, "g" : 20}, 20, 45, 4, 1.2, 1, team=team)

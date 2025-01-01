@@ -26,9 +26,9 @@ if __name__ == "__main__":
     print(village1.population())
     print(monde.get_ressources())
     print("Before : ", village1.get_ressources())
-    fo = monde.get_ressources()["fo"]["0"]
+    fo = monde.get_ressources()["f"]
     v.drop_ressources()
-    v.collect(fo)
+    #v.collect(fo)
     print("After : ", village1.get_ressources())
     print(v.ressources_dict)
     community = village1.get_community()
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     gm.addUnitToMoveDict(v, Position(40, 40))
     print("Added unit to move dict")
-    gm.addUnitToMoveDict(community["sm"]["eq1p4"], Position(10,20))
+    gm.addUnitToMoveDict(community["s"]["eq1p4"], Position(10,20))
     print("Added 2nd unit to move dict")
     #gm.checkUnitsToMove()
     #Boucle pour tester le game manager
@@ -52,11 +52,9 @@ if __name__ == "__main__":
     print("started main loop")
     elapsedTime = 0
     while True:
-        start_time = timeit.default_timer()
         print(elapsedTime)
         gm.checkUnitsToMove()
-        endTime = timeit.default_timer()
-        gm.tick = endTime-start_time
+        gm.tick = timeit.default_timer()
 
 
     # monde.show_world()

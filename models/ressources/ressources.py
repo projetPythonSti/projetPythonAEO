@@ -6,9 +6,9 @@ import random as rd
 class Ressource:
     def __init__(self, uid, name, quantity, world):
         self.name = name
-        self.quantity=quantity
+        self.quantity = quantity
         self.world = world
-        self.position = Position(rd.randint(0, self.world.width), rd.randint(0, self.world.height))
+        self.position = Position(rd.randint(0, self.world.width - 1), rd.randint(0, self.world.height - 1))
         self.uid = uid
 
     def get_quantity(self):
@@ -20,6 +20,10 @@ class Ressource:
     def get_position(self):
         return self.position
     
+    def set_position(self, x, y):
+        self.position.setX(x)
+        self.position.setY(y)
+
     def set_quantity(self, quantity):
         self.quantity = quantity
     
@@ -39,20 +43,22 @@ class Ressource:
 
 class Wood(Ressource):
     
-    def __init__(self, world):
+    def __init__(self,  world):
         community = world.get_ressources().get('w')
         uid = len(community) if community else 0 # 0 if 
-        super().__init__(uid,"W",100, world=world)
+        super().__init__(uid,"w",100, world=world)
 
 class Gold(Ressource):
     def __init__(self, world):
         community = world.get_ressources().get('g')
         uid = len(community) if community else 0 # 0 if 
-        super().__init__(uid,"G",800, world=world)
+        super().__init__(uid,"g",800, world=world)
 
 class Food(Ressource):
-    def __init__(self,world):
-        community = world.get_ressources().get('fo')
+    def __init__(self, farm, world):
+        community = world.get_ressources().get('f')
         uid = len(community) if community else 0 # 0 if 
-        super().__init__(uid,"FO",300, world=world)
+        super().__init__(uid,"f", 1, world=world)
+        self.farm = farm
+        self.farm.add_food(self)
 

@@ -9,5 +9,5 @@ class Archer(Unity):
         community = team.get_pplCount()
         villageName = team.get_name()
         uid = f"eq{villageName}p{community}"
-        super().__init__(uid, "A", { "wood" : 25, "gold" : 45}, 35, 30, 4, 1, 4, team = team)
+        super().__init__(uid, "a", { "w" : 25, "g" : 45}, 35, 30, 4, 1, 4, team = team)
         

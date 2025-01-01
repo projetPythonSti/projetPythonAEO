@@ -1,3 +1,4 @@
+import timeit
 from datetime import datetime
 
 import pygame as pg
@@ -9,7 +10,6 @@ import time as t
 import datetime as dt
 from models.unity.Archer import *
 import asyncio
-from pynput import keyboard #Enlever dans le futur
 from blessed import Terminal #A implementer
 
 ################################
@@ -84,7 +84,8 @@ class Game_term :
         # self.events()
         # self.update()
         self.gm.checkUnitsToMove()
-        print(self.world.filled_tiles)
+        self.gm.tick = timeit.default_timer()
+
         #self.world.update_unit_presence()
         self.draw_term()
 
@@ -100,21 +101,26 @@ class Game_term :
                 print('special key {0} pressed'.format(
                     key))
 
-        def on_release(key):
+        '''def on_release(key):
             print('{0} released'.format(key))
             if key == keyboard.Key.esc:
                 # Stop listener
-                return False
+                return False'''
 
     def update(self):
         pass
 
 
     def draw_term (self):
+        term = Terminal()
+
         os.system('cls' if os.name == 'nt' else 'clear')
         #self.world.afficher_console()
-        self.world.show_world()
-        print("Durée de la partie " + str(self.game_duration) + "s ")
+        with term.location(0,term.height-1):
+            #print(term.home + term.clear)
+            self.world.show_world()
+
+            print("Durée de la partie " + str(self.game_duration) + "s ")
 
 
 

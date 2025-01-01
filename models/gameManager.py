@@ -6,6 +6,7 @@ import re
 from importlib.resources import Resource
 
 from models.Pathfinding import Pathfinding
+from models.Position import Position
 from models.World import World
 from models.buildings.buildings import Building
 from models.unity.Unity import Unity
@@ -17,6 +18,9 @@ class GameManager:
         """
             26/12/2024@tahakhetib : J'ai apporté les modifications suivantes
                 - Adaptation de la fonction moveUnit() pour que celle-ci fasse bien bouger les unités sur la carte
+            01/01/2025@tahakhetib : J'ai apporté les modifications suivantes
+                - Corrigé le code de singe que j'ai écrit
+
         """
         tick = timeit.default_timer()
         unitToMove = defaultdict(dict)
@@ -51,6 +55,7 @@ class GameManager:
                 unit["moveQueue"] = unit["moveQueue"][1::]
                 unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][id]
                 self.world.remove_element(unitObj)
+                self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][id].position = Position(unit["moveQueue"][0][0],unit["moveQueue"][0][0])
                 self.world.place_element(unitObj)
                 unit["currentTile"] = unit["moveQueue"][0]
                 print("Got to the next tile in", (unit["timeElapsed"]))

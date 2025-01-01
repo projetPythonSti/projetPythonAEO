@@ -50,7 +50,7 @@ class Model:
         for i in range(horsmen):
             self.peopleCount += 1
             h = Horseman(team=self)
-            self.community["hm"][h.uid] = h
+            self.community["h"][h.uid] = h
    
         for i in range(villages):
             self.peopleCount += 1
@@ -60,46 +60,39 @@ class Model:
         for i in range(swordsmen):
             self.peopleCount += 1
             s = Swordsman(team=self)
-            self.community["sm"][s.uid] = s
+            self.community["s"][s.uid] = s
         
         for i in range(town_center):
-            self.community["t"][str(i)] = TownCenter(team=self)
+            self.community["T"][str(i)] = TownCenter(team=self)
         
         for i in range(archery_ranger):
-            self.community["ar"][str(i)] = ArcheryRange(team=self)
+            self.community["A"][str(i)] = ArcheryRange(team=self)
 
         for i in range(barracks):
-            self.community["b"][str(i)] = Barracks(team=self)
+            self.community["B"][str(i)] = Barracks(team=self)
 
         for i in range(camps):
-            self.community["c"][str(i)] = Camp(team=self)
+            self.community["C"][str(i)] = Camp(team=self)
 
         for i in range(farms):
-            self.community["f"][str(i)] = Farm(team=self)
+            self.community["F"][str(i)] = Farm(team=self)
 
         for i in range(houses):
-            self.community["h"][str(i)] = House(team=self)
+            self.community["H"][str(i)] = House(team=self)
 
         for i in range(keeps):
-            self.community["k"][str(i)] = Keep(team=self)
+            self.community["K"][str(i)] = Keep(team=self)
 
         for i in range(stables):
-            self.community["s"][str(i)] = Stable(team=self)
-
-        # for i in range(wood):
-        #     self.community["w"][str(i)] = Wood(team=self)
-        
-        # for i in range(food):
-        #     self.community["fo"][str(i)] = Food(team=self)
-        
-        # for i in range(gold):
-        #     self.community["g"][str(i)] = Gold(team=self)
-            
+            self.community["S"][str(i)] = Stable(team=self)
         
         self.ressources["w"] += wood
         self.ressources["g"] += gold
-        self.ressources["fo"] += food
-        
+        self.ressources["f"] += food
+
+    # def initialize_unit(self, unit):
+    #     self.community[unit.name][str(unit.uid)] = unit
+
     def initialise_villages(self, archers = 0, horsmen = 0, swordsmen = 0, villages = 0, town_center = 0,
                             stables = 0, keeps = 0, houses = 0, farms = 0, camps = 0, barracks = 0, 
                             archery_ranger = 0, wood = 0, food = 0, gold = 0):
@@ -129,7 +122,7 @@ class Model:
             Stable(team=self)
         self.ressources["w"] += wood
         self.ressources["g"] += gold
-        self.ressources["fo"] += food
+        self.ressources["f"] += food
       
     #return a tuple that contains à dict of all village content and the length of it
     def population(self):
@@ -140,25 +133,27 @@ class Model:
     """
     def add_unit(self, unit):    
         if(self.has_enough_resources(unit.get_cost())):
-            self.community[unit.name.lower()][str(unit.uid)] = unit
+            # if issubclass(unit.__class__, Building):
+            #     unit.build()
+
+            self.community[unit.name][str(unit.uid)] = unit
             for ressource, cost in unit.get_cost().items():
                 self.ressources[ressource] -= cost
-                
+
     """
         takes ressources to add, and update the village ressources
     """
     def add_ressources(self, ressource, quantity = 0):
         # self.add_unit(ressource)
         if(issubclass(ressource.__class__, Ressource)):
-            self.ressources[ressource.get_name().lower()] += ressource.get_quantity()
+            self.ressources[ressource.get_name()] += ressource.get_quantity()
         else:
             self.ressources[ressource] += quantity
         
     def remove_unit(self, unit):
-        self.community[unit.name.lower()].pop(str(unit.uid))
-        self.world.remove_element(unit)
+        self.community[unit.name].pop(str(unit.uid))
         if(issubclass(unit.__class__, Ressource)):
-            self.ressources[unit.name.lower()] -= 1
+            self.ressources[unit.name] -= 1
 
     def update_unit(self, unit):
         pass
