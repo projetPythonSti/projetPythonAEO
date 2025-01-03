@@ -1,7 +1,6 @@
 import time
-from save import JSONSerializable
 
-class Building(JSONSerializable):
+class Building:
     def __init__(self, name, cost, time_building, health, length, population=0, spawn='Unity', dropPoint=False):
         self.name = name
         self.cost = cost

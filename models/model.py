@@ -18,11 +18,11 @@ from models.ressources.ressources import Ressource, Gold, Wood, Food
 # from controllers import Game_controller
 # from unity import Unity
 from collections import defaultdict
-from save import JSONSerializable
 
 
 
-class Model(JSONSerializable):
+
+class Model:
     """
             22/12/2024@tahakhetib - J'ai apporté des modifications à ce fichier sur ce que @amadou_yaya_diallo a écrit
             - Ajouté une fonction get_name afin d'obtenir le nom d'équipe (utilisé dans Villager.py).
@@ -39,6 +39,10 @@ class Model(JSONSerializable):
         self.name = name
         self.world = world
         self.world.add_village(self)
+
+    def to_dict(self):
+        return {"community" : {k1 : { k2 : (self.community[k1][k2].position.getX(),self.community[k1][k2].position.getY()) for k2 in self.community[k1].keys()} for k1 in self.community.keys()}}
+
         
     def initialize_villages(self, archers = 0, horsmen = 0, swordsmen = 0, villages = 0, town_center = 0,
                             stables = 0, keeps = 0, houses = 0, farms = 0, camps = 0, barracks = 0, 

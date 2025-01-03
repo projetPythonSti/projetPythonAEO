@@ -1,14 +1,14 @@
 import numpy as np
+import json
 from models.maps.Tile import  Tile
 from models.model import Model  # delete it after finish testing the class World
 from models.unity.Villager import Villager  # delete it after finish testing the class World
 from models.ressources.ressources import Gold, Wood, Food, Ressource
 from collections import defaultdict
 import random as rd
-from save import JSONSerializable
 
 
-class World(JSONSerializable):
+class World:
 
 
     """
@@ -30,6 +30,13 @@ class World(JSONSerializable):
         self.initialise_world()
         # les clés du dico seront de la forme (x,y)
         # self.units  #every unit on the map, a list seems better to me
+
+    def to_dict (self):
+        print (self.ressources)
+        print(self.ressources.items())
+        print(self.ressources.keys())
+        print(self.ressources.values())
+        return {"width" : self.width, "height" : self.height, "villages" : { v.name : v.to_dict() for v in self.villages }, "ressources" : { k1 : {k2 : self.ressources[k1][k2].to_dict() for k2 in self.ressources[k1].keys()} for k1 in self.ressources.keys()}}
 
     def initialise_world(self):  # emplit de Tuile le dico du monde
         for x in range(self.width + 1):
@@ -124,6 +131,16 @@ class World(JSONSerializable):
         for i, (key, value) in enumerate(self.tiles_dico.items()):
             binary_array[key[0], key[1]] = 0 if value.contains == None else 1
         return binary_array
+
+
+
+    def to_json(self, file_path=None):
+        """Convert object to JSON and optionally save to file."""
+        data = self.to_dict()
+        if file_path:
+            with open(file_path, "w") as f:
+                json.dump(data, f, indent=4)
+        return json.dumps(data, indent=4)
 
     #def intkey(key): #turns a float key into an int key for dict indexation
     #     return (int(key[0]),int(key[1]))
