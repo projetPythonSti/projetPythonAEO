@@ -129,10 +129,6 @@ class World:
 
     """Les deux fonction qui suivent sont utilisées pour la sauvegarde et ne sont pas à utiliser seule """
     def to_dict (self):
-        print (self.ressources)
-        print(self.ressources.items())
-        print(self.ressources.keys())
-        print(self.ressources.values())
         return {"width" : self.width, "height" : self.height, "villages" : { v.name : v.to_dict() for v in self.villages }, "ressources" : { k1 : {k2 : self.ressources[k1][k2].to_dict() for k2 in self.ressources[k1].keys()} for k1 in self.ressources.keys()}}
 
     def to_json(self, file_name=None):
