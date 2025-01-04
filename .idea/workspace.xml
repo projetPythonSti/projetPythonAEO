@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="dist et closest_position servent calculs entre positions&#10;move_easy bouge unité avec théorème de thalès">
-      <change afterPath="$PROJECT_DIR$/bagarreVillageois.py" afterDir="false" />
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="fichier bagarreVillageois qui permettra à des villageois de s'entretuer, afin de montrer que tout ce qu'on a produit jusque là sert à qlqc">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bagarreVillageois.py" beforeDir="false" afterPath="$PROJECT_DIR$/bagarreVillageois.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,26 +49,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.Unity.executor&quot;: &quot;Run&quot;,
-    &quot;Python.barracks.executor&quot;: &quot;Run&quot;,
-    &quot;Python.buildings.executor&quot;: &quot;Run&quot;,
-    &quot;Python.mPygameMonde.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.mcarte.executor&quot;: &quot;Run&quot;,
-    &quot;Python.mmonde.executor&quot;: &quot;Run&quot;,
-    &quot;Python.mressources.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pathfinding.executor&quot;: &quot;Run&quot;,
-    &quot;Python.randommap.executor&quot;: &quot;Run&quot;,
-    &quot;Python.tests.executor&quot;: &quot;Run&quot;,
-    &quot;Python.town_center.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;mgirardo&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/rowee/PycharmProjects/projetPythonAEO_MAX&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.Unity.executor": "Run",
+    "Python.bagarreVillageois.executor": "Run",
+    "Python.barracks.executor": "Run",
+    "Python.buildings.executor": "Run",
+    "Python.mPygameMonde.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.mcarte.executor": "Run",
+    "Python.mmonde.executor": "Run",
+    "Python.mressources.executor": "Run",
+    "Python.pathfinding.executor": "Run",
+    "Python.randommap.executor": "Run",
+    "Python.tests.executor": "Run",
+    "Python.town_center.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "mgirardo",
+    "last_opened_file_path": "C:/Users/rowee/PycharmProjects/projetPythonAEO_MAX",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\rowee\PycharmProjects\projetPythonAEO" />
@@ -347,7 +347,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735562673940</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="fichier bagarreVillageois qui permettra à des villageois de s'entretuer, afin de montrer que tout ce qu'on a produit jusque là sert à qlqc">
+      <option name="closed" value="true" />
+      <created>1735993589570</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1735993589570</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -362,7 +370,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="ajout fichier mressources : contient la classe Ressource et initialise wood et gold&#10;include mressources dans mmonde pour tester" />
     <MESSAGE value="Monde initialisé avec x et y &#10;Création randommap : Permettra de randomiser les Monde&#10;Création tests : Fichier dédié à tester mon bazar" />
     <MESSAGE value="maps aléatoires good&#10;exécutez tests si ça vous fait plaisir&#10;c'est mimi je vous jure" />
     <MESSAGE value="jsp j'ai changé quoi" />
@@ -387,7 +394,8 @@
     <MESSAGE value="fichiers et dossiers refaits&#10;tout est réparé&#10;j'ai juré je refait plus ça" />
     <MESSAGE value="j'ai des &quot;unversioned files&quot; à commit ça m'empêchait de checkout j'espère pas tout casser" />
     <MESSAGE value="dist et closest_position servent calculs entre positions&#10;move_easy bouge unité avec théorème de thalès" />
-    <option name="LAST_COMMIT_MESSAGE" value="dist et closest_position servent calculs entre positions&#10;move_easy bouge unité avec théorème de thalès" />
+    <MESSAGE value="fichier bagarreVillageois qui permettra à des villageois de s'entretuer, afin de montrer que tout ce qu'on a produit jusque là sert à qlqc" />
+    <option name="LAST_COMMIT_MESSAGE" value="fichier bagarreVillageois qui permettra à des villageois de s'entretuer, afin de montrer que tout ce qu'on a produit jusque là sert à qlqc" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
