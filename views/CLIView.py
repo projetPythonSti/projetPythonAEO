@@ -24,9 +24,9 @@ from blessed import Terminal #A implementer
 
 class Game_term :
 
-    def __init__(self, world,clock, gm):
+    def __init__(self, world, clock, game_manager):
         self.ltick = datetime.now()
-        self.gm = gm
+        self.game_manager = game_manager
         self.clock = clock
         self.speed = 1
         self.world = world
@@ -67,7 +67,6 @@ class Game_term :
                                     quit()
                     elif val.lower() == 'q':
                         quit()
-
                 print(f'bye!{term.normal}')
 
 
@@ -83,8 +82,8 @@ class Game_term :
         #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
         # self.events()
         # self.update()
-        self.gm.checkUnitsToMove()
-        self.gm.tick = timeit.default_timer()
+        self.game_manager.checkUnitsToMove()
+        self.game_manager.tick = timeit.default_timer()
 
         #self.world.update_unit_presence()
         self.draw_term()

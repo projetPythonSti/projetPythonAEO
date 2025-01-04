@@ -1,11 +1,8 @@
-import time
-import os, sys
-
 from game import Game
-from game_term import Game_term
+from views.CLIView import Game_term
 from randommap import *
 from models.unity.Archer import *
-import asyncio
+
 
 def jeu_terminal (world):
     running = True

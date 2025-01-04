@@ -56,7 +56,6 @@ class Model:
             self.community["v"][v.uid] = v
         
         for i in range(swordsmen):
-            self.peopleCount += 1
             s = Swordsman(team=self)
             self.community["s"][s.uid] = s
         
@@ -168,7 +167,12 @@ class Model:
     def get_name(self):
         return self.name
     def get_pplCount(self):
-        return self.peopleCount
+        villagerNumber = len(self.community["v"])
+        sNumber = len(self.community["s"])
+        hNumber = len(self.community["h"])
+        aNumber = len(self.community["a"])
+        return villagerNumber+sNumber+hNumber+aNumber
+
     def get_ressources(self):
         return self.ressources
 

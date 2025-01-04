@@ -1,5 +1,6 @@
 import numpy as np
 
+from models.buildings.buildings import Building
 from models.buildings.town_center import TownCenter
 from models.maps.Tile import  Tile
 from models.model import Model  # delete it after finish testing the class World
@@ -29,7 +30,7 @@ class World:
         self.villages = list()
         self.ressources = defaultdict(dict)
         self.tiles_dico = defaultdict(Tile)  # à chaque clé sera associé une Tuile
-        self.filled_tiles = defaultdict(tuple)  #
+        self.filled_tiles = defaultdict(tuple)
         self.initialise_world()
         # les clés du dico seront de la forme (x,y)
         # self.units  #every unit on the map, a list seems better to me
@@ -81,19 +82,37 @@ class World:
 
     def place_element(self, element):
         place = (element.position.getX(), element.position.getY())
-        if (place not in self.filled_tiles.values()):
-            self.tiles_dico[place].set_contains(element)
-            self.filled_tiles[place] = place
-            # update the view of the element
+        if place not in self.filled_tiles and place[0] <= self.width and place[1] <= self.height:
+            if issubclass(element.__class__, Building) and all(tile not in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
+                #check if the building can be placed
+                if element.surface[0] + place[0] <= self.width and element.surface[1] + place[1] <= self.height:
+                    for x in range(element.surface[0]):
+                        for y in range(element.surface[1]):
+                            try:
+                                self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(element)
+                            except KeyError:
+                                pass
+                            self.filled_tiles[(place[0] + x, place[1] + y)] = (place[0] +x, place[1]+y)
+            elif not issubclass(element.__class__, Building):
+                self.tiles_dico[place].set_contains(element)
+                self.filled_tiles[place] = place
+            #update the view of the element
 
     def remove_element(self, element):
         place = (element.position.getX(), element.position.getY())
-        self.tiles_dico[place].set_contains(None)
-        self.filled_tiles.pop(place)
-        if (type(element) == Ressource or type(element) == Wood or type(element) == Food or type(element) == Gold):
-            self.ressources[element.name.lower()].pop(str(element.uid))
+        if(issubclass(element.__class__, Building)) and all(tile in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
+            for x in range(element.surface[0]):
+                for y in range(element.surface[1]):
+                    self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(None)
+                    self.filled_tiles.pop[((place[0] + x, place[1] + y))]
+        elif not issubclass(element.__class__, Building):
+            self.tiles_dico[place].set_contains(None)
+            self.filled_tiles.pop(place)
+            #self.ressources[element.name].pop(str(element.uid))
 
-        # update the view of the element
+        #removing element from its team also
+        element.team.remove_unit(element)
+        #update the view of the element
 
     # def afficher_console(self):
     #     # self.update_unit_presence() #updates this everytime we print the map

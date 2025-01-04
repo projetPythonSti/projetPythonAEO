@@ -1,21 +1,14 @@
 import pygame as pg
-import time
-import os, sys
 
 from game import Game
-from game_term import Game_term
-from randommap import *
-from models.unity.Archer import *
-import asyncio
+from views.CLIView import Game_term
 
 from models.Position import Position
-from models.maps.Tile import Tile
 from models.model import Model
-import models.unity
 from models.World import World
 from models.gameManager import GameManager
 from models.unity.Villager import Villager
-from datetime import datetime
+
 
 def jeu_terminal (world, gm:GameManager):
     running = True

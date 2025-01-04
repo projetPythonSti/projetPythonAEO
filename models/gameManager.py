@@ -52,11 +52,13 @@ class GameManager:
             unit["timeElapsed"] += deltaTime.real
             #print("time elapsed : ", unit["timeElapsed"])
             if unit["timeElapsed"] >= (unit["timeToTile"]):
+                self.world.tiles_dico[unit["moveQueue"][0]].set_contains(None)
+                self.world.filled_tiles.pop(unit["moveQueue"][0])
                 unit["moveQueue"] = unit["moveQueue"][1::]
                 unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][id]
-                self.world.remove_element(unitObj)
                 self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][id].position = Position(unit["moveQueue"][0][0],unit["moveQueue"][0][0])
-                self.world.place_element(unitObj)
+                self.world.tiles_dico[unit["moveQueue"][0]].set_contains(unitObj)
+                self.world.filled_tiles[unit["moveQueue"][0]] = unit["moveQueue"][0]
                 unit["currentTile"] = unit["moveQueue"][0]
                 print("Got to the next tile in", (unit["timeElapsed"]))
                 unit["timeElapsed"] = 0
