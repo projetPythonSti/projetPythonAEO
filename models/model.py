@@ -27,6 +27,8 @@ class Model:
             - Ajouté une fonction get_name afin d'obtenir le nom d'équipe (utilisé dans Villager.py).
             - Changé la manière dont les unités sont ajoutées dans initialize_villages() pour faire en sorte que les nouveaux ID soient utilisés
             - Ajouté un compteur de population pour directement avoir accès au nombre de personnes faisant partie du village (avec le getter associé)
+            04/12/2024@tahakhetib - J'ai ajouté des modification au dessus de ce que @amadou_yaya_diallo à écrit
+                - Ajouté un compteur workingPpl qui va permettre aux IA de suivre le nombre de personnes qui doivent travailler.
 
     """
     def __init__(self, name, world = None):
@@ -35,10 +37,11 @@ class Model:
         self.community = defaultdict(dict)
         self.ressources = defaultdict(int)
         self.peopleCount = 0
+        self.workingPpl = 0
         self.name = name
         self.world = world
         self.world.add_village(self)
-        
+
     def initialize_villages(self, archers = 0, horsmen = 0, swordsmen = 0, villages = 0, town_center = 0,
                             stables = 0, keeps = 0, houses = 0, farms = 0, camps = 0, barracks = 0, 
                             archery_ranger = 0, wood = 0, food = 0, gold = 0):

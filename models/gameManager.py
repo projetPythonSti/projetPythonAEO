@@ -82,7 +82,6 @@ class GameManager:
 
         def addUnitToMoveDict(self, unit : Unity, destination):
             if (unit.position.toTuple() not in self.world.filled_tiles.values()):
-                print("position not in filled_tiles, adding it")
                 self.world.filled_tiles[unit.position.toTuple()] = unit.position.toTuple()
             grid = self.world.convertMapToGrid()
             teamNumber = self.getTeamNumber(unit.uid)

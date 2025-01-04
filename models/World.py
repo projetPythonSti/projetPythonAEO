@@ -20,13 +20,15 @@ class World:
         26/12/2024@tahakhetib : J'ai apporté des modifs sur ce que @amadou_yaya_diallo
             - Changé le type de l'attribut filled_tiles vers un dictionnaire
             - Modifié les fonctions place_element() et remove_element() pour qu'elle s'adapte au changement de filled_tiles
+        02/12/2024@tahakhetib : J'ai apporté des modifications sur ce que @amadou_yaya_diallo a écrit
+            - Passé le type des éléments du dictionnaire de tiles_dico à Tiles
     """
     def __init__(self, width, height):  # dict of villages in the world
         self.width = width
         self.height = height
         self.villages = list()
         self.ressources = defaultdict(dict)
-        self.tiles_dico = defaultdict(int)  # à chaque clé sera associé une Tuile
+        self.tiles_dico = defaultdict(Tile)  # à chaque clé sera associé une Tuile
         self.filled_tiles = defaultdict(tuple)  #
         self.initialise_world()
         # les clés du dico seront de la forme (x,y)
@@ -83,7 +85,6 @@ class World:
             self.tiles_dico[place].set_contains(element)
             self.filled_tiles[place] = place
             # update the view of the element
-        print("ADDED")
 
     def remove_element(self, element):
         place = (element.position.getX(), element.position.getY())
@@ -91,7 +92,6 @@ class World:
         self.filled_tiles.pop(place)
         if (type(element) == Ressource or type(element) == Wood or type(element) == Food or type(element) == Gold):
             self.ressources[element.name.lower()].pop(str(element.uid))
-        print("REMOVED")
 
         # update the view of the element
 
