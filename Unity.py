@@ -14,10 +14,10 @@ class Unity:
         self.range = ranges
         self.team = team
     
-    def move(lastPosition):
+    def move(self,lastPosition):
         pass
     
-    def attack(attackedObjet):
+    def attack(self,attackedObjet):
         pass
     
     def getCost(self): return self.cost

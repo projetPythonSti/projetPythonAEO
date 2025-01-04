@@ -1,4 +1,4 @@
-from time import perf_counter
+from time import *
 
 from models.unity.Archer import Archer
 from models.Pathfinding import Pathfinding
@@ -7,7 +7,6 @@ from Unity import *
 from models.buildings.town_center import TownCenter
 from mmonde import *
 
-import time
 
 print("\n\n\n\n\n")
 
@@ -27,7 +26,21 @@ for i in range(5):
 monde.afficher_console()
 #villagers should now target one of the opposing team villagers
 for u in monde.units:
-    ()
+    for t in monde.units:
+        if u.team!=t.team:
+            u.target=t
+            break
 #each cycle, every villager either moves towards its target or attacks it (if at range)
-#also, they should check if their target is alive. If not,
+while 1:
+    sleep(2)
+    monde.afficher_console()
+    for u in monde.units:
+        #if not at range
+        if dist(u.position,u.target.position)>0.5:
+            u.move_easy(u.target.position)
+        #if at range
+        else:
+            u.attack(u.target)
+    #also, dead units should be removed, and alive units should retarget
+
 
