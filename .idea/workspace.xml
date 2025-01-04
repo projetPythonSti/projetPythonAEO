@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="fichiers et dossiers refaits&#10;tout est réparé&#10;j'ai juré je refait plus ça">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_12_2024_13_52_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_12_2024_13_52__Changes_.xml" beforeDir="false" />
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="dist et closest_position servent calculs entre positions&#10;move_easy bouge unité avec théorème de thalès">
+      <change afterPath="$PROJECT_DIR$/bagarreVillageois.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Unity.py" beforeDir="false" afterPath="$PROJECT_DIR$/Unity.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mmonde.py" beforeDir="false" afterPath="$PROJECT_DIR$/mmonde.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -73,6 +70,11 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\rowee\PycharmProjects\projetPythonAEO" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -337,7 +339,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733843395142</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="dist et closest_position servent calculs entre positions&#10;move_easy bouge unité avec théorème de thalès">
+      <option name="closed" value="true" />
+      <created>1735562673940</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1735562673940</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -352,7 +362,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="classes Tuile et Monde" />
     <MESSAGE value="ajout fichier mressources : contient la classe Ressource et initialise wood et gold&#10;include mressources dans mmonde pour tester" />
     <MESSAGE value="Monde initialisé avec x et y &#10;Création randommap : Permettra de randomiser les Monde&#10;Création tests : Fichier dédié à tester mon bazar" />
     <MESSAGE value="maps aléatoires good&#10;exécutez tests si ça vous fait plaisir&#10;c'est mimi je vous jure" />
@@ -377,7 +386,8 @@
     <MESSAGE value="CORRECTING THINGS" />
     <MESSAGE value="fichiers et dossiers refaits&#10;tout est réparé&#10;j'ai juré je refait plus ça" />
     <MESSAGE value="j'ai des &quot;unversioned files&quot; à commit ça m'empêchait de checkout j'espère pas tout casser" />
-    <option name="LAST_COMMIT_MESSAGE" value="j'ai des &quot;unversioned files&quot; à commit ça m'empêchait de checkout j'espère pas tout casser" />
+    <MESSAGE value="dist et closest_position servent calculs entre positions&#10;move_easy bouge unité avec théorème de thalès" />
+    <option name="LAST_COMMIT_MESSAGE" value="dist et closest_position servent calculs entre positions&#10;move_easy bouge unité avec théorème de thalès" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

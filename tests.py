@@ -30,8 +30,8 @@ from time import sleep
 print("\n\n\n\n\n")
 vill1 = monde.spawn_unit(Villager,"blue",0,0)
 for _ in range(5):
-    sleep(1)
-    vill1.move_easy(Position(2,1))
+    sleep(2)
+    vill1.move_easy(Position(3,2))
     print(vill1.position.getX(),vill1.position.getY())
     monde.update_unit_presence()
     monde.afficher_console()
