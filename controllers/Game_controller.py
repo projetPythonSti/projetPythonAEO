@@ -1,5 +1,5 @@
 from views.Cli import *
-from model import Model
+from models.model import Model
 
 """
 le controleur doit gerer l'interaction des utilisateur du jeu avec le jeu

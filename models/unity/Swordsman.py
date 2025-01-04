@@ -10,4 +10,4 @@ class Swordsman(Unity):
         community = team.get_pplCount()
         villageName = team.get_name()
         uid = f"eq{villageName}p{community}"
-        super().__init__(uid, "SM", { "food" : 50, "gold" : 20}, 20, 40, 4, 0.2, 1, team=team)
+        super().__init__(uid, "s", { "f" : 50, "g" : 20}, 20, 40, 4, 0.9, 1, team=team)

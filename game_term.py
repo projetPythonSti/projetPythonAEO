@@ -1,7 +1,10 @@
+import timeit
 from datetime import datetime
 
+import pygame as pg
 import sys
 from mmonde import World
+from utils.setup import TILE_SIZE
 import os, sys
 import time as t
 import datetime as dt
@@ -26,8 +29,8 @@ class Game_term :
         self.game_duration = 0
 
     def run_term (self):
-        self.playing = True
         speed = 10
+        self.playing = True
 
         while self.playing :
             term = Terminal()
@@ -76,6 +79,7 @@ class Game_term :
         # self.events()
         # self.update()
         self.gm.checkUnitsToMove()
+        self.gm.tick = timeit.default_timer()
         print(self.world.filled_tiles)
         #self.world.update_unit_presence()
         self.draw_term()
@@ -105,10 +109,15 @@ class Game_term :
 
 
     def draw_term (self):
+        term = Terminal()
+
         os.system('cls' if os.name == 'nt' else 'clear')
         #self.world.afficher_console()
-        self.world.show_world()
-        print("Durée de la partie " + str(self.game_duration) + "s ")
+        with term.location(0,term.height-1):
+            #print(term.home + term.clear)
+            self.world.show_world()
+
+            print("Durée de la partie " + str(self.game_duration) + "s ")
 
 
 

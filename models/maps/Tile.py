@@ -9,7 +9,7 @@ class Tile:
         return self.contains
     
     def __repr__(self):
-        return self.contains.get_name() if self.contains != None else ""
+        return self.contains.get_name() if self.contains != None else "_"
     
     # def affiche(self): #magic method repr wasn't doing me right, made a non-magic method    #KillAllWizards
     #     if self.unites!=[]:
