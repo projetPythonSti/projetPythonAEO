@@ -97,9 +97,9 @@ if __name__ == "__main__":
     #print(gm.checkUnitsToMove())
     #Boucle pour tester le game manager
     n = 0
-    #jeu_terminal(monde,gm)
-    monde.to_json("world.json")
-    print("World saved to 'world.json'")
+    jeu_terminal(monde,gm)
+    #monde.to_json("world.json")
+    #print("World saved to 'world.json'")
 
 
 

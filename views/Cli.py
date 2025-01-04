@@ -82,9 +82,6 @@ class CLIView():
                 pass #écrire du code pour set une large map
 
 
-
-
-
     def set_ressources_quantity (self) :
         term = Terminal()
         print("Veuillez choisir la taille de la carte")
@@ -153,7 +150,7 @@ class CLIView():
 
 
         # j'ai la flemme je rajouterais la suite plus tard
-        #verif1
+        # verif1
         pass
         #rajouté code
 

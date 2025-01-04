@@ -113,11 +113,10 @@ class Game_term :
 
         os.system('cls' if os.name == 'nt' else 'clear')
         #self.world.afficher_console()
-        with term.location(0,term.height-1):
-            #print(term.home + term.clear)
-            self.world.show_world()
+        #print(term.home + term.clear)
+        self.world.show_world()
 
-            print("Durée de la partie " + str(self.game_duration) + "s ")
+        print("Durée de la partie " + str(self.game_duration) + "s ")
 
 
 
