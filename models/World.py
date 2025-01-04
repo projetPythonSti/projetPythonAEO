@@ -6,6 +6,7 @@ from models.unity.Villager import Villager  # delete it after finish testing the
 from models.ressources.ressources import Gold, Wood, Food, Ressource
 from collections import defaultdict
 import random as rd
+import os
 
 
 class World:
@@ -31,12 +32,6 @@ class World:
         # les clés du dico seront de la forme (x,y)
         # self.units  #every unit on the map, a list seems better to me
 
-    def to_dict (self):
-        print (self.ressources)
-        print(self.ressources.items())
-        print(self.ressources.keys())
-        print(self.ressources.values())
-        return {"width" : self.width, "height" : self.height, "villages" : { v.name : v.to_dict() for v in self.villages }, "ressources" : { k1 : {k2 : self.ressources[k1][k2].to_dict() for k2 in self.ressources[k1].keys()} for k1 in self.ressources.keys()}}
 
     def initialise_world(self):  # emplit de Tuile le dico du monde
         for x in range(self.width + 1):
@@ -132,13 +127,19 @@ class World:
             binary_array[key[0], key[1]] = 0 if value.contains == None else 1
         return binary_array
 
+    """Les deux fonction qui suivent sont utilisées pour la sauvegarde et ne sont pas à utiliser seule """
+    def to_dict (self):
+        print (self.ressources)
+        print(self.ressources.items())
+        print(self.ressources.keys())
+        print(self.ressources.values())
+        return {"width" : self.width, "height" : self.height, "villages" : { v.name : v.to_dict() for v in self.villages }, "ressources" : { k1 : {k2 : self.ressources[k1][k2].to_dict() for k2 in self.ressources[k1].keys()} for k1 in self.ressources.keys()}}
 
-
-    def to_json(self, file_path=None):
+    def to_json(self, file_name=None):
         """Convert object to JSON and optionally save to file."""
         data = self.to_dict()
-        if file_path:
-            with open(file_path, "w") as f:
+        if file_name:
+            with open("saves/"+file_name, "w") as f:
                 json.dump(data, f, indent=4)
         return json.dumps(data, indent=4)
 
