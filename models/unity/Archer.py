@@ -6,7 +6,7 @@ class Archer(Unity):
             - Changé la définition de l'UID d'Archer -> Passage à une string basé sur le numéro d'équipe + la taille de la communauté.
     """
     def __init__(self, team):
-        community = team.get_pplCount()
+        community = len(team.community)
         villageName = team.get_name()
         uid = f"eq{villageName}p{community}"
         super().__init__(uid, "a", { "w" : 25, "g" : 45}, 35, 30, 4, 1, 4, team = team)

@@ -82,6 +82,7 @@ class AIPlayer:
     def getBuildTarget(self, size):
         pass
 
+
     def setResourceAction(self, concernedRes):
         pass
 

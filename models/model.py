@@ -36,8 +36,6 @@ class Model:
         # Dictionary of human, materiel and ressources of the village
         self.community = defaultdict(dict)
         self.ressources = defaultdict(int)
-        self.peopleCount = 0
-        self.workingPpl = 0
         self.name = name
         self.world = world
         self.world.add_village(self)
@@ -46,17 +44,14 @@ class Model:
                             stables = 0, keeps = 0, houses = 0, farms = 0, camps = 0, barracks = 0, 
                             archery_ranger = 0, wood = 0, food = 0, gold = 0):
         for i in range(archers):
-            self.peopleCount += 1
             a = Archer(team=self)
             self.community["a"][a.uid] = a
 
         for i in range(horsmen):
-            self.peopleCount += 1
             h = Horseman(team=self)
             self.community["h"][h.uid] = h
    
         for i in range(villages):
-            self.peopleCount += 1
             v = Villager(team=self)
             self.community["v"][v.uid] = v
         
