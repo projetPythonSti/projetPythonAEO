@@ -15,8 +15,7 @@ class Hud:
         self.build_surface, self.build_rect = self.create_surface(width * 0.15, height * 0.25, (self.width * 0.84, self.height * 0.74))
         self.select_surface, self.select_rect = self.create_surface(width * 0.3, height * 0.2, (self.width * 0.35, self.height * 0.79))
 
-        # Load images and define buildable buildings
-        self.images = self.load_images()
+        # Define buildable buildings
         self.create_buildings()
         self.tiles = self.create_build_hud()  # Assign the returned value to self.tiles
 
@@ -36,12 +35,19 @@ class Hud:
         render_pos = [self.width * 0.84 + 10, self.height * 0.74 + 10]
         object_width = self.build_surface.get_width() // 5
         tiles = []
+        cols = 3
+        col_count = 0
+        row_count = 0
+        space = 10
 
         for building_name, building_info in self.building_classes.items():
-            image = self.load_image_for_building(building_name)
+            # Use resource_manager's images instead of loading again
+            image = self.resource_manager.images.get(building_name)
             if image:
                 image_scaled = self.scale_image(image.copy(), w=object_width)
-                rect = image_scaled.get_rect(topleft=render_pos.copy())
+                tile_x = render_pos[0] + col_count * (image_scaled.get_width() + space)
+                tile_y = render_pos[1] + row_count * (image_scaled.get_height() + space)
+                rect = image_scaled.get_rect(topleft=(tile_x, tile_y))
                 tiles.append({
                     "name": building_name,
                     "icon": image_scaled,
@@ -49,28 +55,12 @@ class Hud:
                     "rect": rect,
                     "affordable": True  # No resource check yet
                 })
-                render_pos[0] += image_scaled.get_width() + 10
+                col_count += 1
+                if col_count >= cols:
+                    col_count = 0
+                    row_count += 1
 
         return tiles  # Return the list of tiles
-    
-    def load_images(self):
-        images = {}
-        try:
-            images["tree"] = pg.image.load("assets/graphics/tree.png").convert_alpha()
-            images["rock"] = pg.image.load("assets/graphics/rock.png").convert_alpha()
-            images["block"] = pg.image.load("assets/graphics/block.png").convert_alpha()
-            images["Town Centre"] = pg.image.load("assets/graphics/town_centre.png").convert_alpha()
-            images["House"] = pg.image.load("assets/graphics/house.png").convert_alpha()
-            images["Camp"] = pg.image.load("assets/graphics/camp.png").convert_alpha()
-            images["Farm"] = pg.image.load("assets/graphics/farm.png").convert_alpha()
-            images["Barracks"] = pg.image.load("assets/graphics/barracks.png").convert_alpha()
-            images["Stable"] = pg.image.load("assets/graphics/stable.png").convert_alpha()
-            images["Archery Range"] = pg.image.load("assets/graphics/archery_range.png").convert_alpha()
-            images["Keep"] = pg.image.load("assets/graphics/keep.png").convert_alpha()
-        except FileNotFoundError as e:
-            print(f"Error loading image: {e}")
-        return images
-    
 
     def update(self):
         mouse_pos = pg.mouse.get_pos()
@@ -95,7 +85,7 @@ class Hud:
             img_scaled = self.scale_image(self.examined_tile.image.copy(), h=self.select_rect.height * 0.7)
             screen.blit(self.select_surface, (self.width * 0.35, self.height * 0.79))
             screen.blit(img_scaled, (self.width * 0.35 + 10, self.height * 0.79 + 40))
-            draw_text(screen, self.examined_tile.name, 40, (255, 255, 255), self.select_rect.topleft)
+            draw_text(screen, self.examined_tile.name, 40, (255, 255, 255), (self.width * 0.35 + 10, self.height * 0.79))
 
         for tile in self.tiles:
             screen.blit(tile["icon"], tile["rect"].topleft)

@@ -1,4 +1,6 @@
 import pygame as pg
+from settings import WIDTH, HEIGHT
+import pygame as pg
 from game import Game
 from menu import StartMenu, GameMenu
 
@@ -8,7 +10,7 @@ def main():
 
     pg.init()
     pg.mixer.init()
-    screen = pg.display.set_mode((720, 720))
+    screen = pg.display.set_mode((900, 700))
     clock = pg.time.Clock()
 
     # implement menus
@@ -30,4 +32,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
 
