@@ -1,154 +1,103 @@
 import curses
-
-# class CLIView():
-    
-#     def __init__(self):
-#         pass
-    
-#     def affichage(self, stdscr):
-#         curses.curs_set(0)
-#         stdscr.clear()
-        
-#         letter = list("abcde")
-#         current = 0
-#         while(current < len(letter)):
-#             stdscr.clear()
-#             stdscr.addstr(0,0,f"Lettre : {letter[current]}")
-#             stdscr.refresh()
-            
-#             key = stdscr.getch()
-            
-#             if(key == curses.KEY_DOWN):
-#                 current += 1
-            
-#             if current >= len(letter):
-#                 break
-        
-#         # stdscr.getch()
-
-# if __name__ == "__main__":
-#     cli = CLIView()
-#     curses.wrapper(cli.affichage)
-
-import timeit
-from datetime import datetime
-
-import pygame as pg
-from models.World import World
-from utils.setup import TILE_SIZE
-import os, sys
-import time as t
-import datetime as dt
-from models.unity.Archer import Unity
-from blessed import Terminal #A implementer
-
-################################
-## Partie input
-################################
-
-
-
-#########################################
-## Jeu
-#########################################
+import time
 
 class CLIView:
-
-    def __init__(self, world, clock, game_manager):
-        self.ltick = datetime.now()
+    def __init__(self, monde, stdscr, game_manager):
+        self.monde = monde
+        self.stdscr = stdscr
+        self.height = monde.height
+        self.width = monde.width
+        self.running = False
         self.game_manager = game_manager
-        self.clock = clock
-        self.speed = 1
-        self.world = world
-        self.playing = False
-        self.game_duration = 0
+        self.init_curses()
 
-    def run (self):
-        speed = 10
-        self.playing = True
+    def init_curses(self):
+        """Initialisation de l'écran curses"""
+        curses.curs_set(0)  # Masque le curseur
+        self.stdscr.nodelay(1)  # Ne bloque pas l'exécution
+        self.stdscr.timeout(100)  # Rafraîchit tous les 100ms
+        self.stdscr.clear()  # Efface l'écran
+        self.stdscr.refresh()
 
-        while self.playing:
-            terminal = Terminal()
-            print("press 'q' to quit.")
-            with terminal.cbreak():
-                val = ''
-                while val.lower() != 'q':
-                    val = terminal.inkey(timeout=0.00001)
-                    if not val:
-                        self.Turn(speed)
-                    elif val.lower() == '+':
-                        if speed < 20:
-                            speed += 1
-                        print(speed)
-                    elif val.lower() == '-':
-                        if speed > 5:
-                            speed -= 1
-                        print(speed)
-                    elif val.lower() == 'p':
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        print("Nous sommes en pause : ")
-                        print("Appuyez sur z pour quitter")
-                        print("Appuyez sur r pour reprendre")
-                        with terminal.cbreak():
-                            val2 = ''
-                            while val2.lower() != 'r':
-                                val2 = terminal.inkey()
-                                if val2.lower() == 'z' :
-                                    quit()
-                    elif val.lower() == 'q':
-                        quit()
+    def display_world(self):
+        height, width = self.stdscr.getmaxyx()  # Obtient les dimensions du terminal
+        for y in range(self.height):
+            if y >= height - 1:  # Si on atteint la fin de l'écran, on arrête de dessiner
+                break
+            for x in range(self.width):
+                if x >= width - 1:  # Si on dépasse la largeur de l'écran, on arrête
+                    break
+                self.display_tile(x, y)  # Affiche la tuile à la position (x, y)
+            self.stdscr.addstr("\n")  # Passe à la ligne suivante, mais vérifie que l'on est encore dans les limites de la fenêtre
 
-                print(f'bye!{terminal.normal}')
+    def display_tile(self, x, y):
+        """Affiche une seule tuile"""
+        tile = self.monde.tiles_dico[(x, y)]
+        # Utilisation de la méthode str pour obtenir une représentation textuelle de la tuile
+        content = str(tile)  # Vous pouvez remplacer par la méthode spécifique pour obtenir un symbole
+        self.stdscr.addstr(content)
 
+    def update_element_position(self, element, old_position):
+        """Met à jour la position d'un élément"""
+        if old_position != element.position:
+            # Efface l'ancienne position
+            self.clear_tile(old_position)
+            # Met à jour la vue pour la nouvelle position
+            self.place_element(element)
 
+    def remove_element(self, element):
+        """Supprime un élément de la vue"""
+        position = (element.position.getX(), element.position.getY())
+        self.clear_tile(position)
 
-    def Turn (self,speed) :
-        self.clock.tick(0.5 * (speed/10))
-        now = datetime.now()
-        delta = now - self.ltick
-        ig_delta = delta * self.speed
-        self.game_duration = self.game_duration + ig_delta.seconds
-        self.ltick = now
-        # t.sleep(2)
-        #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
-        # self.events()
-        # self.update()
-        self.gm.checkUnitsToMove()
-        self.gm.tick = timeit.default_timer()
+    def place_element(self, element):
+        """Place un élément sur la grille"""
+        position = (element.position.getX(), element.position.getY())
+        # Récupère la position de la tuile
+        tile = self.monde.tiles_dico[position]
+        # Mettez ici le code pour obtenir un caractère qui représente l'élément
+        symbol = "X"  # Par exemple, un "X" pour un élément placé
+        self.stdscr.addstr(position[1], position[0], symbol)  # Affiche à la position donnée
 
-        #self.world.update_unit_presence()
-        self.draw_term()
+    def clear_tile(self, position):
+        """Efface une tuile donnée"""
+        self.stdscr.addstr(position[1], position[0], "-")  # Efface la position
 
-    def Horloge(self):
-        pass
-
-    def events (self): #inutile il me semble
-
-        def on_press(key):
-            try:
-                print('alphanumeric key {0} pressed'.format(key.char))
-            except AttributeError:
-                print('special key {0} pressed'.format(
-                    key))
-
-        '''def on_release(key):
-            print('{0} released'.format(key))
-            if key == keyboard.Key.esc:
-                # Stop listener
-                return False'''
+    def refresh(self):
+        """Rafraîchit l'écran"""
+        self.stdscr.refresh()
 
     def update(self):
-        pass
+        """Met à jour la vue du monde"""
+        self.stdscr.clear()
+        self.display_world()
+        self.refresh()
 
+    def main_loop(self):
+        """Boucle principale de la vue CLI"""
+        self.running = True
+        while self.running:
+            self.update()  # Rafraîchit l'affichage à chaque itération
 
-    def draw_term (self):
-        terminal = Terminal()
-
-        os.system('cls' if os.name == 'nt' else 'clear')
-        #self.world.afficher_console()
-        with terminal.location(0,terminal.height-1):
-            #print(terminal.home + terminal.clear)
-            self.world.show_world()
-
-            print("Durée de la partie " + str(self.game_duration) + "s ")
-    
+            # Exécuter un test d'action sur le monde
+            # Simulation d'une modification de position d'un élément pour la démonstration
+            time.sleep(1)  # Pause d'une seconde pour voir les changements
+            try:
+                self.monde.remove_element(self.monde.villages[0].population()['a']['0'])  # Supprime le premier village
+            except Exception as e:
+                pass
+            
+            for element in self.game_manager.moving_units:
+                self.update_element_position(element, element.position)
+            # Exemple d'action sur un élément : déplacer un village
+            # (Ce serait déclenché par un événement dans votre jeu, ici nous le simulons)
+            # if self.monde.villages:
+            #     village = self.monde.villages[0].population()['a']['0']  # Exemple, on déplace le premier village
+            #     old_position = village.position
+            #     village.position.setX(village.position.getX() + 1)  # Déplacement à droite
+            # self.update_element_position(village, old_position)
+            
+            # Gestion des entrées du clavier, par exemple pour quitter la boucle
+            key = self.stdscr.getch()
+            if key == ord('q'):  # Quitte si on appuie sur "q"
+                self.running = False

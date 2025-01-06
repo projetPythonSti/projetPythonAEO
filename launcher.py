@@ -1,16 +1,19 @@
 from models.World import World
 from models.model import Model
+from models.Position import Position
 from controllers.gameManager import GameManager
+from views.Cli import CLIView
 from models.save import Save
 
+import curses
 
-if __name__ == "__main__":
-    world = World(30, 60)
+def main(stdscr):
+    world = World(50, 50)
     save = Save()
     
     village1 = Model("fabulous", world)
     village2 = Model("hiraculous", world)
-    village1.initialize_villages(1,2,3, gold=200, wood=400, food=300, town_center=1, keeps=2, houses=5, camps=3)
+    village1.initialize_villages(1,2,3, 1, gold=200, wood=400, food=300, town_center=1, keeps=2, houses=5, camps=3)
     village2.initialize_villages(4,5,6, 2, 1, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
     
     world.fill_world()
@@ -25,6 +28,24 @@ if __name__ == "__main__":
     
     #testing the html file
     game_manager = GameManager(1, world)
-    game_manager.html_generator()
+    # game_manager.html_generator()
     
+    game_manager.addUnitToMoveDict(village1.community["v"]["0"], Position(5,5))
+    # print(game_manager.unitToMove)
+    # return
+    #testing the terminal game
+    terminal = CLIView(world, stdscr, game_manager)
+    terminal.main_loop() 
+
+
+if __name__ == "__main__":
+    curses.wrapper(main)
+    # world = World(30, 60)
+    
+    # village1 = Model("fabulous", world)
+    # village2 = Model("hiraculous", world)
+    # village1.initialize_villages(1,2,3, gold=200, wood=400, food=300, town_center=1, keeps=2, houses=5, camps=3)
+    # village2.initialize_villages(4,5,6, 2, 1, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
+    
+    # print(world.villages[0].population())
     

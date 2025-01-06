@@ -12,6 +12,9 @@ class Tile:
     def __repr__(self):
         return self.contains.get_name() if self.contains != None else "-"
     
+    def __str__(self):
+        return self.__repr__()
+    
     # def affiche(self): #magic method repr wasn't doing me right, made a non-magic method    #KillAllWizards
     #     if self.unites!=[]:
     #         return self.unites[0].name[0].lower() #lowered first letter of the first unit on the tile

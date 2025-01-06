@@ -39,6 +39,8 @@ class GameManager:
     def __init__(self, speed, world: World ):
         self.gameSpeed = speed
         self.world = world
+        self.moving_units = list()
+        
 
     def getTeamNumber(self, name):
         pattern = r'\d+'
@@ -91,7 +93,7 @@ class GameManager:
             print("Found no short path")
         path = path + [pathFinding.startingPoint]
         path = path[::-1]
-
+        self.moving_units.append(unit) #adding the unit to the list of moving units
         self.unitToMove[unit.uid] = {
             "group"     : [],
             "timeToTile" : 1/(unit.speed),

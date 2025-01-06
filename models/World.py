@@ -6,6 +6,7 @@ from models.buildings.buildings import Building
 from models.ressources.ressources import Gold, Wood
 from collections import defaultdict
 import random as rd
+import numpy as np
 
 """
     22/12/2024 : J'ai apporté des modifications à ce fichier @tahakhetib sur ce que @amadou_yaya_diallo a écrit
@@ -105,11 +106,18 @@ class World:
         elif not issubclass(element.__class__, Building):           
             self.tiles_dico[place].set_contains(None)
             self.filled_tiles.pop(place)
-            monde.ressources[element.name].pop(str(element.uid))
+            # self.ressources[element.name].pop(str(element.uid))
         
         #removing element from its team also
         element.team.remove_unit(element)
         #update the view of the element
+        
+    def convertMapToGrid(self):
+        array_shape = (self.width, self.height)
+        binary_array = np.zeros(array_shape, dtype=int)
+        for i, (key, value) in enumerate(self.tiles_dico.items()):
+            binary_array[key[0], key[1]] = 0 if value.contains == None else 1
+        return binary_array
         
 if __name__ == "__main__":
     monde = World(30,50)
