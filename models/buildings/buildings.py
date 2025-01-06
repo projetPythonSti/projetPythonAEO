@@ -1,5 +1,5 @@
 import time
-from Position import Position
+from models.Position import Position
 import random as rd
 
 class Building:

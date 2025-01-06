@@ -1,5 +1,5 @@
-from buildings.buildings import Building
-from ressources.ressources import Food
+from models.buildings.buildings import Building
+from models.ressources.ressources import Food
 
 class Farm(Building):
   def __init__(self, team):

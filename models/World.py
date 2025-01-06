@@ -1,9 +1,9 @@
-from maps.Tile import Tile
-from model import Model #delete it after finish testing the class World
-from unity.Villager import Villager #delete it after finish testing the class World
-from buildings.buildings import Building
-from buildings.town_center import TownCenter #delete it after finish testing the class World
-from ressources.ressources import Gold, Wood
+from models.maps.Tile import Tile
+# from models.model import Model #delete it after finish testing the class World
+# from models.unity.Villager import Villager #delete it after finish testing the class World
+from models.buildings.buildings import Building
+# from models.buildings.town_center import TownCenter #delete it after finish testing the class World
+from models.ressources.ressources import Gold, Wood
 from collections import defaultdict
 import random as rd
 
@@ -65,7 +65,7 @@ class World:
             
     def fill_world(self):
         village1, village2 = self.villages
-        #iterating on 2 dict at the same time
+        #iterating on 2 dicts at the same time
         for pop1, pop2 in zip(village1.population().values(), village2.population().values()):
             for v1, v2 in zip(pop1.values(), pop2.values()):
                 self.place_element(v1)

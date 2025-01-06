@@ -1,5 +1,5 @@
 # this class is the parent class of all the unities in the game
-from Position import Position
+from models.Position import Position
 import random as rd
 
 class Unity:
@@ -17,6 +17,7 @@ class Unity:
         self.position = position if position else Position(rd.randint(0, self.team.world.width - 1), rd.randint(0, self.team.world.height - 1))
         self.range = visibility
         self.target = target
+        self.task = None
         # self.team.add_unit(self)
         # population += 1
     
@@ -37,6 +38,7 @@ class Unity:
     
     def attack(self, enemy):
         #1 attack per second for all units
+        self.task = "Fighting"
         enemy.set_health(enemy.get_health() - self.damage)
     
     def die(self):

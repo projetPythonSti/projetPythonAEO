@@ -1,5 +1,5 @@
 # This file contains the ressources classes, which are the objects that the player can collect in the game.
-from Position import Position
+from models.Position import Position
 import random as rd
 
 

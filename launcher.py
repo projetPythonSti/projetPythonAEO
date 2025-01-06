@@ -1,6 +1,7 @@
-from World import World
-from model import Model
-from save import Save
+from models.World import World
+from models.model import Model
+from controllers.gameManager import GameManager
+from models.save import Save
 
 
 if __name__ == "__main__":
@@ -13,13 +14,17 @@ if __name__ == "__main__":
     village2.initialize_villages(4,5,6, 2, 1, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
     
     world.fill_world()
-    world.show_world()
+    # world.show_world()
     
     print("After saving and loading")
     
     backup = save.save(world)
     data = save.load()
     world_prime = data[0]
-    world_prime.show_world()
+    # world_prime.show_world()
+    
+    #testing the html file
+    game_manager = GameManager(1, world)
+    game_manager.html_generator()
     
     

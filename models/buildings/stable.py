@@ -1,4 +1,4 @@
-from buildings.buildings import Building
+from models.buildings.buildings import Building
 
 class Stable(Building) :
   def __init__(self, team) :

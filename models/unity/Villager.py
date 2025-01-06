@@ -1,6 +1,6 @@
 # This file contains the Villager class which is a subclass of Unity
-from unity.Unity import Unity
-from buildings.farm import Farm
+from models.unity.Unity import Unity
+from models.buildings.farm import Farm
 
 class Villager(Unity):
 
@@ -12,10 +12,6 @@ class Villager(Unity):
         community = team.get_community().get('v')
         villageName = team.get_name()
         uid = f"eq{villageName}p{len(community) if community else 0}" # 0 if
-        super().__init__(uid,"v", {"f" : 50}, 25, 40, 2, 0.8, 1, team=team)
-        self.carry_max = 25
-        community = team.get_community().get('v')
-        uid = len(community) if community else 0 # 0 if 
         super().__init__(uid,"v", {"f" : 50}, 25, 40, 2, 0.8, 1, team=team)
         self.carry_max = 20
         # self.buildingSpeed = buildingSpeed,
@@ -30,6 +26,7 @@ class Villager(Unity):
         To do : a villager Can collect resources at rate of 25/minute
     """
     def collect(self, ressource):
+        self.task = "collecting"
         ressources_count = 1
         if isinstance(ressource, Farm):
             ressources_count = len(ressource.contains)
@@ -68,4 +65,5 @@ class Villager(Unity):
     """
     
     def build(self):
+        self.task = "building"
         return 0

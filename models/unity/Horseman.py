@@ -1,4 +1,4 @@
-from unity.Unity import Unity
+from models.unity.Unity import Unity
 
 class Horseman(Unity):
     """
