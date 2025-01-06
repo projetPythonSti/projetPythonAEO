@@ -20,13 +20,13 @@ import random as rd
 """
 
 class World:
-    def __init__(self, width, height, villages=None, ressources=None, tiles_dico=None, filled_tiles=None):
+    def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.villages = villages if villages else list()
-        self.ressources = ressources if ressources else defaultdict(dict)
-        self.tiles_dico = tiles_dico if tiles_dico else defaultdict(None)
-        self.filled_tiles = filled_tiles if filled_tiles else defaultdict(tuple)
+        self.villages = list()
+        self.ressources = defaultdict(dict)
+        self.tiles_dico = defaultdict(None)
+        self.filled_tiles = defaultdict(tuple)
         self.initialise_world()
         # les clés du dico seront de la forme (x,y)
         # self.units  #every unit on the map, a list seems better to me
@@ -39,23 +39,8 @@ class World:
     def add_village(self, village):
         self.villages.append(village)
     
-    def fill_ressources(self, max_ressource):
-        for i in range(rd.randint(0, max_ressource)):
-           self.ressources["w"][str(i)] = Wood(world=self)
-        
-        for i in range(rd.randint(0, max_ressource//2)):
-           self.ressources["g"][str(i)] = Gold(world=self)
-        
-        # for i in range(rd.randint(0, max_ressource)):
-        #    self.ressources["f"][str(i)] = Food(world=self)
-        
-        self.place_ressources()
-    
     def get_ressources(self):
         return self.ressources
-    
-    def add_village(self, village):
-        self.villages.append(village)
 
     def fill_ressources(self, max_ressource):
         for i in range(rd.randint(0, max_ressource)):
