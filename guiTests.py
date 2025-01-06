@@ -16,14 +16,17 @@ from models.World import World
 from models.gameManager import GameManager
 from models.unity.Villager import Villager
 from datetime import datetime
-from views.Cli import *
+from views.start_menu import *
 
 #Le world en paramètre est voué à disparaitre
 def jeu_terminal (world, gm:GameManager):
     running = True
     playing = True
-    #MENU
-    start_menu()
+
+    # MENU
+    menu = Menu()
+    menu.start_menu()
+    dico = menu.return_value()
 
 
     clock = pg.time.Clock()
