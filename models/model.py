@@ -29,6 +29,8 @@ class Model:
             - Ajouté un compteur de population pour directement avoir accès au nombre de personnes faisant partie du village (avec le getter associé)
             04/12/2024@tahakhetib - J'ai ajouté des modification au dessus de ce que @amadou_yaya_diallo à écrit
                 - Ajouté un compteur workingPpl qui va permettre aux IA de suivre le nombre de personnes qui doivent travailler.
+            05/12/2024@tahakhetib - J'ai ajouté les modifications au dessus de ce que @amadou_yaya_diallo à écrit
+                - Retiré les compteurs workingPpl et peopleCount pour une fonction get_pplCount()
 
     """
     def __init__(self, name, world = None):

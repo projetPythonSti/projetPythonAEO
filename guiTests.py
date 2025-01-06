@@ -6,7 +6,7 @@ from views.CLIView import Game_term
 from models.Position import Position
 from models.model import Model
 from models.World import World
-from models.gameManager import GameManager
+from controllers.gameManager import GameManager
 from models.unity.Villager import Villager
 
 
