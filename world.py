@@ -72,7 +72,6 @@ class World:
         return int(cart_x), int(cart_y)
 
     def is_entity_collision(self, grid_x, grid_y, size):
-<<<<<<< HEAD
         size_x, size_y = size
         for entity in self.entities:
             if isinstance(entity, Building) and entity.alive:
@@ -81,16 +80,6 @@ class World:
                         for dy in range(size_y):
                             if (grid_x + dx, grid_y + dy) == (ox, oy):
                                 return True
-=======
-        """Check if placing a building at the given position collides with existing entities."""
-        size_x, size_y = size
-        for entity in self.entities:
-            if isinstance(entity, Building):
-                for dx in range(size_x):
-                    for dy in range(size_y):
-                        if (grid_x + dx, grid_y + dy) in entity.tiles_occupied:
-                            return True
->>>>>>> fabf5e0e59423b8c00684cd8858b44aa6406cf36
         return False
 
     def can_place_building(self, grid_x, grid_y, size):
@@ -102,22 +91,14 @@ class World:
         for dx in range(size_x):
             for dy in range(size_y):
                 if not self.is_tile_available(grid_x + dx, grid_y + dy):
-<<<<<<< HEAD
                     return False  # Tile is not available
 
         if self.is_entity_collision(grid_x, grid_y, size):
             return False  # Collision with existing entity
-=======
-                    return False
-
-        if self.is_entity_collision(grid_x, grid_y, size):
-            return False
->>>>>>> fabf5e0e59423b8c00684cd8858b44aa6406cf36
 
         return True
 
     def is_tile_available(self, x, y):
-<<<<<<< HEAD
         if (x, y) not in self.world:
             return False
 
@@ -127,17 +108,6 @@ class World:
 
         # Check if the tile is marked as a collision in the world (e.g., tree, rock)
         if self.world[(x, y)]["collision"]:
-=======
-        if not (0 <= x < self.grid_length_x and 0 <= y < self.grid_length_y):
-            return False
-
-        # Check if there's already a building here
-        if self.buildings[x][y] is not None:
-            return False
-
-        # Check if the tile is marked as a collision in the world (e.g., tree, rock)
-        if self.world[x][y]["collision"]:
->>>>>>> fabf5e0e59423b8c00684cd8858b44aa6406cf36
             return False
 
         return True
@@ -231,11 +201,7 @@ class World:
                 iso_poly_screen = [(int(c[0] + camera.scroll.x + self.grass_tiles.get_width() / 2),
                                     int(c[1] + camera.scroll.y)) for c in iso_poly]
 
-<<<<<<< HEAD
                 if self.world[x, y]["collision"]:
-=======
-                if self.world[x][y]["collision"]:
->>>>>>> fabf5e0e59423b8c00684cd8858b44aa6406cf36
                     color = (255, 0, 0)  # Red outline if colliding
                 else:
                     color = (0, 255, 0)  # Green outline if free
@@ -473,124 +439,6 @@ class World:
             logger.info(f"Finished drawing projectiles for {building.name}")
         # ...existing code...
         
-<<<<<<< HEAD
-=======
-        # Reset temporary tile before handling new interactions
-        self.temp_tile = None
-        
-        # If a building is selected in the HUD, handle its placement
-        if self.hud.selected_tile:
-            self.handle_tile_selection(mouse_pos, camera, mouse_action)
-        else:
-            # No building selected, handle examination of existing tiles
-            self.handle_tile_examination(mouse_pos, camera, mouse_action)
-
-        # Remove redundant entity updates
-        # for entity in self.entities:
-        #     entity.update()
-        
-        #super().update(camera)
-        
-        for entity in self.entities:
-            if isinstance(entity, Keep):
-                # Example: Attack the closest worker
-                target = entity.find_closest_target(self.entities)  # Pass entities list
-                if target:
-                    entity.attack(target.pos)
-
-    def find_closest_target(self, building):
-        closest = None
-        min_distance = float('inf')
-        for entity in self.entities:
-            if isinstance(entity, Building):  # Example target
-                distance = building.pos.distance_to(entity.pos)
-                if distance < building.range * TILE_SIZE and distance < min_distance:
-                    closest = entity
-                    min_distance = distance
-        return closest
-
-
-    def create_world(self):
-        world = []
-        for grid_x in range(self.grid_length_x):
-            world.append([])
-            for grid_y in range(self.grid_length_y):
-                world_tile = self.grid_to_world(grid_x, grid_y)
-                world[grid_x].append(world_tile)
-                render_pos = world_tile["render_pos"]
-                self.grass_tiles.blit(self.tiles["block"], (render_pos[0] + self.grass_tiles.get_width() / 2, render_pos[1]))
-        return world
-
-    def grid_to_world(self, grid_x, grid_y):
-        rect = [(grid_x * TILE_SIZE, grid_y * TILE_SIZE),
-                (grid_x * TILE_SIZE + TILE_SIZE, grid_y * TILE_SIZE),
-                (grid_x * TILE_SIZE + TILE_SIZE, grid_y * TILE_SIZE + TILE_SIZE),
-                (grid_x * TILE_SIZE, grid_y * TILE_SIZE + TILE_SIZE)]
-
-        iso_poly = [self.cart_to_iso(x, y) for x, y in rect]
-
-        minx = min(x for x, y in iso_poly)
-        miny = min(y for x, y in iso_poly)
-
-        r = random.randint(1, 100)
-        perlin = 100 * noise.pnoise2(grid_x / self.perlin_scale, grid_y / self.perlin_scale)
-
-        if (perlin >= 15) or (perlin <= -35):
-            tile = "tree"
-        else:
-            if r == 1:
-                tile = "tree"
-            elif r == 2:
-                tile = "rock"
-            else:
-                tile = ""
-
-        return {
-            "grid": [grid_x, grid_y],
-            "cart_rect": rect,
-            "iso_poly": iso_poly,
-            "render_pos": [minx, miny],
-            "tile": tile,
-            "collision": False if tile == "" else True
-        }
-
-    def create_collision_matrix(self):
-        collision_matrix = [[1 if not self.world[x][y]["collision"] else 0 for y in range(self.grid_length_y)]
-                            for x in range(self.grid_length_x)]
-        print("Collision Matrix:")
-        for row in collision_matrix:
-            print(row)
-        return collision_matrix
-
-    def mouse_to_grid(self, x, y, camera):
-        """Convert mouse position to grid coordinates, accounting for zoom."""
-        adjusted_x = (x - camera.scroll.x * camera.zoom - (self.grass_tiles.get_width() / 2) * camera.zoom) / camera.zoom
-        adjusted_y = (y - camera.scroll.y * camera.zoom) / camera.zoom
-        world_x = adjusted_x
-        world_y = adjusted_y
-        cart_y = (2 * world_y - world_x) / 2
-        cart_x = cart_y + world_x
-        grid_x = int(cart_x // TILE_SIZE)
-        grid_y = int(cart_y // TILE_SIZE)
-        return grid_x, grid_y
-
-    def load_images(self):
-        images = {}
-        try:
-            images["tree"] = pg.image.load("assets/graphics/tree.png").convert_alpha()
-            images["rock"] = pg.image.load("assets/graphics/rock.png").convert_alpha()
-            images["block"] = pg.image.load("assets/graphics/block.png").convert_alpha()
-        except FileNotFoundError as e:
-            print(f"Error loading image: {e}")
-        return images
-
-    def draw(self, screen, camera):
-        """Render the world, including buildings."""
-        self.draw_grass_tiles(screen, camera)
-        self.draw_world_tiles(screen, camera)
-        self.draw_buildings(screen, camera)
-
->>>>>>> fabf5e0e59423b8c00684cd8858b44aa6406cf36
 
     def draw_buildings(self, screen, camera):
         """Draw all the buildings in the world."""
