@@ -3,6 +3,12 @@ from Position import Position
 import random as rd
 
 class Building:
+
+    """
+    04/12/2024@tahakhetib - J'ai ajouté des modification au dessus de ce que @moutanahzir à écrit
+                - ajouté un méthode get_surface() permettant d'obtenir efficacement la surface d'un batiment
+    """
+
     def __init__(self, uid, name, cost, time_building, health, surface, spawn="", population=0, dropPoint=False, position=None, team=None):
         self.uid = uid
         self.name = name
@@ -62,9 +68,12 @@ class Building:
         self.is_built = True
         print(f"Construction de {self.name} terminée.")
         return True
-    
+
     def get_position(self):
         return self.position
 
+    def get_surface(self):
+        return self.surface
+    
     def __repr__(self):
         return self.name

@@ -1,35 +1,3 @@
-import curses
-
-# class CLIView():
-    
-#     def __init__(self):
-#         pass
-    
-#     def affichage(self, stdscr):
-#         curses.curs_set(0)
-#         stdscr.clear()
-        
-#         letter = list("abcde")
-#         current = 0
-#         while(current < len(letter)):
-#             stdscr.clear()
-#             stdscr.addstr(0,0,f"Lettre : {letter[current]}")
-#             stdscr.refresh()
-            
-#             key = stdscr.getch()
-            
-#             if(key == curses.KEY_DOWN):
-#                 current += 1
-            
-#             if current >= len(letter):
-#                 break
-        
-#         # stdscr.getch()
-
-# if __name__ == "__main__":
-#     cli = CLIView()
-#     curses.wrapper(cli.affichage)
-
 import timeit
 from datetime import datetime
 
@@ -52,28 +20,28 @@ from blessed import Terminal #A implementer
 ## Jeu
 #########################################
 
-class CLIView:
+class Game_term :
 
-    def __init__(self, world, clock, game_manager):
+    def __init__(self, world, clock, gm):
         self.ltick = datetime.now()
-        self.game_manager = game_manager
+        self.gm = gm
         self.clock = clock
         self.speed = 1
         self.world = world
         self.playing = False
         self.game_duration = 0
 
-    def run (self):
+    def run_term (self):
         speed = 10
         self.playing = True
 
-        while self.playing:
-            terminal = Terminal()
+        while self.playing :
+            term = Terminal()
             print("press 'q' to quit.")
-            with terminal.cbreak():
+            with term.cbreak():
                 val = ''
                 while val.lower() != 'q':
-                    val = terminal.inkey(timeout=0.00001)
+                    val = term.inkey(timeout=0.00001)
                     if not val:
                         self.Turn(speed)
                     elif val.lower() == '+':
@@ -89,16 +57,16 @@ class CLIView:
                         print("Nous sommes en pause : ")
                         print("Appuyez sur z pour quitter")
                         print("Appuyez sur r pour reprendre")
-                        with terminal.cbreak():
+                        with term.cbreak():
                             val2 = ''
                             while val2.lower() != 'r':
-                                val2 = terminal.inkey()
+                                val2 = term.inkey()
                                 if val2.lower() == 'z' :
                                     quit()
                     elif val.lower() == 'q':
                         quit()
 
-                print(f'bye!{terminal.normal}')
+                print(f'bye!{term.normal}')
 
 
 
@@ -142,13 +110,12 @@ class CLIView:
 
 
     def draw_term (self):
-        terminal = Terminal()
+        term = Terminal()
 
         os.system('cls' if os.name == 'nt' else 'clear')
         #self.world.afficher_console()
-        with terminal.location(0,terminal.height-1):
-            #print(terminal.home + terminal.clear)
+        with term.location(0,term.height-1):
+            #print(term.home + term.clear)
             self.world.show_world()
 
             print("Durée de la partie " + str(self.game_duration) + "s ")
-    

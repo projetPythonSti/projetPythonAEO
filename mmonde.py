@@ -1,5 +1,6 @@
-from ressources.mressources import *
-from unity.Unity import *
+from models.maps.Tile import Tile
+from models.ressources.ressources import *
+from models.unity.Unity import *
 import numpy as np
 
 from utils.setup import TILE_SIZE

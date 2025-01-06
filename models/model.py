@@ -128,6 +128,12 @@ class Model:
             self.ressources[ressource.get_name()] += ressource.get_quantity()
         else:
             self.ressources[ressource] += quantity
+    def add_ressources(self, ressource, quantity = 0):
+        # self.add_unit(ressource)
+        if(issubclass(ressource.__class__, Ressource)):
+            self.ressources[ressource.get_name()] += ressource.get_quantity()
+        else:
+            self.ressources[ressource] += quantity
         
     def remove_unit(self, unit):
         self.community[unit.name].pop(str(unit.uid))
@@ -150,6 +156,8 @@ class Model:
     def get_ressources(self):
         return self.ressources
 
+    def get_name(self):
+        return self.name
 
 if __name__ == "__main__":
     model = Model("Mine")
@@ -165,5 +173,18 @@ if __name__ == "__main__":
     # w.remove()
     
     # model.remove_unit(model.community["w"]["0"])
+    # model.ressources |= dict([("fo",60), ("g",30)])
+    model.initialise_villages(0, 0, 0, 3)
+    # model.add_unit(Swordsman(team=model))
+    # model.add_unit(Villager(team=model))
+    # model.add_unit(Swordsman(team=model))
+    # # model.add_unit(Food(team=model))
+    # model.remove_unit(model.community["v"]["0"])
+    # w = Wood(team=model)
+    # model.add_ressources(w)
+    # w.remove()
+    
+    # model.remove_unit(model.community["w"]["0"])
     print(model.community)
+    print(model.ressources)
     print(model.ressources)
