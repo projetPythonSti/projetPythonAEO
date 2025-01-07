@@ -24,6 +24,7 @@ def jeu_terminal (world, gm:GameManager):
     playing = True
 
     # MENU
+
     menu = Menu()
     menu.start_menu()
     dico = menu.return_value()
