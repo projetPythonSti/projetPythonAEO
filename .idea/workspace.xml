@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="terminal qui se met bien tout seul">
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="tentative bouger camera terminal">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bagarreVillageois.py" beforeDir="false" afterPath="$PROJECT_DIR$/bagarreVillageois.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game_term.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_term.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/World.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/World.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -384,7 +382,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736263616272</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="tentative bouger camera terminal">
+      <option name="closed" value="true" />
+      <created>1736265462095</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1736265462095</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -399,7 +405,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="correction génération monde:&#10;-les ressources sont bien contenues dans self.dico[(x,y)].contains" />
     <MESSAGE value="classe créée pour chaque ressource" />
     <MESSAGE value="afficher_console now shows units on the map (+repaired things around that topic)" />
     <MESSAGE value="no change" />
@@ -424,7 +429,8 @@
     <MESSAGE value="last push of what i did&#10;imma just start over with etan's branch" />
     <MESSAGE value="j'ai tout piqué d'etan&#10;methode de World show_precise_world qui montre une partie du monde grâce aux nouvelles variables de Game_term upleft et downright" />
     <MESSAGE value="terminal qui se met bien tout seul" />
-    <option name="LAST_COMMIT_MESSAGE" value="terminal qui se met bien tout seul" />
+    <MESSAGE value="tentative bouger camera terminal" />
+    <option name="LAST_COMMIT_MESSAGE" value="tentative bouger camera terminal" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

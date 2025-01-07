@@ -50,16 +50,16 @@ class Game_term :
                         self.pause()
                     elif val.name =='KEY_TAB' :
                         self.stat()
-                    elif val.name == 'z':
+                    elif val.lower == 'z':
                         if self.upleft.getX()>0:
                             self.upleft.setX(self.upleft.getX()-1)
-                    elif val.name == 'q':
+                    elif val.lower == 'q':
                         if self.upleft.getY()>0:
                             self.upleft.setY(self.upleft.getY()-1)
-                    elif val.name == 's':
+                    elif val.lower == 's':
                         if self.upleft.getX()<self.world.height:
                             self.upleft.setX(self.upleft.getX()+1)
-                    elif val.name == 'd':
+                    elif val.lower == 'd':
                         if self.upleft.getY()<self.world.width:
                             self.upleft.setY(self.upleft.getY()+1)
 
