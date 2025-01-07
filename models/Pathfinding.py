@@ -2,6 +2,7 @@ import heapq
 
 import numpy as np
 
+
 class Pathfinding:
     def __init__(self, mapGrid, statingPoint, goal):
         self.mapGrid = mapGrid
@@ -22,7 +23,51 @@ class Pathfinding:
         """
         
     def getGoal(self): return self.goal
-    
+
+
+    def checkIfOccupied(self, position):
+        return self.mapGrid[position[0]][position[1]] != 1
+
+    def checkNeighbors(self, position):
+        finalPos = None
+        direction = (self.goal[0]-self.startingPoint[0], self.goal[1]-self.startingPoint[1])
+        if (direction[0] < 0) and (direction[0]<0) or (direction[0] < 0) and (direction[1] > 0): # Came from northeast, searching for accurate
+            print("NORTHEAST or NORTHWEST or NORTH")
+            finalPos = (self.goal[0],self.goal[1]-1) if self.checkIfOccupied((self.goal[0],self.goal[1]-1)) else None
+            print("finalPOS now", finalPos)
+
+
+        elif ((direction[0] > 0) and (direction[1] < 0)) or ((direction[0] < 0) and (direction[1] < 0)) or ((direction[0]==0) and (direction[1] < 0)) : # Came from south, searching for accurate position
+            print("SOUTHEAST or SOUTHWEST or SOUTH")
+            finalPos = (self.goal[0],self.goal[1]+1) if self.checkIfOccupied((self.goal[0],self.goal[1]+1)) else None
+            print("finalPOS now", finalPos)
+
+        elif (direction[0] < 0) and (direction[1] == 0):
+            print("EAST")
+            finalPos = (self.goal[0]-1,self.goal[1]) if self.checkIfOccupied((self.goal[0]-1,self.goal[1])) else None
+            print("finalPOS now", finalPos)
+
+        elif (direction[0] > 0) and (direction[1] == 0):
+            print("West")
+            finalPos = (self.goal[0] + 1, self.goal[1]) if self.checkIfOccupied((self.goal[0] + 1, self.goal[1])) else None
+            print("finalPOS now", finalPos)
+
+        if finalPos is None:
+            print("Found no nearPath")
+            xPos = -1
+            yPos = -1
+            while finalPos is None and xPos<=1 :
+                finalPos = (self.goal[0] + xPos, self.goal[1] -yPos) if self.checkIfOccupied((self.goal[0]+xPos , self.goal[1]+yPos)) else None
+                print("Xpos val : ", xPos, "Ypos val : ", yPos, "CIO : ",self.checkIfOccupied((self.goal[0]+xPos , self.goal[1]+yPos)))
+                xPos += 1
+                yPos += 1
+            if finalPos is None:
+                print("After all this search foundNoPaths")
+            print("avant de partir, voici finalPos à la fin de checkNeighbors",finalPos)
+            return finalPos
+        return finalPos
+
+
     def astar(self):
         neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # ,(1,1),(1,-1),(-1,1),(-1,-1)]
         close_set = set()
@@ -31,6 +76,10 @@ class Pathfinding:
         fscore = {self.startingPoint: self.heuristic(self.startingPoint, self.goal)}
         oheap = []
         heapq.heappush(oheap, (fscore[self.startingPoint], self.startingPoint))
+        if self.mapGrid[self.goal[0]][self.goal[1]]:
+            print("VALUE NOT SHEKED")
+            self.goal = self.checkNeighbors(self.goal)
+            print("new goal value = ", self.goal)
 
         while oheap:
 

@@ -1,7 +1,8 @@
 import pygame as pg
 
 from game import Game
-from views.CLIView import Game_term
+from views.game_term import Game_term
+from blessed import Terminal
 
 from models.Position import Position
 from models.model import Model
@@ -90,6 +91,8 @@ if __name__ == "__main__":
     #print(gm.checkUnitsToMove())
     #Boucle pour tester le game manager
     n = 0
+    term2 = Terminal()
+    print(term2.width, term2.height)
     jeu_terminal(monde,gm)
 
 

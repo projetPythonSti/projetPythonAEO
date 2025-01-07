@@ -1,4 +1,9 @@
+from collections import defaultdict
 from enum import Enum
+from os import fdopen
+
+import numpy as np
+from pygame.pkgdata import getResource
 
 from models.Position import Position
 from models.World import World
@@ -12,6 +17,7 @@ from models.buildings.stable import Stable
 from models.buildings.town_center import TownCenter
 from controllers.gameManager import GameManager
 from models.model import Model
+from models.ressources.ressources import Ressource, Wood, Gold, Food
 from models.unity.Villager import Villager
 
 
@@ -30,10 +36,12 @@ class BuildingTypeENUM(Enum):
     Village = [House, TownCenter]
     Farming = [Farm, Camp]
 
+class ResourceTypeENUM(Enum):
+    w = Wood
+    g = Gold
+    f = Food
+
 class PlayStyle:
-
-
-
 
     """
         Matrice de style de jeu
@@ -43,6 +51,7 @@ class PlayStyle:
           G H I
         ]
 
+-
           A : Représente l'importance de la collecte de matières premières / 10 (Wood)
           D : Représente l'importance de la collecte de ressources pécuniaires / 10(Gold)
           G : Représente l'importance de la collecte de ressources alimentaires / 10 (Food)
@@ -61,40 +70,48 @@ class PlayStyle:
         self.playStyleMatrix = []
         self.minWorkers = minWorkers
 
+
     def setPlayStyleMatrix(self, matrix):
         self.playStyleMatrix = matrix
+
+    def getPlayStyleMatrix(self):
+        return self.playStyleMatrix
 
 
 class AIPlayer:
     playing = False
-    def __init__(self, team : Model, world : World, playStyle : PlayStyle):
+    def __init__(self, team : Model, world : World, playStyle : PlayStyle, level : int):
         self.team = team
         self.world = world
         self.playStyle = playStyle
+        self.level = level
         self.freeUnits = {
             "v" : list(team.community["v"].keys()),
             "h" : list(team.community["h"].keys()),
             "s" : list(team.community["s"].keys()),
             "a" : list(team.community["a"].keys())
         }
+        self.topVillageBorder = (0, 0)
+        self.bottomVillageBorder = (0, 0)
         print("voici les unités libres ..",self.freeUnits)
         self.eventQueue = []
+
+    def setVillageBorders(self, topLeftPos, bottomRightPos):
+        self.topVillageBorder = topLeftPos
+        self.bottomVillageBorder = bottomRightPos
 
 
     def playTurn(self):
             self.playing = True
             workingPpl  = self.team.get_pplCount() - self.getFreePplCount()
-
-            if workingPpl < playStyle.minWorkers:
+            if workingPpl < play_style.minWorkers:
                 print("Minworkers hit, playing now")
                 self.setBuildingAction(self.checkBuildings())
+                self.setResourceAction(self.team.ressources)
             else:
                 print("RAS")
 
 
-    def checkRessources(self):
-        vRessources = self.team.get_ressources()
-        return min(vRessources.values(), key=vRessources.get())
 
     def checkBuildings(self):
         nbAR = len(self.team.community["A"])
@@ -119,6 +136,19 @@ class AIPlayer:
     def getBuildingsPriority(self):
         return self.playStyle.playStyleMatrix[0][1],self.playStyle.playStyleMatrix[1][1],self.playStyle.playStyleMatrix[2][1]
 
+    def getResourcesPriority(self):
+        return self.playStyle.playStyleMatrix[0][0],self.playStyle.playStyleMatrix[1][0],self.playStyle.playStyleMatrix[2][0]
+
+    def estimateDistance(self, pos1 : tuple, pos2 : tuple):
+        return abs(pos2[0] - pos1[0]), abs(pos2[1] - pos1[1])
+
+    def getNearestRessource(self,topLeftPos,bottomRightPos,  resourceType):
+        ressourceKeyDict = list(map(lambda  x : x, self.world.ressources[resourceType].keys()))
+        resourcesPositionList = list(map(lambda x : self.estimateDistance(x.position.toTuple(), topLeftPos) , self.world.ressources[resourceType].values()))
+        nearestResourcesIndex = resourcesPositionList.index(min(resourcesPositionList))
+        return {
+            ressourceKeyDict[nearestResourcesIndex] : resourcesPositionList[nearestResourcesIndex]
+        }
 
     def getOptimalBuildingCurve(self, BuildingType):
         return 3
@@ -141,7 +171,7 @@ class AIPlayer:
             print("LISTE D'UNITES LIBRE VIDE !!!!")
             return -1  # an error will be thrown later
         for i in idList:
-            print(i)
+            #print(i)
             self.freeUnits[type].remove(i)
         return {
             "action": "Build",
@@ -154,15 +184,25 @@ class AIPlayer:
         }
 
     def setResourceAction(self, concernedRes):
+        resPriority = self.getResourcesPriority()
+        resPriority = (resPriority[0]*self.level,resPriority[1]*self.level,resPriority[2]*self.level)
+        resDistance = {"w": concernedRes["w"]-resPriority[0],"g" : concernedRes["g"]-resPriority[1], "f" :concernedRes["f"]-resPriority[2]}
+        ressourceToGet =  min(resDistance, key=resDistance.get)
+        print("Ressource to get is", ResourceTypeENUM[ressourceToGet].value)
+        resToCollect = self.getNearestRessource((0,0),(0,4),ressourceToGet)
+        unitID = self.getFreePeople(1, )
+        print(unitID)
 
-        pass
+
+
 
 
     def setBuildingAction(self, buildings):
         if buildings["T"] == 0:
             buildingEvent = self.getBuildingActionDict(buildingType="T")
             self.eventQueue.append(buildingEvent)
-        if True:
+
+        else:
             buildingPriority = self.getBuildingsPriority()
             builtBuildings = (
                 (buildings["A"] + buildings["K"] + buildings["S"] + buildings["B"]), (buildings["H"] + buildings["T"]),
@@ -190,7 +230,7 @@ if __name__ == "__main__":
     monde = World(100, 100)
     village1 = Model("1", monde)
     village2 = Model("2", monde)
-    village1.initialize_villages(1, 2, 3, gold=200, wood=100, food=300)
+    village1.initialize_villages(1, 2, 3,villages=3, gold=200, wood=100, food=300)
     village2.initialize_villages(4, 5, 6, gold=2, wood=1, food=3)
     v = Villager(village1)
     village1.add_unit(v)
@@ -210,20 +250,22 @@ if __name__ == "__main__":
     #print(community)
     gm = GameManager(speed=1, world=monde)
     print("Launched GameManager")
+    print()
     gm.addUnitToMoveDict(v, Position(40, 40))
     print("Added unit to move dict")
-    gm.addUnitToMoveDict(community["v"]["eq1p6"], Position(10,20))
+    gm.addUnitToMoveDict(community["v"]["eq1p3"],community["a"]["eq1p0"].position)
     print("Added 2nd unit to move dict")
     print(monde.filled_tiles)
     #print(gm.checkUnitsToMove())
     #Boucle pour tester le game manager
     n = 0
-    playStyle = PlayStyle(minWorkers=2)
+    play_style = PlayStyle(minWorkers=2)
     playStyleMatrix= [
-        [0,3,0],
-        [0,4,0],
-        [0,3,0]
+        [4,3,0],
+        [2,4,0],
+        [1,3,0]
     ]
-    playStyle.setPlayStyleMatrix(playStyleMatrix)
-    player = AIPlayer(village1,monde,playStyle)
+    play_style.setPlayStyleMatrix(playStyleMatrix)
+    player = AIPlayer(village1, monde, play_style, level=100)
     player.playTurn()
+

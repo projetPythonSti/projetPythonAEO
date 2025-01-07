@@ -1,4 +1,3 @@
-from importlib.resources import Resource
 
 import pygame as pg
 import sys
@@ -46,7 +45,7 @@ class Game :
     def update(self):
         pass
 
-    '''def draw (self) :
+    def draw (self) :
         self.screen.fill((0,0,0))
         for x in range (self.world.x):
             for y in range(self.world.y):
@@ -56,16 +55,18 @@ class Game :
                     pg.draw.rect(self.screen, (23,0,255),rect,1)
                     if (len(self.world.dico[(x,y)].unites) != 0):
                         pg.draw(self.screen, (23,0,255), rect)
-                elif(self.world.dico[(x,y)].contains.__class__ == models.Wood):
+                elif(self.world.dico[(x,y)].contains.__class__ == models.ressources.mressources.Wood):
                     pg.draw.rect(self.screen, (255,0,0),rect,1)
-                elif(self.world.dico[(x,y)].contains.__class__ == models.Gold):
+                elif(self.world.dico[(x,y)].contains.__class__ == models.ressources.mressources.Gold):
                     pg.draw.rect(self.screen, (0,255,0),rect,1)
-                elif(self.world.dico[(x,y)].contains.__class__ == models.Food):
-                    pg.draw.rect(self.screen,(100,210,255),rect,width=1)'''
+                elif(self.world.dico[(x,y)].contains.__class__ == models.ressources.mressources.Food):
+                    pg.draw.rect(self.screen,(100,210,255),rect,width=1)
 
 
 
+                #pg.draw.rect(self.screen, (0,0,255),rect,1)
 
+        #pg.display.flip()
 
     def draw_term (self):
         self.world.afficher_console()

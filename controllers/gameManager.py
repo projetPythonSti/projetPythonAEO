@@ -3,7 +3,6 @@ from collections import defaultdict
 from datetime import datetime
 import time
 import re
-from importlib.resources import Resource
 
 from models.Pathfinding import Pathfinding
 from models.Position import Position
@@ -46,17 +45,17 @@ class GameManager:
             print(substrings)
             return int(substrings[0])
 
-        def moveUnit(self, id):
+        def moveUnit(self, uid):
             deltaTime = timeit.default_timer() - self.tick
-            unit = self.unitToMove[id]
+            unit = self.unitToMove[uid]
             unit["timeElapsed"] += deltaTime.real
             #print("time elapsed : ", unit["timeElapsed"])
             if unit["timeElapsed"] >= (unit["timeToTile"]):
                 self.world.tiles_dico[unit["moveQueue"][0]].set_contains(None)
                 self.world.filled_tiles.pop(unit["moveQueue"][0])
                 unit["moveQueue"] = unit["moveQueue"][1::]
-                unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][id]
-                self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][id].position = Position(unit["moveQueue"][0][0],unit["moveQueue"][0][0])
+                unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][uid]
+                self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][uid].position = Position(unit["moveQueue"][0][0], unit["moveQueue"][0][0])
                 self.world.tiles_dico[unit["moveQueue"][0]].set_contains(unitObj)
                 self.world.filled_tiles[unit["moveQueue"][0]] = unit["moveQueue"][0]
                 unit["currentTile"] = unit["moveQueue"][0]
@@ -69,7 +68,7 @@ class GameManager:
 
 
         def checkUnitsToMove(self):
-            if (len(self.unitToMove) == 0):
+            if len(self.unitToMove) == 0:
                 print("No unit to move")
             else:
                 unitToDelete = ""
@@ -83,7 +82,7 @@ class GameManager:
 
 
         def addUnitToMoveDict(self, unit : Unity, destination):
-            if (unit.position.toTuple() not in self.world.filled_tiles.values()):
+            if unit.position.toTuple() not in self.world.filled_tiles.values():
                 self.world.filled_tiles[unit.position.toTuple()] = unit.position.toTuple()
             grid = self.world.convertMapToGrid()
             teamNumber = self.getTeamNumber(unit.uid)

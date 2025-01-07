@@ -26,6 +26,7 @@ class CLIView():
         
         # stdscr.getch()
 
+
 if __name__ == "__main__":
     cli = CLIView()
     curses.wrapper(cli.affichage)

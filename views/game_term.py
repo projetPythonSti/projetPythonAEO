@@ -10,13 +10,7 @@ import time as t
 import datetime as dt
 from models.unity.Archer import *
 import asyncio
-from blessed import Terminal #A implementer
-
-################################
-## Partie input
-################################
-
-
+from blessed import Terminal
 
 #########################################
 ## Jeu
@@ -24,9 +18,9 @@ from blessed import Terminal #A implementer
 
 class Game_term :
 
-    def __init__(self, world, clock, game_manager):
+    def __init__(self, world,clock, gm):
         self.ltick = datetime.now()
-        self.game_manager = game_manager
+        self.gm = gm
         self.clock = clock
         self.speed = 1
         self.world = world
@@ -67,6 +61,7 @@ class Game_term :
                                     quit()
                     elif val.lower() == 'q':
                         quit()
+
                 print(f'bye!{term.normal}')
 
 
@@ -82,9 +77,9 @@ class Game_term :
         #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
         # self.events()
         # self.update()
-        self.game_manager.checkUnitsToMove()
-        self.game_manager.tick = timeit.default_timer()
-
+        self.gm.checkUnitsToMove()
+        self.gm.tick = timeit.default_timer()
+        print(self.world.filled_tiles)
         #self.world.update_unit_presence()
         self.draw_term()
 
@@ -93,18 +88,20 @@ class Game_term :
 
     def events (self): #inutile il me semble
 
-        def on_press(key):
+        """
+            def on_press(key):
             try:
                 print('alphanumeric key {0} pressed'.format(key.char))
             except AttributeError:
                 print('special key {0} pressed'.format(
                     key))
 
-        '''def on_release(key):
+        def on_release(key):
             print('{0} released'.format(key))
             if key == keyboard.Key.esc:
                 # Stop listener
-                return False'''
+                return False
+        """
 
     def update(self):
         pass
@@ -115,11 +112,10 @@ class Game_term :
 
         os.system('cls' if os.name == 'nt' else 'clear')
         #self.world.afficher_console()
-        with term.location(0,term.height-1):
-            print(term.home + term.clear)
-            self.world.show_world()
+        #print(term.home + term.clear)
+        self.world.show_world()
 
-            print("Durée de la partie " + str(self.game_duration) + "s ")
+        print("Durée de la partie " + str(self.game_duration) + "s ")
 
 
 
