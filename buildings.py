@@ -2,19 +2,24 @@ import time
 from Position import Position
 from Ressource import Ressource
 
+
+
+
 class Building:
-    def __init__(self, name, cost, time_building, health, longueur, spawn=False, dropPoint=False, flag=False, position=None, population=0):
+    def __init__(self, name, cost, time_building, health, max_health, longueur, spawn=False, dropPoint=False,
+                 flag=False, position=None, population=0):
         self.name = name
-        self.cost = cost 
+        self.cost = cost
         self.time_building = time_building
         self.health = health
+        self.max_health = max_health
         self.longueur = longueur
         self.is_built = False
         self.spawn = spawn
         self.dropPoint = dropPoint
         self.flag = flag
         self.position = position if position else Position(0, 0)
-        self.population = population  # Ajout de population
+        self.population = population
 
     def can_afford(self, resources: list):
         for res_name, amount_needed in self.cost.items():
@@ -36,7 +41,7 @@ class Building:
 
     def set_time_building(self, villagers: int):
         return max(1, int(3 * self.time_building / (villagers + 2)))
-    
+
     def build(self, resources: list, villagers: int):
         if not self.can_afford(resources):
             print(f"Pas assez de ressources pour construire {self.name}.")
@@ -52,7 +57,134 @@ class Building:
         print(f"Construction de {self.name} terminée.")
         return True
 
+    def repair(self, resources: list, villagers: int):
+        if self.health == self.max_health:
+            print(f"{self.name} est déjà en pleine santé.")
+            return False
+        missing_health = self.max_health - self.health
+        repair_cost = {}
+        for res_name, res_value in self.cost.items():
+            repair_cost[res_name] = int((missing_health * res_value) / self.max_health)
+
+        for res_name, amount_needed in repair_cost.items():
+            found = False
+            for res in resources:
+                if res.name == res_name and res.getQuantity() >= amount_needed:
+                    found = True
+                    break
+            if not found:
+                print(f"Pas assez de ressources pour réparer {self.name}.")
+                return False
+
+        for res_name, amount_needed in repair_cost.items():
+            for res in resources:
+                if res.name == res_name:
+                    res.setQuantity(res.getQuantity() - amount_needed)
+
+        repair_time = max(1, int(3 * missing_health * self.time_building / (self.max_health * (villagers + 2))))
+        print(f"Réparation de {self.name} commencée... Cela prendra {repair_time} secondes.")
+        for second in range(repair_time):
+            print(f"Réparation en cours : {second + 1}/{repair_time} secondes")
+            time.sleep(1)
+
+        self.health = self.max_health
+        print(f"{self.name} a été réparé avec succès et est maintenant à pleine santé.")
+        return True
+
     def set_position(self, x, y):
         self.position.setX(x)
         self.position.setY(y)
         print(f"Position de {self.name} définie à ({x}, {y}).")
+
+
+
+class TownCenter(Building):
+    def __init__(self):
+        super().__init__(
+            name="T",
+            cost={"w": 350},
+            time_building=150,
+            health=1000,
+            max_health=1000,
+            longueur=4,
+            population=5,
+            dropPoint=True,
+            spawn="v"
+        )
+
+
+class Stable(Building):
+    def __init__(self):
+        super().__init(
+            name="S",
+            cost={"w": 175},
+            time_building=50,
+            health=500,
+            max_health=500,
+            longueur=3,
+            spawn="h"
+        )
+
+
+class Keep(Building):
+    def __init__(self):
+        super().__init__(
+            name="K",
+            cost={"w": 35, "g": 125},
+            time_building=80,
+            health=800,
+            max_health=800,
+            longueur=1,
+        )
+
+
+class Farm(Building):
+    def __init__(self):
+        super().__init__(
+            name="F",
+            cost={"w": 60},
+            build_time=10,
+            health=100,
+            max_health=100,
+            longueur=2,
+            dropPoint=True
+        )
+
+
+class Camp(Building):
+    def __init__(self):
+        super().__init__(
+            name="C",
+            cost={"w": 100},
+            time_building=25,
+            health=200,
+            max_health=200,
+            longueur=2,
+            dropPoint=True
+        )
+
+
+class Barracks(Building):
+    def __init__(self):
+        super().__init__(
+            name="B",
+            cost={"w": 175},
+            time_building=50,
+            health=500,
+            max_health=500,
+            longueur=3,
+            spawn="s"
+        )
+
+
+class Archery_range(Building):
+    def __init__(self):
+        super().__init__(
+            name="A",
+            cost={"w": 175},
+            time_building=50,
+            health=500,
+            max_health=500,
+            longueur=3,
+            spawn="a"
+        )
