@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="fichier bagarreVillageois qui permettra à des villageois de s'entretuer, afin de montrer que tout ce qu'on a produit jusque là sert à qlqc">
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="bagarreVillageois.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Unity.py" beforeDir="false" afterPath="$PROJECT_DIR$/Unity.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bagarreVillageois.py" beforeDir="false" afterPath="$PROJECT_DIR$/bagarreVillageois.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -356,7 +355,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735993589570</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="bagarreVillageois.py">
+      <option name="closed" value="true" />
+      <created>1736000236304</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1736000236304</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -371,7 +378,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Monde initialisé avec x et y &#10;Création randommap : Permettra de randomiser les Monde&#10;Création tests : Fichier dédié à tester mon bazar" />
     <MESSAGE value="maps aléatoires good&#10;exécutez tests si ça vous fait plaisir&#10;c'est mimi je vous jure" />
     <MESSAGE value="jsp j'ai changé quoi" />
     <MESSAGE value="j'ai merge avec Unit" />
@@ -396,7 +402,8 @@
     <MESSAGE value="j'ai des &quot;unversioned files&quot; à commit ça m'empêchait de checkout j'espère pas tout casser" />
     <MESSAGE value="dist et closest_position servent calculs entre positions&#10;move_easy bouge unité avec théorème de thalès" />
     <MESSAGE value="fichier bagarreVillageois qui permettra à des villageois de s'entretuer, afin de montrer que tout ce qu'on a produit jusque là sert à qlqc" />
-    <option name="LAST_COMMIT_MESSAGE" value="fichier bagarreVillageois qui permettra à des villageois de s'entretuer, afin de montrer que tout ce qu'on a produit jusque là sert à qlqc" />
+    <MESSAGE value="bagarreVillageois.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="bagarreVillageois.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

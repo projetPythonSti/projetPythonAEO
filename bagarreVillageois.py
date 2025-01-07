@@ -42,5 +42,3 @@ while 1:
         else:
             u.attack(u.target)
     #also, dead units should be removed, and alive units should retarget
-
-
