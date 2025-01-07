@@ -63,7 +63,7 @@ def cluster(world,resource,key,repl=50,fade=16): #key is a tuple please
 def random_world(dict):
     newworld = World(dict["X"],dict["Y"])
     maptype = dict["t"]
-    wealth = int(newworld.width*newworld.height / 3600) # = 4 for a 120x120 , wealth allows resources to scale with map size
+    wealth = int(newworld.width*newworld.height / 4800) # = 3 for a 120x120 , wealth allows resources to scale with map size
     if maptype == "Arabia": #Medium clusters of wood, open center
         for _ in range(0,wealth+2): #Some wood on the outskirts
             number = randint(1,8)

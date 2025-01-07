@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="camera bouge correctement">
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="MAP ALEATOIRES&#10;j'ai tout refait &#10;Arabia très bien je trouve">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game_term.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_term.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/World.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/World.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/randommap.py" beforeDir="false" afterPath="$PROJECT_DIR$/randommap.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -400,7 +398,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736265929406</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="MAP ALEATOIRES&#10;j'ai tout refait &#10;Arabia très bien je trouve">
+      <option name="closed" value="true" />
+      <created>1736275110066</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1736275110066</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -415,7 +421,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="afficher_console now shows units on the map (+repaired things around that topic)" />
     <MESSAGE value="no change" />
     <MESSAGE value="tentative de réparation du git" />
     <MESSAGE value="LE GIT EST REPARE POUR MOI&#10;unites affichée sur la map" />
@@ -440,7 +445,8 @@
     <MESSAGE value="terminal qui se met bien tout seul" />
     <MESSAGE value="tentative bouger camera terminal" />
     <MESSAGE value="camera bouge correctement" />
-    <option name="LAST_COMMIT_MESSAGE" value="camera bouge correctement" />
+    <MESSAGE value="MAP ALEATOIRES&#10;j'ai tout refait &#10;Arabia très bien je trouve" />
+    <option name="LAST_COMMIT_MESSAGE" value="MAP ALEATOIRES&#10;j'ai tout refait &#10;Arabia très bien je trouve" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
