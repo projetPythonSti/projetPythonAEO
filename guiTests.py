@@ -26,9 +26,7 @@ def jeu_terminal (world, gm:GameManager):
     # MENU
 
     menu = Menu()
-    menu.start_menu()
-    dico = menu.return_value()
-
+    dico = menu.start_menu()
 
     clock = pg.time.Clock()
     game_term = Game_term(world,clock,gm)

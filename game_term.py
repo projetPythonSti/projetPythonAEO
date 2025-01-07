@@ -37,7 +37,6 @@ class Game_term :
             term = Terminal()
             with term.cbreak():
                 val = ''
-                #while val.lower() != 'q':
                 while 1 :
                     val = term.inkey(timeout=0.0000000001)
                     if not val:
