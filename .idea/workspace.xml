@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="tentative bouger camera terminal">
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="camera bouge correctement">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game_term.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_term.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/World.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/World.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/randommap.py" beforeDir="false" afterPath="$PROJECT_DIR$/randommap.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -390,7 +392,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736265462095</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="camera bouge correctement">
+      <option name="closed" value="true" />
+      <created>1736265929404</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1736265929406</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -405,7 +415,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="classe créée pour chaque ressource" />
     <MESSAGE value="afficher_console now shows units on the map (+repaired things around that topic)" />
     <MESSAGE value="no change" />
     <MESSAGE value="tentative de réparation du git" />
@@ -430,7 +439,8 @@
     <MESSAGE value="j'ai tout piqué d'etan&#10;methode de World show_precise_world qui montre une partie du monde grâce aux nouvelles variables de Game_term upleft et downright" />
     <MESSAGE value="terminal qui se met bien tout seul" />
     <MESSAGE value="tentative bouger camera terminal" />
-    <option name="LAST_COMMIT_MESSAGE" value="tentative bouger camera terminal" />
+    <MESSAGE value="camera bouge correctement" />
+    <option name="LAST_COMMIT_MESSAGE" value="camera bouge correctement" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

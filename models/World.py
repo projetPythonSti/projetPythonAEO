@@ -196,4 +196,3 @@ if __name__ == "__main__":
     monde.remove_element(town_center)
     print("After removing town center")
     monde.show_world()
-

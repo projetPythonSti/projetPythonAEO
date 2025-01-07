@@ -28,7 +28,7 @@ class Game_term :
         self.clock = clock
         self.speed = 1
         self.world = world
-        self.upleft = Position(10,10) #changes by player arrow keys, should always start upper left of the map (0,0)
+        self.upleft = Position(0,0) #changes by player arrow keys, should always start upper left of the map (0,0)
         self.downright = Position(0, 0) #changes by itself to fit the screen
         self.playing = False
         self.game_duration = 0
