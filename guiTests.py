@@ -18,16 +18,19 @@ from models.unity.Villager import Villager
 from datetime import datetime
 from views.start_menu import *
 
+from models.Position import Position
+
 #Le world en paramètre est voué à disparaitre
 def jeu_terminal (world, gm:GameManager):
     running = True
     playing = True
 
+    '''
     # MENU
     menu = Menu()
     menu.start_menu()
     dico = menu.return_value()
-
+    '''
 
     clock = pg.time.Clock()
     game_term = Game_term(world,clock,gm)

@@ -10,8 +10,10 @@ import time as t
 import datetime as dt
 from models.unity.Archer import *
 import asyncio
-from pynput import keyboard
+
 from blessed import Terminal
+
+from models.Position import Position
 
 #########################################
 ## Jeu
@@ -25,6 +27,8 @@ class Game_term :
         self.clock = clock
         self.speed = 1
         self.world = world
+        self.upleft = Position(1,1) #used for show_precise_world
+        self.downright = Position(30,100)
         self.playing = False
         self.game_duration = 0
 
@@ -114,7 +118,7 @@ class Game_term :
         os.system('cls' if os.name == 'nt' else 'clear')
         #self.world.afficher_console()
         #print(term.home + term.clear)
-        self.world.show_world()
+        self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
 
         print("Durée de la partie " + str(self.game_duration) + "s ")
 

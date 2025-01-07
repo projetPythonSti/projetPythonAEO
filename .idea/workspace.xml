@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="bagarreVillageois.py">
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="last push of what i did&#10;imma just start over with etan's branch">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bagarreVillageois.py" beforeDir="false" afterPath="$PROJECT_DIR$/bagarreVillageois.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_term.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_term.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/guiTests.py" beforeDir="false" afterPath="$PROJECT_DIR$/guiTests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/World.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/World.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/gameManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/gameManager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +27,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="tahakhetib" />
+        <entry key="$PROJECT_DIR$" value="etan" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -49,27 +53,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.Unity.executor&quot;: &quot;Run&quot;,
-    &quot;Python.bagarreVillageois.executor&quot;: &quot;Run&quot;,
-    &quot;Python.barracks.executor&quot;: &quot;Run&quot;,
-    &quot;Python.buildings.executor&quot;: &quot;Run&quot;,
-    &quot;Python.mPygameMonde.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.mcarte.executor&quot;: &quot;Run&quot;,
-    &quot;Python.mmonde.executor&quot;: &quot;Run&quot;,
-    &quot;Python.mressources.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pathfinding.executor&quot;: &quot;Run&quot;,
-    &quot;Python.randommap.executor&quot;: &quot;Run&quot;,
-    &quot;Python.tests.executor&quot;: &quot;Run&quot;,
-    &quot;Python.town_center.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;mgirardo&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/rowee/PycharmProjects/projetPythonAEO_MAX&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.Unity.executor": "Run",
+    "Python.World.executor": "Run",
+    "Python.bagarreVillageois.executor": "Run",
+    "Python.barracks.executor": "Run",
+    "Python.buildings.executor": "Run",
+    "Python.game_term.executor": "Run",
+    "Python.guiTests.executor": "Run",
+    "Python.mPygameMonde.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.mcarte.executor": "Run",
+    "Python.mmonde.executor": "Run",
+    "Python.mressources.executor": "Run",
+    "Python.pathfinding.executor": "Run",
+    "Python.randommap.executor": "Run",
+    "Python.tests.executor": "Run",
+    "Python.town_center.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "mgirardo",
+    "last_opened_file_path": "C:/Users/rowee/PycharmProjects/projetPythonAEO_MAX",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\rowee\PycharmProjects\projetPythonAEO" />
@@ -378,7 +385,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="maps aléatoires good&#10;exécutez tests si ça vous fait plaisir&#10;c'est mimi je vous jure" />
     <MESSAGE value="jsp j'ai changé quoi" />
     <MESSAGE value="j'ai merge avec Unit" />
     <MESSAGE value="correction génération monde:&#10;-les ressources sont bien contenues dans self.dico[(x,y)].contains" />
@@ -403,7 +409,8 @@
     <MESSAGE value="dist et closest_position servent calculs entre positions&#10;move_easy bouge unité avec théorème de thalès" />
     <MESSAGE value="fichier bagarreVillageois qui permettra à des villageois de s'entretuer, afin de montrer que tout ce qu'on a produit jusque là sert à qlqc" />
     <MESSAGE value="bagarreVillageois.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="bagarreVillageois.py" />
+    <MESSAGE value="last push of what i did&#10;imma just start over with etan's branch" />
+    <option name="LAST_COMMIT_MESSAGE" value="last push of what i did&#10;imma just start over with etan's branch" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

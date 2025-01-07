@@ -10,6 +10,7 @@ from collections import defaultdict
 import random as rd
 import os
 
+from models.Position import Position
 
 class World:
 
@@ -80,6 +81,21 @@ class World:
                 print(self.tiles_dico[(x, y)], end="")
             print("", end="\n")
 
+    # shows a part of the world, takes two position found in the game's loop
+    def show_precise_world(self,upleft:Position,downright:Position):
+        print()
+        if upleft.getY()!=0:
+            print(' '+(downright.getY()-upleft.getY())*'ʌ')
+        for x in range(upleft.getX(),downright.getX(),1):
+            if upleft.getX()!=0:
+                print('<',end='')
+            for y in range(upleft.getY(),downright.getY(),1):
+                print(self.tiles_dico[(x, y)], end="")
+            if downright.getX()!=self.width:
+                print('>',end='')
+            print("", end="\n")
+        if upleft.getY()!=self.height:
+            print(' '+(downright.getY()-upleft.getY())*'v')
 
     def place_element(self, element):
         place = (element.position.getX(), element.position.getY())
