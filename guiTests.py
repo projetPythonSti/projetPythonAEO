@@ -20,6 +20,8 @@ from views.start_menu import *
 
 from models.Position import Position
 
+from blessed import Terminal
+
 #Le world en paramètre est voué à disparaitre
 def jeu_terminal (world, gm:GameManager):
     running = True

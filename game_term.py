@@ -28,8 +28,8 @@ class Game_term :
         self.clock = clock
         self.speed = 1
         self.world = world
-        self.upleft = Position(1,1) #used for show_precise_world
-        self.downright = Position(30,100)
+        self.upleft = Position(0,0) #changes by player arrow keys (x and y are swaped lol)
+        self.downright = Position(0, 0) #changes by itself to fit the screen
         self.playing = False
         self.game_duration = 0
 
@@ -66,7 +66,7 @@ class Game_term :
 
     def Turn (self,speed) :
 
-        self.clock.tick(60* (speed/10))
+        self.clock.tick(0.5* (speed/10))
         now = datetime.now()
         delta = now - self.ltick
         ig_delta = delta * self.speed
@@ -112,7 +112,9 @@ class Game_term :
         os.system('cls' if os.name == 'nt' else 'clear')
         #self.world.afficher_console()
         #print(term.home + term.clear)
+        self.downright=Position(min(self.upleft.getX()+term.height-8,self.world.height),min(self.upleft.getY()+term.width-4,self.world.width)) #lil minuses here to fit everything nicely
         self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
+        print(term.width, term.height)
 
         print("Durée de la partie " + str(self.game_duration) + "s ")
 

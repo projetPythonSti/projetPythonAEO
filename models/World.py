@@ -84,17 +84,18 @@ class World:
     # shows a part of the world, takes two position found in the game's loop
     def show_precise_world(self,upleft:Position,downright:Position):
         print()
-        if upleft.getY()!=0:
+        if upleft.getX()>0:
             print(' '+(downright.getY()-upleft.getY())*'ʌ')
         for x in range(upleft.getX(),downright.getX(),1):
-            if upleft.getX()!=0:
+            if upleft.getY()>0:
                 print('<',end='')
             for y in range(upleft.getY(),downright.getY(),1):
                 print(self.tiles_dico[(x, y)], end="")
-            if downright.getX()!=self.width:
+            if downright.getY()<self.width:
                 print('>',end='')
             print("", end="\n")
-        if upleft.getY()!=self.height:
+        if downright.getX()<self.height:
+            #print(f"downright.getX() == {downright.getX()} self.height == {self.height}",end=' ')
             print(' '+(downright.getY()-upleft.getY())*'v')
 
     def place_element(self, element):

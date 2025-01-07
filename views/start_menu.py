@@ -1,5 +1,4 @@
 from blessed import Terminal
-from defer import return_value
 
 from save import load
 import os, sys
