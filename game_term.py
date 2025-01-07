@@ -28,7 +28,7 @@ class Game_term :
         self.clock = clock
         self.speed = 1
         self.world = world
-        self.upleft = Position(0,0) #changes by player arrow keys (x and y are swaped lol)
+        self.upleft = Position(10,10) #changes by player arrow keys, should always start upper left of the map (0,0)
         self.downright = Position(0, 0) #changes by itself to fit the screen
         self.playing = False
         self.game_duration = 0
@@ -50,6 +50,18 @@ class Game_term :
                         self.pause()
                     elif val.name =='KEY_TAB' :
                         self.stat()
+                    elif val.name == 'z':
+                        if self.upleft.getX()>0:
+                            self.upleft.setX(self.upleft.getX()-1)
+                    elif val.name == 'q':
+                        if self.upleft.getY()>0:
+                            self.upleft.setY(self.upleft.getY()-1)
+                    elif val.name == 's':
+                        if self.upleft.getX()<self.world.height:
+                            self.upleft.setX(self.upleft.getX()+1)
+                    elif val.name == 'd':
+                        if self.upleft.getY()<self.world.width:
+                            self.upleft.setY(self.upleft.getY()+1)
 
 
                     elif val.lower() == '+':

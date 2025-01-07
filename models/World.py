@@ -95,8 +95,9 @@ class World:
                 print('>',end='')
             print("", end="\n")
         if downright.getX()<self.height:
-            #print(f"downright.getX() == {downright.getX()} self.height == {self.height}",end=' ')
             print(' '+(downright.getY()-upleft.getY())*'v')
+        # print(f"downright.getX() == {downright.getX()} self.height == {self.height}",end=' ')
+        print("upleft.getX = ",upleft.getX()," upleft.getY = ",upleft.getY())
 
     def place_element(self, element):
         place = (element.position.getX(), element.position.getY())
