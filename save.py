@@ -2,7 +2,14 @@ import json
 import os
 import time
 
-def save (world,file_name) :
+def save (world) :
+    file_name = input("Veuillez choisir le nom de votre sauvegarde")
+    print(f"{file_name} , est-ce bien le nom que vous voulez ?")
+    confirmation = input(f" o pour oui et n pour non")
+    while confirmation != 'o' :
+        file_name = input("Veuillez choisir un nouveau nom pour votre sauvegarde")
+        print(f"{file_name} , est-ce bien le nom que vous voulez ?")
+        confirmation = input(f" o pour oui et n pour non")
 
     if file_name:
         if os.path.exists("saves/" + file_name):

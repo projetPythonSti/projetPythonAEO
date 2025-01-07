@@ -12,6 +12,7 @@ from models.unity.Archer import *
 import asyncio
 
 from blessed import Terminal
+from save import *
 
 from models.Position import Position
 
@@ -38,13 +39,19 @@ class Game_term :
 
         while self.playing :
             term = Terminal()
-            print("press 'q' to quit.")
             with term.cbreak():
                 val = ''
-                while val.lower() != 'q':
-                    val = term.inkey(timeout=0.00001)
+                #while val.lower() != 'q':
+                while 1 :
+                    val = term.inkey(timeout=0.0000000001)
                     if not val:
                         self.Turn(speed)
+                    elif val.lower() == 'p':
+                        self.pause()
+                    elif val.name =='KEY_TAB' :
+                        self.stat()
+
+
                     elif val.lower() == '+':
                         if speed < 20:
                             speed += 1
@@ -53,26 +60,13 @@ class Game_term :
                         if speed > 5:
                             speed -= 1
                         print(speed)
-                    elif val.lower() == 'p':
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        print("Nous sommes en pause : ")
-                        print("Appuyez sur z pour quitter")
-                        print("Appuyez sur r pour reprendre")
-                        with term.cbreak():
-                            val2 = ''
-                            while val2.lower() != 'r':
-                                val2 = term.inkey()
-                                if val2.lower() == 'z' :
-                                    quit()
-                    elif val.lower() == 'q':
-                        quit()
 
-                print(f'bye!{term.normal}')
 
 
 
     def Turn (self,speed) :
-        self.clock.tick(0.5 * (speed/10))
+
+        self.clock.tick(60* (speed/10))
         now = datetime.now()
         delta = now - self.ltick
         ig_delta = delta * self.speed
@@ -122,6 +116,37 @@ class Game_term :
 
         print("Durée de la partie " + str(self.game_duration) + "s ")
 
+
+    def pause (self) :
+        term = Terminal()
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("Nous sommes en pause : ")
+        print("Appuyez sur q pour quitter")
+        print("Appuyez sur s pour sauvegarder")
+        print("Appuyez sur r pour reprendre")
+        with term.cbreak():
+            val2 = ''
+            while val2.lower() != 'r':
+                val2 = term.inkey()
+                if val2.lower() == 'q':
+                    quit()
+                elif val2.lower() == 's':
+                    save(self.world)
+
+
+    def stat (self):
+        #generate
+        term = Terminal()
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("Nous sommes en pause : ")
+        print("Appuyez sur q pour quitter")
+        print("Appuyez sur r pour reprendre")
+        with term.cbreak():
+            val2 = ''
+            while val2.lower() != 'r':
+                val2 = term.inkey()
+                if val2.lower() == 'q':
+                    quit()
 
 
 
