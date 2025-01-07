@@ -1,16 +1,25 @@
-from mressources import *
-from Unity import *
+from models.ressources.mressources import *
+from models.unity.Unity import *
 import numpy as np
 from models.buildings.buildings import *
 
 from utils.setup import TILE_SIZE
+from setup import TILE_SIZE
 
 class Tile:
     def __init__(self,id): #id c'est le tuple (x,y)
         self.id=id
         self.contains= " " #représente une tuile sans ressources, sera remplacé par une instance de Ressource
         #il suffira de changer le __repr__ de Ressource pour afficher la lettre correspondant à la ressource
-        self.unites=[]
+        self.unites=[] #a list might be more relevant
+        self.rect = [
+            (id[0] * TILE_SIZE, id[1] * TILE_SIZE),
+            (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE),
+            (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE),
+            (id[0] * TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE)
+        ]
+
+        #self.iso = [self.cart_to_iso(id[0], id[1]) for id[0], id[1] in self.rect]S
 
     def __repr__(self):
         if self.unites!=[]:
@@ -35,8 +44,13 @@ class Tile_gui (Tile) :
             (id[0] * TILE_SIZE + TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE),
             (id[0] * TILE_SIZE, id[1] * TILE_SIZE + TILE_SIZE)
         ]
-
         self.iso = [self.cart_to_iso(id[0], id[1]) for id[0], id[1] in self.rect]
+
+    #Attention a cette fonction
+    def affichage_magique(self):
+        if len(self.unites) != 0:
+            return self.unites[0].name[0].lower() #First letter of the first unit class name
+        return self.contains
 
 
 class World:
@@ -58,7 +72,8 @@ class World:
         self.update_unit_presence() #updates this everytime we print the map
         for x in range(self.x):
             for y in range(self.y):
-                print(self.dico[(x, y)].affiche(),end="") #This one works
+                #print(self.dico[(x,y)].affichage_magique(),end="")
+                print(self.dico[(x, y)].affiche(),end="") #
             print("",end="\n")
 
     def afficher_route_console(self,route):
@@ -77,9 +92,10 @@ class World:
     def update_unit_presence(self):
         for x in range(self.x): #resets every tile's unit list
             for y in range(self.y):
-                self.dico[(x,y)].unites=[]
+                self.dico[(x, y)].unites = []
         for u in self.units: #puts every unit in their tile's unit list
             key=floatkey_to_intkey(position_to_tuple(u.position))
+            #key=intkey(u.position) #Attention je ne sais pas lequel mettre
             self.dico[key].unites.append(u)
     #this one fucker shall not be used, for it tempers with the actual gameplay
     def update_build_presence(self):

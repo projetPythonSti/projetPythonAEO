@@ -1,48 +1,48 @@
-from time import sleep
-
-from Position import Position
-import time
-
+# this class is the parent class of all the unities in the game
+from models.Position import Position
+import random as rd
 class Unity:
     population = 0
     
-    def __init__(self, id, name, cost, trainningTime, health, damage, speed, visibility, team, target = None, ):
-        self.id = id
+    def __init__(self, uid, name, cost, trainningTime, health, damage, speed, visibility, team, position=None, target = None):
+        self.uid = uid
         self.name = name
         self.cost = cost
         self.trainningTime = trainningTime
         self.health = health
         self.damage = damage
         self.speed = speed
-        self.position = Position()
+        self.team  = team
+        self.position = position if position else Position(rd.randint(0, self.team.world.width - 1), rd.randint(0, self.team.world.height - 1))
         self.range = visibility
         self.target = target
-        self.team  = team
+        # self.team.add_unit(self)
         # population += 1
-     
-    def move(self,destination, route):
-        i = 0
-        while(self.position != destination):
-            print(f"Still in {i}, position {self.position}")
-            if route[i+1][0] != self.position.getX():
-                print(route[i+1], "is the destination")
-                direction = 1 if self.position.getX() < route[i+1][0] else -1
-                self.position.setX(self.position.getX()+direction)
-                sleep(1.25)
-            elif route[i+1][1] != self.position.getY():
-                print(route[i+1], "is the destination")
-                direction = 1 if self.position.getY() < route[i + 1][1] else -1
-                self.position.setY(self.position.getY()+direction)
-                sleep(1.25)
-            if self.position == route[i+1]:
-                print("Got to the next point")
-                i += 1
-        print("Arrivé à destination")
     
-    def attack(attackedObjet):
-        pass
+    def move_unit(self, destination:Position):
+        self.position = destination
     
-    def getCost(self): return self.cost
+    def get_health(self):
+        return self.health
+    
+    def set_health(self, health):
+        self.health = health
+    
+    def get_damage(self):
+        return self.damage
+    
+    def get_name(self):
+        return self.name
+    
+    def attack(self, enemy):
+        #1 attack per second for all units
+        enemy.set_health(enemy.get_health() - self.damage)
+    
+    def die(self):
+        self.position = None
+        self.team.world.remove_element(self)
+    
+    def get_cost(self): return self.cost
     
     def __repr__(self): return f"{self.name}"
     

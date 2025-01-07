@@ -3,9 +3,10 @@ from importlib.resources import Resource
 import pygame as pg
 import sys
 
-import mressources
+import models.ressources.ressources
 from mmonde import World
-from mressources import Ressource
+from setup import TILE_SIZE
+from models.ressources.mressources import Ressource
 from utils.setup import TILE_SIZE
 import os, sys
 import time
@@ -57,17 +58,18 @@ class Game :
                     pg.draw.rect(self.screen, (23,0,255),rect,1)
                     if (len(self.world.dico[(x,y)].unites) != 0):
                         pg.draw(self.screen, (23,0,255), rect)
-                elif(self.world.dico[(x,y)].contains.__class__ == mressources.Wood):
+                elif(self.world.dico[(x,y)].contains.__class__ == models.ressources.mressources.Wood):
                     pg.draw.rect(self.screen, (255,0,0),rect,1)
-                elif(self.world.dico[(x,y)].contains.__class__ == mressources.Gold):
+                elif(self.world.dico[(x,y)].contains.__class__ == models.ressources.mressources.Gold):
                     pg.draw.rect(self.screen, (0,255,0),rect,1)
-                elif(self.world.dico[(x,y)].contains.__class__ == mressources.Food):
+                elif(self.world.dico[(x,y)].contains.__class__ == models.ressources.mressources.Food):
                     pg.draw.rect(self.screen,(100,210,255),rect,width=1)
 
 
 
+                #pg.draw.rect(self.screen, (0,0,255),rect,1)
 
-        pg.display.flip()
+        #pg.display.flip()
 
     def draw_term (self):
         self.world.afficher_console()
