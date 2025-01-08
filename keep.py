@@ -10,8 +10,8 @@ class Keep(Building) :
             max_health=800,
             longueur=1,
           )
-        #self.attack_damage = 50 par exemple
-        #self.attack_range = 10 "toute les unités dans cette range peuvent être attaqué"
+        self.attack_damage = 5
+        self.attack_range = 8
 
    def calculate_distance(self, target):
         dx = self.position.getX() - target.position.getX()
