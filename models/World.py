@@ -81,7 +81,7 @@ class World:
                 print(self.tiles_dico[(x, y)], end="")
             print("", end="\n")
 
-    # shows a part of the world, takes two position found in the game's loop
+    # shows a part of the world, works with two position found in the game's loop
     def show_precise_world(self,upleft:Position,downright:Position):
         print()
         if upleft.getX()>0:

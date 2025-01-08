@@ -65,15 +65,15 @@ def random_world(dict):
     maptype = dict["t"]
     wealth = int(newworld.width*newworld.height / 4800) # = 3 for a 120x120 , wealth allows resources to scale with map size
     if maptype == "Arabia": #Medium clusters of wood, open center
-        for _ in range(0,wealth+2): #Some wood on the outskirts
-            number = randint(1,8)
-            x = randint(0,newworld.width//number) ; y = randint(0,newworld.height//(9-number))
+        for _ in range(0,wealth+1): #Some wood on the outskirts
+            number = randint(1,6)
+            x = randint(0,newworld.width//number) ; y = randint(0,newworld.height//(7-number))
             cluster(newworld,Wood(newworld),(x,y)) ; cluster(newworld,Wood(newworld),(newworld.width-x-1,y))
             cluster(newworld,Wood(newworld),(newworld.width-x-1,newworld.height-y-1)) ; cluster(newworld,Wood(newworld),(x,newworld.height-y-1))
-        for _ in range(0,wealth+2): #Some lil wood
-            x = randint(0,newworld.width//3) ; y = randint(0,newworld.height//3)
-            cluster(newworld,Wood(newworld),(x,y),50,25) ; cluster(newworld,Wood(newworld),(newworld.width-x-1,y),50,25)
-            cluster(newworld,Wood(newworld),(newworld.width-x-1,newworld.height-y-1),50,25) ; cluster(newworld,Wood(newworld),(x,newworld.height-y-1),50,25)
+        for _ in range(0,wealth+4): #Some lil wood
+            x = randint(0,newworld.width//2) ; y = randint(0,newworld.height//2)
+            cluster(newworld,Wood(newworld),(x,y),50,30) ; cluster(newworld,Wood(newworld),(newworld.width-x-1,y),50,30)
+            cluster(newworld,Wood(newworld),(newworld.width-x-1,newworld.height-y-1),50,30) ; cluster(newworld,Wood(newworld),(x,newworld.height-y-1),50,30)
         for _ in range(0,wealth): #Some gold around the world
             x = randint(0,int(newworld.width/2.5)) ; y = randint(0,int(newworld.height/2.5))
             cluster(newworld,Gold(newworld),(x,y),50,25) ; cluster(newworld,Gold(newworld),(newworld.width-x-1,y),50,25)
@@ -98,5 +98,5 @@ def random_world(dict):
     return newworld
 
 if __name__ == "__main__":
-    test = random_world({"X":120,"Y":120,"q":3,"t":"GoldRush"})
+    test = random_world({"X":120,"Y":120,"q":3,"t":"Arabia"})
     test.show_world()
