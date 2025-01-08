@@ -24,6 +24,7 @@ class GameManager:
     """
     tick = timeit.default_timer()
     unitToMove = defaultdict(dict)
+    time_elapse = defaultdict(int)
     '''
         Syntaxe du dictionnaire
         { 
@@ -48,9 +49,9 @@ class GameManager:
         print(substrings)
         return int(substrings[0])
 
-    def moveUnit(self, id):
+    def moveUnit(self, uid):
         deltaTime = timeit.default_timer() - self.tick
-        unit = self.unitToMove[id]
+        unit = self.unitToMove[uid]
         unit["timeElapsed"] += deltaTime.real
         #print("time elapsed : ", unit["timeElapsed"])
         if unit["timeElapsed"] >= (unit["timeToTile"]):
@@ -67,6 +68,19 @@ class GameManager:
             else:
                 unit["nextTile"] = unit["moveQueue"][1]
 
+    def buiding_process(self, building):
+        building.begin_building()
+        self.time_elapse[building.uid] = 0
+        begin_time = timeit.default_timer() - self.tick
+        self.time_elapse += begin_time
+        begin_time_seconds = self.time_elapse[building.uid] / timeit.default_timer().resolution
+        
+        if begin_time_seconds >= building.time_building:
+            self.world.tiles_dico[(building.position.getX(), building.position.getY())].set_contains(building)
+        
+        #reshow the world here, because le buiding is finish to be built
+        
+        
 
     def checkUnitsToMove(self):
         if (len(self.unitToMove) == 0):

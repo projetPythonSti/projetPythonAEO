@@ -26,7 +26,7 @@ class World:
         self.height = height
         self.villages = list()
         self.ressources = defaultdict(dict)
-        self.tiles_dico = defaultdict(None)
+        self.tiles_dico = defaultdict(Tile)
         self.filled_tiles = defaultdict(tuple)
         self.initialise_world()
         # les clés du dico seront de la forme (x,y)
@@ -78,6 +78,18 @@ class World:
                 print(self.tiles_dico[(x, y)], end="")
             print("", end="\n")
     
+    def book_place(self, surface, starting_point:tuple):
+        occupied_tiles = [(starting_point[0] + x, starting_point[1] + y) for x in range(surface[0]) for y in range(surface[1])]
+        for place in occupied_tiles:
+            self.filled_tiles[place] = place
+        # #check whether the starting point is free
+        # if starting_point not in self.filled_tiles.values() and starting_point[0] <= self.width and starting_point[1] <= self.height:
+        #     #if it is a building and all tiles of the surface is available
+        #     if issubclass(element.__class__, Building) and all(tile not in set(self.filled_tiles.values()) for tile in occupied_tiles):
+        #         #if the buiding can be place without truncate
+        #         if element.surface[0] + starting_point[0] <= self.width and element.surface[1] + starting_point[1] <= self.height:
+        
+    
     def place_element(self, element):
         place = (element.position.getX(), element.position.getY())
         if place not in self.filled_tiles.values() and place[0] <= self.width and place[1] <= self.height:
@@ -88,7 +100,7 @@ class World:
                         for y in range(element.surface[1]):
                             try:
                                 self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(element)
-                            except KeyError:
+                            except Exception:
                                 pass
                             self.filled_tiles[(place[0] + x, place[1] + y)] = (place[0] + x, place[1] + y)
             elif not issubclass(element.__class__, Building):       
@@ -115,7 +127,7 @@ class World:
     def convertMapToGrid(self):
         array_shape = (self.width, self.height)
         binary_array = np.zeros(array_shape, dtype=int)
-        for i, (key, value) in enumerate(self.tiles_dico.items()):
+        for _, (key, value) in enumerate(self.tiles_dico.items()):
             binary_array[key[0], key[1]] = 0 if value.contains == None else 1
         return binary_array
         
