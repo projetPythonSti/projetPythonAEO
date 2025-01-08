@@ -74,19 +74,29 @@ def random_world(dict):
             x = randint(0,newworld.width//3) ; y = randint(0,newworld.height//3)
             cluster(newworld,Wood(newworld),(x,y),50,25) ; cluster(newworld,Wood(newworld),(newworld.width-x-1,y),50,25)
             cluster(newworld,Wood(newworld),(newworld.width-x-1,newworld.height-y-1),50,25) ; cluster(newworld,Wood(newworld),(x,newworld.height-y-1),50,25)
-        for _ in range(0,wealth): #Some gold
+        for _ in range(0,wealth): #Some gold around the world
             x = randint(0,int(newworld.width/2.5)) ; y = randint(0,int(newworld.height/2.5))
             cluster(newworld,Gold(newworld),(x,y),50,25) ; cluster(newworld,Gold(newworld),(newworld.width-x-1,y),50,25)
             cluster(newworld,Gold(newworld),(newworld.width-x-1,newworld.height-y-1),50,25) ; cluster(newworld,Gold(newworld),(x,newworld.height-y-1),50,25)
     elif maptype == "GoldRush": #Most gold in the center
-        ()
+        for _ in range(0, wealth + 2):  # Some wood on the outskirts
+            number = randint(1, 8)
+            x = randint(0, newworld.width // number); y = randint(0, newworld.height // (9 - number))
+            cluster(newworld, Wood(newworld), (x, y)); cluster(newworld, Wood(newworld), (newworld.width - x - 1, y))
+            cluster(newworld, Wood(newworld), (newworld.width - x - 1, newworld.height - y - 1)); cluster(newworld, Wood(newworld), (x, newworld.height - y - 1))
+        for _ in range(0, wealth + 2):  # Some lil wood
+            x = randint(0, newworld.width // 3); y = randint(0, newworld.height // 3)
+            cluster(newworld, Wood(newworld), (x, y), 50, 25); cluster(newworld, Wood(newworld), (newworld.width - x - 1, y), 50, 25)
+            cluster(newworld, Wood(newworld), (newworld.width - x - 1, newworld.height - y - 1), 50, 25); cluster(newworld, Wood(newworld), (x, newworld.height - y - 1), 50, 25)
+        for _ in range(0, wealth):  # Some gold in the center
+            x = randint(newworld.width // 4, newworld.width//2); y = randint(newworld.height//4, newworld.height//2)
+            cluster(newworld, Gold(newworld), (x, y), 50, 25); cluster(newworld, Gold(newworld), (newworld.width - x - 1, y), 50, 25)
+            cluster(newworld, Gold(newworld), (newworld.width - x - 1, newworld.height - y - 1), 50, 25); cluster(newworld, Gold(newworld), (x, newworld.height - y - 1), 50, 25)
     else:
         ()
 
     return newworld
 
-test = random_world({"X":120,"Y":120,"q":3,"t":"Arabia"})
-#test.show_world()
-
-cluster(test,Wood(test),(5,5))
-test.show_world()
+if __name__ == "__main__":
+    test = random_world({"X":120,"Y":120,"q":3,"t":"GoldRush"})
+    test.show_world()

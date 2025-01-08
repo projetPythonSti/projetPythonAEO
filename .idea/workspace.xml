@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="MAP ALEATOIRES&#10;j'ai tout refait &#10;Arabia très bien je trouve">
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="petites modifs sur Arabia&#10;si elle vous plait pas il me suffit de la renommer">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/randommap.py" beforeDir="false" afterPath="$PROJECT_DIR$/randommap.py" afterDir="false" />
     </list>
@@ -406,7 +406,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736275110066</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="petites modifs sur Arabia&#10;si elle vous plait pas il me suffit de la renommer">
+      <option name="closed" value="true" />
+      <created>1736275823855</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1736275823855</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -421,7 +429,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="no change" />
     <MESSAGE value="tentative de réparation du git" />
     <MESSAGE value="LE GIT EST REPARE POUR MOI&#10;unites affichée sur la map" />
     <MESSAGE value="j'ai merge avec vos trucs" />
@@ -446,7 +453,8 @@
     <MESSAGE value="tentative bouger camera terminal" />
     <MESSAGE value="camera bouge correctement" />
     <MESSAGE value="MAP ALEATOIRES&#10;j'ai tout refait &#10;Arabia très bien je trouve" />
-    <option name="LAST_COMMIT_MESSAGE" value="MAP ALEATOIRES&#10;j'ai tout refait &#10;Arabia très bien je trouve" />
+    <MESSAGE value="petites modifs sur Arabia&#10;si elle vous plait pas il me suffit de la renommer" />
+    <option name="LAST_COMMIT_MESSAGE" value="petites modifs sur Arabia&#10;si elle vous plait pas il me suffit de la renommer" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
