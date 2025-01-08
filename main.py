@@ -22,7 +22,7 @@ for res in resources1:
     print(f"{res.name}: {res.getQuantity()}")
 
 # Simuler des dégâts
-keep.health -= 100  # Le bâtiment perd 10 points de santé
+keep.health -= 100  # Le bâtiment perd 100 points de santé à cause d'une attaque si vous voulez :)
 print(f"Santé actuelle de la keep : {keep.health}/{keep.max_health}")
 
 # Réparer la maison
