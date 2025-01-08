@@ -9,5 +9,5 @@ class House(Building):
             health=200,
             max_health=200,
             longueur=2,
-            population=5
+            spawn="v"
         )
