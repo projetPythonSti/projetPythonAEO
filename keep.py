@@ -10,7 +10,8 @@ class Keep(Building) :
             max_health=800,
             longueur=1,
           )
-        #self.attack_damage = 50
+        #self.attack_damage = 50 par exemple
+        #self.attack_range = 10 "toute les unités dans cette range peuvent être attaqué
 
     def attack(self, target):
         if self.health != self.max_health :
