@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import filedialog
 import pygame 
 from pygame import mixer
 from PIL import Image, ImageTk
@@ -31,8 +32,9 @@ class game:
         pass
 
 class FenetreJeu:
-    def __init__(self, master):
-        self.master = master
+    def __init__(self, luncher):
+        self.luncher = luncher
+        self.master = luncher.root
         self.master.title("Age Of Empires")
         self.master.attributes('-fullscreen', True)
         self.master.resizable(False, False)  # Prevent resizing
@@ -62,16 +64,42 @@ class FenetreJeu:
         self.bouton_quitter.place(x=x_position_quitter, y=y_position, width=button_width, height=button_height)
 
     def play(self):
-        print("Le jeu commence...")
+        self.luncher.main()
 
+class FolderSelector:
+    def __init__(self, master=None):
+        self.master = master if master else tk.Tk()
+        self.folder_path = ""
+        self.select_folder_button = tk.Button(self.master, text="Select Folder", command=self.select_folder)
+        self.select_folder_button.pack(pady=20)
+        
+
+    def select_folder(self):
+        self.folder_path = filedialog.askdirectory()
+        # if self.folder_path:
+        #     print(f"Selected folder: {self.folder_path}")
+
+class FileSelector:
+    def __init__(self, master=None):
+        self.master = master if master else tk.Tk()
+        self.file_path = ""
+        self.select_file_button = tk.Button(self.master, text="Select File", command=self.select_file)
+        self.select_file_button.pack(pady=20)
+
+    def select_file(self):
+        self.file_path = filedialog.askopenfilename()
+        if self.file_path:
+            print(f"Selected file: {self.file_path}")
 
 if __name__ == "__main__":
     # Create the main window
-    root = tk.Tk()
+    # root = tk.Tk()
 
     # Create an instance of the FenetreJeu class
-    fenetre = FenetreJeu(root)
-
+    # fenetre = FenetreJeu(root)
+    file_selector = FileSelector()
+    file_selector.master.mainloop()
+    
     # Start the main Tkinter loop
-    root.mainloop()
+    # root.mainloop()
 

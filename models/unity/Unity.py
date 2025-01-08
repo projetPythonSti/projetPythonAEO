@@ -18,6 +18,8 @@ class Unity:
         self.range = visibility
         self.target = target
         self.task = None
+        self.image = f"./assets/images/units/{self.name}.png"
+        
         # self.team.add_unit(self)
         # population += 1
     

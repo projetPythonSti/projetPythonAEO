@@ -1,15 +1,11 @@
-import timeit
-from collections import defaultdict
-from datetime import datetime
-import time
-import re
-from importlib.resources import Resource
-
 from models.Pathfinding import Pathfinding
 from models.Position import Position
-from models.World import World
-from models.buildings.buildings import Building
 from models.unity.Unity import Unity
+from collections import defaultdict
+from models.World import World
+from models.save import Save
+import timeit
+import re
 
 
 class GameManager:
@@ -37,11 +33,11 @@ class GameManager:
         } 
                 
     '''
-    def __init__(self, speed, world: World ):
+    def __init__(self, speed, world: World):
         self.gameSpeed = speed
         self.world = world
         self.moving_units = list()
-        
+        self.save = Save()
 
     def getTeamNumber(self, name):
         pattern = r'\d+'
@@ -120,6 +116,22 @@ class GameManager:
             "moveQueue": path,
         }
 
+    def pause(self):
+        #pauses the game
+        self.html_generator()
+        self.save_world()
+        
+    def play(self):
+        datas = self.load_from_file()
+        if datas:
+            self.world = datas[0]
+    
+    def save_world(self, path=None):
+        self.save.save(self.world, path) 
+    
+    def load_from_file(self, path=None):
+        return self.save.load(path)
+    
     def html_generator(self):
         village1, village2 = self.world.villages
         #iterating on 2 dict at the same time

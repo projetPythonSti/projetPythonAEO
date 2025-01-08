@@ -15,25 +15,30 @@ class Save:
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
 
-    def save(self, world):
+    def save(self, world, path=None):
         datas = [world]
-        file = open(self.save_path + "\\save", 'wb')
+        if path: self.save_path = path
+        file = open(self.save_path + "/save", 'wb')
         pickle.dump(datas, file)
         file.close()
 
-    def load(self):
-        try:
-            file = open(self.save_path + "\\save", 'rb')
-        except FileNotFoundError:
-            print("No save found")
-            return None
-        datas = pickle.load(file)
-        file.close()
-        return datas
+    """
+        pay attention to load à saved file, note a file of another extention
+    """
+    def load(self, path=None):
+        if path: 
+            self.save_path = path
+        else:
+            self.save_path += "/save"
+        if self.backup_exist():
+            file = open(self.save_path, 'rb')
+            datas = pickle.load(file)
+            file.close()
+            return datas
 
-    def hasload(self):
-        return os.path.exists(self.save_path + "\\save")
-
+    def backup_exist(self, path=None):
+        if path: self.save_path = path
+        return os.path.exists(self.save_path + "/save")
 
 if __name__ == "__main__":
     save = Save()

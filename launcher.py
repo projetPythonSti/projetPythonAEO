@@ -2,6 +2,7 @@ from models.World import World
 from models.model import Model
 from models.Position import Position
 from controllers.gameManager import GameManager
+from views.world import World_GUI
 from views.Cli import CLIView
 from models.save import Save
 
@@ -39,13 +40,17 @@ def main(stdscr):
 
 
 if __name__ == "__main__":
-    curses.wrapper(main)
-    # world = World(30, 60)
+    # curses.wrapper(main)
+    world = World(30, 60)
+    game_manager = GameManager(1, world)
+    village1 = Model("fabulous", world)
+    village2 = Model("hiraculous", world)
+    village1.initialize_villages(1,2,3, gold=200, wood=400, food=300, town_center=1, keeps=2, houses=5, camps=3)
+    village2.initialize_villages(4,5,6, 2, 1, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
     
-    # village1 = Model("fabulous", world)
-    # village2 = Model("hiraculous", world)
-    # village1.initialize_villages(1,2,3, gold=200, wood=400, food=300, town_center=1, keeps=2, houses=5, camps=3)
-    # village2.initialize_villages(4,5,6, 2, 1, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
+    
+    # print(world_gui.tiles)
+    
     
     # print(world.villages[0].population())
     
