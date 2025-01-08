@@ -60,6 +60,8 @@ def cluster(world,resource,key,repl=50,fade=16): #key is a tuple please
 
 #function that takes a big dict {"X":self.x, "Y": self.y, "q" : self.ressources_quantities, "n" : self.nb_joueur, "b" : self.ai_behavior, "t" : self.type_map }
 #and returns a randomly generated World that follows the information
+
+#function that takes a map name, returns a World
 def random_world(dict):
     newworld = World(dict["X"],dict["Y"])
     maptype = dict["t"]
@@ -94,9 +96,8 @@ def random_world(dict):
             cluster(newworld, Gold(newworld), (newworld.width - x - 1, newworld.height - y - 1), 50, 25); cluster(newworld, Gold(newworld), (x, newworld.height - y - 1), 50, 25)
     else:
         ()
-
     return newworld
 
 if __name__ == "__main__":
-    test = random_world({"X":120,"Y":120,"q":3,"t":"Arabia"})
+    test = random_world({"X":120,"Y":180,"t":"Arabia"})
     test.show_world()

@@ -124,10 +124,11 @@ class Game_term :
         os.system('cls' if os.name == 'nt' else 'clear')
         #self.world.afficher_console()
         #print(term.home + term.clear)
-        self.downright=Position(min(self.upleft.getX()+term.height-8,self.world.height),min(self.upleft.getY()+term.width-4,self.world.width)) #lil minuses here to fit everything nicely
+        self.downright=Position(min(self.upleft.getX()+term.width-4,self.world.width),min(self.upleft.getY()+term.height-8,self.world.height)) #lil minuses here to fit everything nicely
         self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
-        print(term.width, term.height)
-
+        #self.world.show_world()
+        print("Place sur le terminal : x",term.width, "y",term.height)
+        print("Nb caractères affichés : x",self.downright.getX()-self.upleft.getX(),"y",self.downright.getY()-self.upleft.getY())
         print("Durée de la partie " + str(self.game_duration) + "s ")
 
 
