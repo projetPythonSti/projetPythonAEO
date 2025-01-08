@@ -91,6 +91,7 @@ class World:
                             try:
                                 self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(element)
                             except KeyError:
+                                print("Y'a une erreur la tout de même faudrait un print ?")
                                 pass
                             self.filled_tiles[(place[0] + x, place[1] + y)] = (place[0] +x, place[1]+y)
             elif not issubclass(element.__class__, Building):

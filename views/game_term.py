@@ -79,7 +79,6 @@ class Game_term :
         # self.update()
         self.gm.checkUnitsToMove()
         self.gm.tick = timeit.default_timer()
-        print(self.world.filled_tiles)
         #self.world.update_unit_presence()
         self.draw_term()
 

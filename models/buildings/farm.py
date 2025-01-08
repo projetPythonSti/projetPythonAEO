@@ -2,7 +2,7 @@ from models.buildings.buildings import Building
 from models.ressources.ressources import Food
 
 class Farm(Building):
-  surface = (2, 2),  # 2x2
+  surface = (2, 2)  # 2x2
   def __init__(self, team):
     community = team.get_community().get('F'),
     uid = len(community) if community else 0 # 0 if it doesn't exist yet

@@ -27,9 +27,9 @@ class Model:
             - Ajouté une fonction get_name afin d'obtenir le nom d'équipe (utilisé dans Villager.py).
             - Changé la manière dont les unités sont ajoutées dans initialize_villages() pour faire en sorte que les nouveaux ID soient utilisés
             - Ajouté un compteur de population pour directement avoir accès au nombre de personnes faisant partie du village (avec le getter associé)
-            04/12/2024@tahakhetib - J'ai ajouté des modification au dessus de ce que @amadou_yaya_diallo à écrit
+            04/12/2024@tahakhetib - J'ai ajouté des modifications au-dessus de ce que @amadou_yaya_diallo a écrit
                 - Ajouté un compteur workingPpl qui va permettre aux IA de suivre le nombre de personnes qui doivent travailler.
-            05/12/2024@tahakhetib - J'ai ajouté les modifications au dessus de ce que @amadou_yaya_diallo à écrit
+            05/12/2024@tahakhetib - J'ai ajouté les modifications au-dessus de ce que @amadou_yaya_diallo a écrit
                 - Retiré les compteurs workingPpl et peopleCount pour une fonction get_pplCount()
 
     """

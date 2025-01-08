@@ -24,9 +24,9 @@ class Building:
 
     def get_cost(self):
         return self.cost
-    
+
     def get_occupied_tiles(self):
-        return [(self.position.getX() + x, self.position.getY() + y) for x in range(self.surface[0]) for y in range(self.surface[1])]
+        return  [(self.position.getX() + x, self.position.getY() + y) for x in range(self.surface[0]) for y in range(self.surface[1])]
     
     def get_name(self):
         return self.name

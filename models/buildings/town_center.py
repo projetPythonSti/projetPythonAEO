@@ -1,7 +1,7 @@
 from models.buildings.buildings import Building
 
 class TownCenter(Building):
-    surface = (4, 4),  # 4x4
+    surface = (4, 4)  # 4x4
     def __init__(self, team):
         community = team.get_community().get('T')
         uid = len(community) if community else 0 # 0 if it doesn't exist yet

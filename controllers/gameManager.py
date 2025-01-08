@@ -42,7 +42,7 @@ class GameManager:
         def getTeamNumber(self, name):
             pattern = r'\d+'
             substrings = re.findall(pattern, name)
-            print(substrings)
+            #print(substrings) #prints the subStrings extracted from the unitName
             return int(substrings[0])
 
         def moveUnit(self, uid):
@@ -59,7 +59,7 @@ class GameManager:
                 self.world.tiles_dico[unit["moveQueue"][0]].set_contains(unitObj)
                 self.world.filled_tiles[unit["moveQueue"][0]] = unit["moveQueue"][0]
                 unit["currentTile"] = unit["moveQueue"][0]
-                print("Got to the next tile in", (unit["timeElapsed"]))
+                #print("Got to the next tile in", (unit["timeElapsed"]))
                 unit["timeElapsed"] = 0
                 if (len(unit["moveQueue"]) < 2):
                     unit["moveQueue"] = []
@@ -69,7 +69,8 @@ class GameManager:
 
         def checkUnitsToMove(self):
             if len(self.unitToMove) == 0:
-                print("No unit to move")
+                pass
+                #print("No unit to move")
             else:
                 unitToDelete = ""
                 for k in self.unitToMove:
@@ -89,10 +90,12 @@ class GameManager:
             pathFinding  = Pathfinding(mapGrid=grid, statingPoint= (unit.position.getX(), unit.position.getY()), goal=(destination.getX(), destination.getY()))
             path = pathFinding.astar()
             if path.__class__ == bool:
-                print("Found no short path")
+                pass
+                #  : AJOUTER UNE EXCEPTION QUAND IL NE TROUVE VRAIMENT PAS DE CHEMIN
+                #print("Found no short path")
             path = path + [pathFinding.startingPoint]
             path = path[::-1]
-
+            print("Unit ADDED TO MOVE DICT")
             self.unitToMove[unit.uid] = {
                 "group"     : [],
                 "timeToTile" : 1/(unit.speed),
