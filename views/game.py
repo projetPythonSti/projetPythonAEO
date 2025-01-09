@@ -1,7 +1,7 @@
 # from resource_manager import ResourceManager
 from utils.setup import TILE_SIZE
-# from views.camera import Camera
-# from views.world import World
+from views.camera import Camera
+from views.world import World_GUI
 # from views.hud import Hud
 import pygame as pg
 import sys
@@ -10,6 +10,7 @@ import sys
 class Game:
 
     def __init__(self, screen, clock, game_manager):
+        
         self.screen = screen
         self.clock = clock
         self.width, self.height = self.screen.get_size()
@@ -18,7 +19,8 @@ class Game:
         # self.resource_manager = ResourceManager() #have to be deleted
         # self.hud = Hud(self.resource_manager, self.width, self.height)
         # self.world = World(self.resource_manager, self.entities, self.hud, 50, 50, self.width, self.height)
-        # self.camera = Camera(self.width, self.height)
+        self.camera = Camera(self.width, self.height)
+        self.world = World_GUI(self.entities, self.game_manager.world.width, self.game_manager.world.height, self.width, self.height, self.game_manager.world)
         self.BLACK, self.WHITE, self.RED = (0, 0, 0), (255, 255, 255), (255,  70,  70)
 
     
@@ -46,18 +48,17 @@ class Game:
                 
 
     def update(self, dt: float):
-        return
         self.camera.update()
         # Update all entities to handle damage and other interactions
         for entity in self.entities:
             if entity.alive:
                 entity.update()
-        self.hud.update()
+        # self.hud.update()
         self.world.update(self.camera, dt)  # Pass both camera and dt
 
     def draw(self):
         self.screen.fill((0, 0, 0))
-        # self.world.draw(self.screen, self.camera)
+        self.world.draw(self.screen, self.camera)
         # self.hud.draw(self.screen)
 
         self.draw_text(

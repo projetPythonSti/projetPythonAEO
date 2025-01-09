@@ -36,7 +36,7 @@ class FenetreJeu:
         self.luncher = luncher
         self.master = luncher.root
         self.master.title("Age Of Empires")
-        self.master.attributes('-fullscreen', True)
+        self.master.geometry("800x600")
         self.master.resizable(False, False)  # Prevent resizing
         # Set the window icon
         self.master.iconbitmap('./assets/images/icon.ico') 

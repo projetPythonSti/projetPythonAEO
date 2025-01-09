@@ -7,14 +7,14 @@ from utils.setup import TILE_SIZE
 
 pg.init()
 class Camera:
-    def __init__(self, largeur_fenetre, hauteur_fenetre):
-        self.largeur = largeur_fenetre
-        self.hauteur = hauteur_fenetre
+    def __init__(self, window_width, window_height):
+        self.width = window_width
+        self.height = window_height
 
         self.deplacement = pg.Vector2(0, 0)
         self.zoom = 1.0
         self.zoom_speed = 0.1
-        self.vitesse = 15  # speed for panning (edge-scrolling or keyboard)
+        self.speed = 15  # speed for panning (edge-scrolling or keyboard)
 
         # Internal dx/dy used each frame
         self.dx = 0
@@ -37,36 +37,36 @@ class Camera:
         mouse_x, mouse_y = pg.mouse.get_pos()
 
         # Edge scrolling logic
-        if mouse_x > self.largeur * 0.97:  # Right edge
-            self.dx = -self.vitesse
-        elif mouse_x < self.largeur * 0.03:  # Left edge
-            self.dx = self.vitesse
+        if mouse_x > self.width * 0.97:  # Right edge
+            self.dx = -self.speed
+        elif mouse_x < self.width * 0.03:  # Left edge
+            self.dx = self.speed
         else:
             self.dx = 0
 
-        if mouse_y > self.hauteur * 0.97:  # Bottom edge
-            self.dy = -self.vitesse
-        elif mouse_y < self.hauteur * 0.03:  # Top edge
-            self.dy = self.vitesse
+        if mouse_y > self.height * 0.97:  # Bottom edge
+            self.dy = -self.speed
+        elif mouse_y < self.height * 0.03:  # Top edge
+            self.dy = self.speed
         else:
             self.dy = 0
 
         # Keyboard movement
         keys = pg.key.get_pressed()
         if keys[pg.K_q]:  # left
-            self.dx -= self.vitesse
+            self.dx -= self.speed
         elif keys[pg.K_d]:  # right
-            self.dx += self.vitesse
+            self.dx += self.speed
         if keys[pg.K_s]:   # down
-            self.dy -= self.vitesse
+            self.dy -= self.speed
         elif keys[pg.K_z]: # up
-            self.dy += self.vitesse
+            self.dy += self.speed
 
         # Apply displacement
         self.deplacement.x += self.dx
         self.deplacement.y += self.dy
 
-        logger.info(f"Camera displacement: {self.deplacement}, zoom: {self.zoom}")
+        # logger.info(f"Camera displacement: {self.deplacement}, zoom: {self.zoom}")
 
     def zoom_me(self):
         """
@@ -99,25 +99,25 @@ class Camera:
         screen_y *= self.zoom
 
         # Then add camera offset and center
-        screen_x += self.deplacement.x + (self.largeur / 2)
-        screen_y += self.deplacement.y + (self.hauteur / 2)
+        screen_x += self.deplacement.x + (self.width / 2)
+        screen_y += self.deplacement.y + (self.height / 2)
 
         # Convert to int for Pygame
         screen_x = int(screen_x)
         screen_y = int(screen_y)
 
-        logger.info(
-            f"iso_to_screen called with iso_pos: {iso_pos}, "
-            f"Result => ({screen_x}, {screen_y})"
-        )
+        # logger.info(
+        #     f"iso_to_screen called with iso_pos: {iso_pos}, "
+        #     f"Result => ({screen_x}, {screen_y})"
+        # )
         return (screen_x, screen_y)
 
     def screen_to_iso(self, screen_pos: tuple) -> pg.Vector2:
         """
         Inverse of iso_to_screen. 
         """
-        sx = screen_pos[0] - (self.largeur / 2) - self.deplacement.x
-        sy = screen_pos[1] - (self.hauteur / 2) - self.deplacement.y
+        sx = screen_pos[0] - (self.width / 2) - self.deplacement.x
+        sy = screen_pos[1] - (self.height / 2) - self.deplacement.y
         sx /= (TILE_SIZE / 2) * self.zoom
         sy /= (TILE_SIZE / 2) * self.zoom
 

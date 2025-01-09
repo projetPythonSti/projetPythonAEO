@@ -12,31 +12,91 @@ logger = logging.getLogger(__name__)
 
 
 class World_GUI:
-    def __init__(self, entities, grid_width, grid_height, width, height, world=None):
+    def __init__(self, entities, grid_width, grid_height, width, height, world):
         self.grid_width = grid_width
         self.grid_height = grid_height
         self.entities = entities
         self.height = height
         self.width = width
         self.hud = None
-        self.world = world if world else World(self.grid_width, self.grid_width)
-        self.grid = [[None] * self.grid_width for _ in range(self.height)]
-        self.grass_tiles = pg.Surface((grid_width * TILE_SIZE * 2, grid_height * TILE_SIZE + 2 * TILE_SIZE)).convert_alpha()
-        self.tiles = defaultdict(None) 
+        self.world_model = world
+        self.world = {}
+        self.perlin_scale = grid_width / 2
+        self.grid = [[None] * self.grid_width for _ in range(self.grid_height)]
+        self.grass_tiles = pg.Surface((self.grid_width * TILE_SIZE * 2, self.grid_height * TILE_SIZE + 2 * TILE_SIZE)).convert_alpha()
+        self.tile_images = defaultdict(None) 
         self.load_images()
+        self.create_world()
         
+                
+    def create_world(self):
+        for grid_x in range(self.grid_width):
+            for grid_y in range(self.grid_height):
+                world_tile = self.grid_to_world(grid_x, grid_y)
+                self.world[(grid_x, grid_y)] = world_tile
+                render_pos = world_tile["render_pos"]
+                tile = self.tile_images["grass"] if world_tile["tile"] != "eau" and world_tile["tile"] != "sable" else \
+                    self.tile_images[world_tile["tile"]]
+                self.grass_tiles.blit(tile, (render_pos[0] + self.grass_tiles.get_width() / 2, render_pos[1]))
+        
+        # If you want to keep a return value, you can return self.world here
+        # return self.world
+
+    def grid_to_world(self, grid_x, grid_y):
+        rect = [(grid_x * TILE_SIZE, grid_y * TILE_SIZE),
+                (grid_x * TILE_SIZE + TILE_SIZE, grid_y * TILE_SIZE),
+                (grid_x * TILE_SIZE + TILE_SIZE, grid_y * TILE_SIZE + TILE_SIZE),
+                (grid_x * TILE_SIZE, grid_y * TILE_SIZE + TILE_SIZE)]
+
+        iso_poly = [self.cart_to_iso(x, y) for x, y in rect]
+
+        minx = min(x for x, y in iso_poly)
+        miny = min(y for x, y in iso_poly)
+
+        r = random.randint(1, 100)
+        perlin = 100 * noise.pnoise2(grid_x / self.perlin_scale, grid_y / self.perlin_scale)
+
+        if (perlin >= 15) or (perlin <= -35):
+            tile = "tree"
+        else:
+            if r == 1:
+                tile = "rock"
+            elif r == 2:
+                tile = "block"
+            else:
+                tile = ""
+            
+        out = {
+            "grid": [grid_x, grid_y],
+            "cart_rect": rect,
+            "iso_poly": iso_poly,
+            "render_pos": [minx, miny],
+            "tile": tile,
+            "collision": False if tile == "" else True,
+            "projectiles": []  # Track projectiles on this tile
+        }
+        
+        return out
+  
     def load_images(self):
-        village1, village2 = self.world.villages
-        ressources = self.world.ressources
+        village1, village2 = self.world_model.villages
+        ressources = self.world_model.ressources
         merged_keys = {**village1.population(), **village2.population(), **ressources}
         for key, values in merged_keys.items():
             if len(values) > 0:
                 self.load_image(key, values['0'])
-     
+        self.tile_images["grass"] = pg.image.load("assets/images/tilegraphic.png").convert_alpha()
+        self.tile_images["eau"] = pg.image.load("assets/images/eau.png").convert_alpha()
+        self.tile_images["sable"] = pg.image.load("assets/images/sable.png").convert_alpha()
+        self.tile_images["block"] = pg.image.load("assets/images/block.png").convert_alpha()
+        self.tile_images["tree"] = pg.image.load("assets/images/graphics/tree.png").convert_alpha()
+        self.tile_images["rock"] = pg.image.load("assets/images/graphics/rock.png").convert_alpha()
+        
+        
     def load_image(self, key, value):
-        if key not in self.tiles:
+        if key not in self.tile_images:
                 try:
-                    self.tiles[key] = pg.image.load(value.image).convert_alpha()
+                    self.tile_images[key] = pg.image.load(value.image).convert_alpha()
                 except FileNotFoundError:
                     print(f"No such file : {value.image}")
             
@@ -54,7 +114,7 @@ class World_GUI:
     #     self.perlin_scale = grid_length_x / 2
 
     #     self.grass_tiles = pg.Surface((grid_length_x * TILE_SIZE * 2, grid_length_y * TILE_SIZE + 2 * TILE_SIZE)).convert_alpha()
-    #     self.tiles = self.resource_manager.images
+    #     self.tile_images = self.resource_manager.images
     #     # Define self.world as an empty dictionary first
     #     self.world = {}
     #     self.create_world()
@@ -81,12 +141,6 @@ class World_GUI:
         # Center the map
         screen_x = iso_x + self.grass_tiles.get_width() / 2
         screen_y = iso_y
-
-        # Log the transformation details
-        logger.info(f"compute_screen_position called with grid_x: {grid_x}, grid_y: {grid_y}")
-        logger.info(f"Cartesian coordinates: ({cart_x}, {cart_y}), Isometric coordinates: ({iso_x}, {iso_y})")
-        logger.info(f"Screen coordinates: ({screen_x}, {screen_y})")
-
         return screen_x, screen_y
 
     def cart_to_iso(self, x, y):
@@ -129,7 +183,7 @@ class World_GUI:
     def is_tile_available(self, x, y):
         if (x, y) not in self.world:
             return False
-
+        
         # Check if there's already a building here
         if (x, y) in self.buildings:
             return False
@@ -242,10 +296,10 @@ class World_GUI:
         if tile != "":
             # Scale the tile image
             scaled_tile = pg.transform.scale(
-                self.tiles[tile],
+                self.tile_images[tile],
                 (
-                    int(self.tiles[tile].get_width() * camera.zoom),
-                    int(self.tiles[tile].get_height() * camera.zoom)
+                    int(self.tile_images[tile].get_width() * camera.zoom),
+                    int(self.tile_images[tile].get_height() * camera.zoom)
                 )
             )
             # Adjust position according to zoom and scroll
@@ -253,7 +307,7 @@ class World_GUI:
                 scaled_tile,
                 (
                     (render_pos[0] + self.grass_tiles.get_width() / 2) * camera.zoom + camera.scroll.x * camera.zoom,
-                    (render_pos[1] - (self.tiles[tile].get_height() - TILE_SIZE)) * camera.zoom + camera.scroll.y * camera.zoom
+                    (render_pos[1] - (self.tile_images[tile].get_height() - TILE_SIZE)) * camera.zoom + camera.scroll.y * camera.zoom
                 )
             )
 
@@ -284,11 +338,11 @@ class World_GUI:
             if entity.alive and  isinstance(entity, Keep):
                 entity.projectile_pool.update(dt, camera=camera)
                 target = entity.find_closest_target()
-                if target and target.alive:
-                    #logger.info(f"{entity.name} at position {entity.pos} found target {target.name} at position {target.pos}.")
-                    entity.attack(target)
-                else:
-                    logger.info(f"{entity.name} at position {entity.pos} found no valid targets to attack.")
+                # if target and target.alive:
+                #     #logger.info(f"{entity.name} at position {entity.pos} found target {target.name} at position {target.pos}.")
+                #     entity.attack(target)
+        #         else:
+        #             logger.info(f"{entity.name} at position {entity.pos} found no valid targets to attack.")
 
 
 
@@ -312,50 +366,6 @@ class World_GUI:
             print(f"{building.name} found no targets within range.")  # Debug statement
         return closest
 
-    def create_world(self):
-        # Fill the existing self.world dictionary
-        for grid_x in range(self.grid_width):
-            for grid_y in range(self.grid_height):
-                world_tile = self.grid_to_world(grid_x, grid_y)
-                self.world[(grid_x, grid_y)] = world_tile
-                render_pos = world_tile["render_pos"]
-                self.grass_tiles.blit(self.tiles["block"], (render_pos[0] + self.grass_tiles.get_width() / 2, render_pos[1]))
-        # If you want to keep a return value, you can return self.world here
-        # return self.world
-
-    def grid_to_world(self, grid_x, grid_y):
-        rect = [(grid_x * TILE_SIZE, grid_y * TILE_SIZE),
-                (grid_x * TILE_SIZE + TILE_SIZE, grid_y * TILE_SIZE),
-                (grid_x * TILE_SIZE + TILE_SIZE, grid_y * TILE_SIZE + TILE_SIZE),
-                (grid_x * TILE_SIZE, grid_y * TILE_SIZE + TILE_SIZE)]
-
-        iso_poly = [self.cart_to_iso(x, y) for x, y in rect]
-
-        minx = min(x for x, y in iso_poly)
-        miny = min(y for x, y in iso_poly)
-
-        r = random.randint(1, 100)
-        perlin = 100 * noise.pnoise2(grid_x / self.perlin_scale, grid_y / self.perlin_scale)
-
-        if (perlin >= 15) or (perlin <= -35):
-            tile = "tree"
-        else:
-            if r == 1:
-                tile = "rock"
-            elif r == 2:
-                tile = "block"
-            else:
-                tile = ""
-
-        return {
-            "grid": [grid_x, grid_y],
-            "cart_rect": rect,
-            "iso_poly": iso_poly,
-            "render_pos": [minx, miny],
-            "tile": tile,
-            "collision": False if tile == "" else True,
-            "projectiles": []  # Track projectiles on this tile
-        }
 
     def remove_projectile_from_tile(self, projectile, old_grid_pos):
         """Remove a projectile from its old tile."""
@@ -424,7 +434,7 @@ class World_GUI:
         self.draw_world_tiles(screen, camera)
         self.draw_buildings(screen, camera)
         self.draw_hp_score(screen, camera)
-        self.draw_projectiles(screen, camera)
+        # self.draw_projectiles(screen, camera)
 
 
 
@@ -559,7 +569,6 @@ class World_GUI:
                 bar_y = building_render_pos[1] - 10
                 pg.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
                 pg.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_width, bar_height))
-        print("Drawing HP bars")
 
 if __name__ == "__main__":
     pass

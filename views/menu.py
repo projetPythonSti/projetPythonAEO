@@ -1,6 +1,6 @@
 from views.buttons import Button
 from views.Gui import FolderSelector
-import pg as pg
+import pygame as pg
 from utils import *
 import sys
 
@@ -17,28 +17,32 @@ class Menu_manager:
         # self.font_name = 'assets/Polices&Wallpaper/Trajan_Pro_.ttf'
         # self.font_name2 = 'assets/Polices&Wallpaper/Trajan_Pro_Bold.ttf'
         self.BLACK, self.WHITE, self.RED = (0, 0, 0), (255, 255, 255), (255,  70,  70)
-        self.main_menu = Menu(self)
-        self.play_pause_menu = PlayPauseMenu(self, game)
+        # self.main_menu = Menu(self)
+        self.play_pause_menu = PlayPauseMenu(menu_manager=self, game=game)
         # self.options = OptionsMenu(self)
         # self.new_game = NewGame(self, game)
         # self.credits = CreditsMenu(self)
         # self.Volume = VolumeMenu(self)
         # self.Controls = CommandsMenu(self)
-        self.current_menu = self.main_menu
+        self.current_menu = self.play_pause_menu
 
     def check_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.running, self.playing = False, False
                 self.current_menu.run_display = False
+                pg.quit()
+                sys.exit()
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
                     self.START_KEY = True
                 elif event.key == pg.K_BACKSPACE:
                     self.BACK_KEY = True
                 elif event.key == pg.K_ESCAPE:
-                    self.game.game_manager.pause() #a voir après
+                    # self.game.game_manager.pause() #a voir après
                     self.ESCAPE_KEY = True
+                    pg.quit()
+                    sys.exit()
                 elif event.key == pg.K_DOWN:
                     self.DOWN_KEY = True
                 elif event.key == pg.K_UP:
@@ -53,9 +57,9 @@ class Menu_manager:
     def reset_keys(self):
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.ESCAPE_KEY = False, False, False, False, False
 
-    def draw_text(self, text, size, x, y, color=None):
+    def draw_text(self, text, size, position, color=None):
         color = color if color else self.game.WHITE
-        self.game.draw_text(self.display, text, size, color, (x,y))
+        self.game.draw_text(self.display, text, size, color, position)
     
 
     # def draw_text2(self, text, size, x, y):
@@ -88,7 +92,7 @@ class Menu:
 
 class PlayPauseMenu(Menu):
         def __init__(self, menu_manager, game):
-            super.__init__(self, menu_manager)
+            super().__init__(menu_manager)
             self.game = game
             self.screen = self.menu_manager.window
             # self.clock = pg.time.Clock()
@@ -100,25 +104,22 @@ class PlayPauseMenu(Menu):
             self.backup_x, self.backup_y = self.mid_width, self.mid_height + 20
             self.exit_x, self.exit_y = self.mid_width, self.mid_height + 40
             
-            self.play_button = Button((0, 255, 0), (self.play_x - 110, self.play_y), "Play")
-            self.backup_button = Button((0, 255, 0), self.backup_x - 110, self.backup_y, "Backup")
-            self.exit_button = Button((0, 255, 0), self.exit_x - 110, self.exit_y, "Quitter")
+            self.play_button = Button((0, 255, 0), (self.play_x - 110, self.play_y), "Play", 30, 10)
+            self.backup_button = Button((0, 255, 0), (self.backup_x - 110, self.backup_y), "Backup",30, 10)
+            self.exit_button = Button((0, 255, 0), (self.exit_x - 110, self.exit_y), "Quitter", 30,10)
         
         def display_menu(self):
             pg.display.init()
-            image = pg.image.load("assets/images/Polices&Wallpaper/sparta.jpeg").convert_alpha()
+            image = pg.image.load("assets/images/sparta.jpeg").convert_alpha()
             while self.run_display:
                 self.menu_manager.check_events()
-                # self.check_input()
+                self.check_input()
                 self.menu_manager.display.fill((0, 0, 0))
                 self.menu_manager.display.blit(image, (0, 0))
-                self.menu_manager.draw_text('PLAY', 100, (self.screen_size[0] // 2, self.screen_size[1] * 0.3))
-                self.menu_manager.draw_text('Sauvegarder', 100, (self.screen_size[0] // 2, self.screen_size[1] * 0.3))
-                self.menu_manager.draw_text('Quitter', 100, (self.screen_size[0] // 2, self.screen_size[1] * 0.3))
-            
-                # self.menu_manager.draw_text("Play", 40, self.play_x, self.play_y)
-                # self.menu_manager.draw_text("Sauvegarder", 40, self.backup_x, self.backup_y - 40)
-                # self.menu_manager.draw_text("Quitter", 40, self.exit_x, self.exit_y + 10)
+                
+                self.menu_manager.draw_text("Play", 40, (self.play_x, self.play_y))
+                self.menu_manager.draw_text("Sauvegarder", 40, (self.backup_x, self.backup_y + 15))
+                self.menu_manager.draw_text("Quitter", 40, (self.exit_x, self.exit_y + 30))
                 # if self.etat == "Pas de Partie":
                 #     self.menu_manager.draw_text2("Pas de Sauvegarde! Veuillez créer une partie avant.", 15, self.selectx,
                 #                             self.selecty)
@@ -129,6 +130,8 @@ class PlayPauseMenu(Menu):
             if self.menu_manager.BACK_KEY or (self.menu_manager.CLICK and self.play_button.is_over(mouse_position)):
                 self.game.game_manager.play()
             elif self.menu_manager.CLICK:
+                print("mouse "+mouse_position)
+                # print("button " + self.exit_button.x + " " +self.exit_button.y)
                 if self.backup_button.is_over(mouse_position):
                     folder_selector = FolderSelector()
                     folder_selector.master.mainloop()
@@ -141,34 +144,16 @@ class PlayPauseMenu(Menu):
                 if self.exit_button.is_over(mouse_position):
                     self.running, self.playing = False, False
                     self.current_menu.run_display = False
-                    
-                    
-            self.run_display = False
-        
-        def run(self):
-            self.menu_running = True
-            while self.menu_running:
-                self.clock.tick(60)
-                self.update()
-                self.draw()
-            return self.playing
-
-        def update(self):
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
                     pg.quit()
                     sys.exit()
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_RETURN:
-                        self.menu_running = False
-                    if event.key == pg.K_ESCAPE:
-                        self.playing = False
-                        self.menu_running = False
-
-        def draw(self):
-            self.screen.fill((0, 0, 0))
-            self.menu_manager.draw_text('PLAY', 100, self.game.WHITE, self.screen_size[0] // 2, self.screen_size[1] * 0.3)
-            self.menu_manager.draw_text('Sauvegarder', 100, self.game.WHITE, self.screen_size[0] // 2, self.screen_size[1] * 0.3)
-            self.menu_manager.draw_text('Quitter', 100, self.game.WHITE, self.screen_size[0] // 2, self.screen_size[1] * 0.3)
-            pg.display.flip()
+                    #detruire les fenetre tkinter et pygame
+                    
+            self.run_display = False
+            
+        # def draw(self):
+        #     self.screen.fill((0, 0, 0))
+        #     self.menu_manager.draw_text('PLAY', 100, self.game.WHITE, self.screen_size[0] // 2, self.screen_size[1] * 0.3)
+        #     self.menu_manager.draw_text('Sauvegarder', 100, self.game.WHITE, self.screen_size[0] // 2, self.screen_size[1] * 0.3)
+        #     self.menu_manager.draw_text('Quitter', 100, self.game.WHITE, self.screen_size[0] // 2, self.screen_size[1] * 0.3)
+        #     pg.display.flip()
 

@@ -2,7 +2,7 @@ import pygame as pg
 from settings import WIDTH, HEIGHT
 import pygame as pg
 from views.game import Game
-from menu import StartMenu, GameMenu
+from views.menu import StartMenu, GameMenu
 
 
 def main():

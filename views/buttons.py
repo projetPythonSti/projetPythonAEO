@@ -9,10 +9,11 @@ class Button:
         self.x = position[0]
         self.y = position[1]
         self.text = text
-        self.image_origine = pg.image.load("assets/hud/" + text + ".png").convert_alpha() #can be deleted maybe
-        self.image = pg.image.load("assets/hud/" + text + ".png").convert_alpha()
-        self.width = width if width else self.image.get_width()
-        self.height = height if height else self.image.get_height()
+        # self.image_origine = pg.image.load("assets/images/hud/" + text + ".png").convert_alpha() #can be deleted maybe
+        # self.image = pg.image.load("assets/images/hud/" + text + ".png").convert_alpha()
+        self.width = width #if width else self.image.get_width()
+        self.height = height #if height else self.image.get_height()
+        print("Button :", position[0], " ", position[1])
 
     def draw(self, screen, outline=None):
         if outline:
