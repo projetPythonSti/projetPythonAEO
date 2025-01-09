@@ -65,31 +65,34 @@ class FenetreJeu:
 
     def play(self):
         self.luncher.main()
-
-class FolderSelector:
-    def __init__(self, master=None):
+        
+class Selectors:
+    def __init__(self, name, master=None):
         self.master = master if master else tk.Tk()
         self.folder_path = ""
-        self.select_folder_button = tk.Button(self.master, text="Select Folder", command=self.select_folder)
+        self.select_folder_button = tk.Button(self.master, text=name, command=self.select)
         self.select_folder_button.pack(pady=20)
-        
+        # Center the window on the screen
+        self.master.update_idletasks()
+        width = self.master.winfo_width()
+        height = self.master.winfo_height()
+        x = (self.master.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.master.winfo_screenheight() // 2) - (height // 2)
+        self.master.geometry(f'{width}x{height}+{x}+{y}')
 
-    def select_folder(self):
-        self.folder_path = filedialog.askdirectory()
-        # if self.folder_path:
-        #     print(f"Selected folder: {self.folder_path}")
-
-class FileSelector:
+class FolderSelector(Selectors):
     def __init__(self, master=None):
-        self.master = master if master else tk.Tk()
-        self.file_path = ""
-        self.select_file_button = tk.Button(self.master, text="Select File", command=self.select_file)
-        self.select_file_button.pack(pady=20)
+        super().__init__("Select folder")
+    
+    def select(self):
+        self.folder_path = filedialog.askdirectory()
 
-    def select_file(self):
+class FileSelector(Selectors):
+    def __init__(self, master=None):
+        super().__init__("Select File")
+
+    def select(self):
         self.file_path = filedialog.askopenfilename()
-        if self.file_path:
-            print(f"Selected file: {self.file_path}")
 
 if __name__ == "__main__":
     # Create the main window

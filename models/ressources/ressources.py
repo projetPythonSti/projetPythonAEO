@@ -19,8 +19,11 @@ class Ressource:
     def get_name(self):
         return self.name
     
+    # def get_position(self):
+    #     return self.position
+    
     def get_position(self):
-        return self.position
+        return (self.position.getX(), self.position.getY())
     
     def set_position(self, x, y):
         self.position.setX(x)

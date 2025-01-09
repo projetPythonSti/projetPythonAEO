@@ -91,7 +91,7 @@ class World:
         
     
     def place_element(self, element):
-        place = (element.position.getX(), element.position.getY())
+        place = element.get_position()
         if place not in self.filled_tiles.values() and place[0] <= self.width and place[1] <= self.height:
             if issubclass(element.__class__, Building) and all(tile not in set(self.filled_tiles.values()) for tile in element.get_occupied_tiles()):
                 #check if the building can be placed
@@ -109,7 +109,7 @@ class World:
             #update the view of the element
     
     def remove_element(self, element):
-        place = (element.position.getX(), element.position.getY())
+        place = element.get_position()
         if(issubclass(element.__class__, Building)) and all(tile in set(self.filled_tiles.values()) for tile in element.get_occupied_tiles()):
             for x in range(element.surface[0]):
                 for y in range(element.surface[1]):

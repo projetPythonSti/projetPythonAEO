@@ -12,7 +12,7 @@ class Camera:
         self.height = window_height
 
         self.deplacement = pg.Vector2(0, 0)
-        self.zoom = 1.0
+        self.zoom = 0.2
         self.zoom_speed = 0.1
         self.speed = 15  # speed for panning (edge-scrolling or keyboard)
 

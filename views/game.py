@@ -2,6 +2,7 @@
 from utils.setup import TILE_SIZE
 from views.camera import Camera
 from views.world import World_GUI
+from views.menu import PlayPauseMenu
 # from views.hud import Hud
 import pygame as pg
 import sys
@@ -22,7 +23,7 @@ class Game:
         self.camera = Camera(self.width, self.height)
         self.world = World_GUI(self.entities, self.game_manager.world.width, self.game_manager.world.height, self.width, self.height, self.game_manager.world)
         self.BLACK, self.WHITE, self.RED = (0, 0, 0), (255, 255, 255), (255,  70,  70)
-
+        self.playPauseMenu = PlayPauseMenu(self)
     
     
     def run(self):
@@ -42,9 +43,11 @@ class Game:
                 if event.key == pg.K_ESCAPE:
                     self.game_manager.pause()
                     self.game_manager.html_generator()
+                    self.playPauseMenu.run()
+                    
                     #temporaires
-                    pg.quit()
-                    sys.exit()
+                    # pg.quit()
+                    # sys.exit()
                 
 
     def update(self, dt: float):
@@ -60,7 +63,16 @@ class Game:
         self.screen.fill((0, 0, 0))
         self.world.draw(self.screen, self.camera)
         # self.hud.draw(self.screen)
-
+        # for x in range(self.world.grid_width):
+        #     for y in range(self.world.grid_height):
+        #         # sq = self.world.world[(x,y)]["cart_rect"]
+        #         # rect = pg.Rect(sq[0][0], sq[0][1], TILE_SIZE, TILE_SIZE)
+        #         # pg.draw.rect(self.screen, (0,0,255), rect, 1)
+                
+        #         sq = self.world.world[(x,y)]["iso_poly"]
+        #         sq = [(x + self.width/2, y + self.height/4) for x, y in sq]
+        #         pg.draw.polygon(self.screen, (0,0,255), sq, 1)
+                
         self.draw_text(
             self.screen,
             'fps={}'.format(round(self.clock.get_fps())),

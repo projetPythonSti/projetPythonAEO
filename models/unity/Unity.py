@@ -18,7 +18,7 @@ class Unity:
         self.range = visibility
         self.target = target
         self.task = None
-        self.image = f"./assets/images/units/{self.name}.png"
+        self.image = f"./assets/images/{self.name}.png"
         
         # self.team.add_unit(self)
         # population += 1
@@ -48,6 +48,9 @@ class Unity:
         self.team.world.remove_element(self)
     
     def get_cost(self): return self.cost
+    
+    def get_position(self):
+        return (self.position.getX(), self.position.getY())
     
     def __repr__(self): return f"{self.name}"
     

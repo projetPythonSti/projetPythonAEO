@@ -25,6 +25,7 @@ class World_GUI:
         self.grid = [[None] * self.grid_width for _ in range(self.grid_height)]
         self.grass_tiles = pg.Surface((self.grid_width * TILE_SIZE * 2, self.grid_height * TILE_SIZE + 2 * TILE_SIZE)).convert_alpha()
         self.tile_images = defaultdict(None) 
+        self.all = {**self.world_model.villages[0].population(), **self.world_model.villages[1].population(), **self.world_model.ressources}
         self.load_images()
         self.create_world()
         
@@ -50,21 +51,28 @@ class World_GUI:
 
         iso_poly = [self.cart_to_iso(x, y) for x, y in rect]
 
-        minx = min(x for x, y in iso_poly)
-        miny = min(y for x, y in iso_poly)
+        minx = min(x for x, _ in iso_poly)
+        miny = min(y for _, y in iso_poly)
 
         r = random.randint(1, 100)
         perlin = 100 * noise.pnoise2(grid_x / self.perlin_scale, grid_y / self.perlin_scale)
 
-        if (perlin >= 15) or (perlin <= -35):
-            tile = "tree"
-        else:
-            if r == 1:
-                tile = "rock"
-            elif r == 2:
-                tile = "block"
+        if "w" in self.world_model.ressources and "g" in self.world_model.ressources:
+            if (perlin >= 15) or (perlin <= -35):
+                tile = "w"
             else:
-                tile = ""
+                if r == 1:
+                    tile = "F"
+                elif r == 2:
+                    tile = "eau"
+                elif r == 3:
+                    tile = "g"
+                else:
+                    tile = ""
+        else:
+            tile = ""
+            
+        
             
         out = {
             "grid": [grid_x, grid_y],
@@ -79,18 +87,17 @@ class World_GUI:
         return out
   
     def load_images(self):
-        village1, village2 = self.world_model.villages
-        ressources = self.world_model.ressources
-        merged_keys = {**village1.population(), **village2.population(), **ressources}
-        for key, values in merged_keys.items():
+        # village1, village2 = self.world_model.villages
+        # ressources = self.world_model.ressources
+        for key, values in self.all.items():
             if len(values) > 0:
                 self.load_image(key, values['0'])
         self.tile_images["grass"] = pg.image.load("assets/images/tilegraphic.png").convert_alpha()
         self.tile_images["eau"] = pg.image.load("assets/images/eau.png").convert_alpha()
-        self.tile_images["sable"] = pg.image.load("assets/images/sable.png").convert_alpha()
-        self.tile_images["block"] = pg.image.load("assets/images/block.png").convert_alpha()
-        self.tile_images["tree"] = pg.image.load("assets/images/graphics/tree.png").convert_alpha()
-        self.tile_images["rock"] = pg.image.load("assets/images/graphics/rock.png").convert_alpha()
+        # self.tile_images["sable"] = pg.image.load("assets/images/sable.png").convert_alpha()
+        # self.tile_images["block"] = pg.image.load("assets/images/block.png").convert_alpha()
+        # self.tile_images["tree"] = pg.image.load("assets/images/graphics/tree.png").convert_alpha()
+        # self.tile_images["rock"] = pg.image.load("assets/images/graphics/rock.png").convert_alpha()
         
         
     def load_image(self, key, value):
@@ -139,7 +146,7 @@ class World_GUI:
         iso_x, iso_y = self.cart_to_iso(cart_x, cart_y)
 
         # Center the map
-        screen_x = iso_x + self.grass_tiles.get_width() / 2
+        screen_x = iso_x #+ self.grass_tiles.get_width() / 2
         screen_y = iso_y
         return screen_x, screen_y
 
@@ -257,7 +264,6 @@ class World_GUI:
 
     def draw_grass_tiles(self, screen, camera):
         """Draw the grass tiles in the background."""
-        # Scale the grass tiles surface
         scaled_grass_tiles = pg.transform.scale(
             self.grass_tiles,
             (
@@ -277,19 +283,10 @@ class World_GUI:
                 render_pos = self.world[x, y]["render_pos"]
                 self.draw_world_tile(screen, render_pos, x, y, camera)
 
-                # Debug grid lines
-                cart_rect = self.world[x, y]["cart_rect"]
-                iso_poly = [self.cart_to_iso(c[0], c[1]) for c in cart_rect]
-                iso_poly_screen = [(int(c[0] + camera.scroll.x + self.grass_tiles.get_width() / 2),
-                                    int(c[1] + camera.scroll.y)) for c in iso_poly]
-
-                if self.world[x, y]["collision"]:
-                    color = (255, 0, 0)  # Red outline if colliding
-                else:
-                    color = (0, 255, 0)  # Green outline if free
-
-                pg.draw.polygon(screen, color, iso_poly_screen, 1)
-
+    def draw_element(self, screen, camera, element):
+        position = element.get_position()
+        self.draw_world_tile(screen, self.world[position]["render_pos"], position[0], position[1], camera)
+    
     def draw_world_tile(self, screen, render_pos, x, y, camera):
         """Draw a single world tile at the specified position."""
         tile = self.world[x, y]["tile"]
@@ -310,7 +307,6 @@ class World_GUI:
                     (render_pos[1] - (self.tile_images[tile].get_height() - TILE_SIZE)) * camera.zoom + camera.scroll.y * camera.zoom
                 )
             )
-
 
 
     def update(self, camera, dt: float):
@@ -431,9 +427,12 @@ class World_GUI:
     def draw(self, screen, camera):
         """Render the world, including buildings."""
         self.draw_grass_tiles(screen, camera)
-        self.draw_world_tiles(screen, camera)
-        self.draw_buildings(screen, camera)
-        self.draw_hp_score(screen, camera)
+        # self.draw_world_tiles(screen, camera)
+        for ressources in self.world_model.ressources.values():
+            for element in ressources.values():
+                self.draw_element(screen, camera, element)
+        # self.draw_buildings(screen, camera)
+        # self.draw_hp_score(screen, camera)
         # self.draw_projectiles(screen, camera)
 
 
@@ -466,10 +465,10 @@ class World_GUI:
         screen.blit(doubled_building_image, building_render_pos)
 
         # Render projectiles if the building has a projectile pool
-        if hasattr(building, 'projectile_pool') and building.projectile_pool:
-            logger.info(f"Drawing projectiles for {building.name}")
-            building.projectile_pool.draw(screen)
-            logger.info(f"Finished drawing projectiles for {building.name}")
+        # if hasattr(building, 'projectile_pool') and building.projectile_pool:
+        #     logger.info(f"Drawing projectiles for {building.name}")
+        #     building.projectile_pool.draw(screen)
+        #     logger.info(f"Finished drawing projectiles for {building.name}")
         
 
     def draw_buildings(self, screen, camera):
