@@ -292,21 +292,24 @@ class World_GUI:
         tile = self.world[x, y]["tile"]
         if tile != "":
             # Scale the tile image
-            scaled_tile = pg.transform.scale(
-                self.tile_images[tile],
-                (
-                    int(self.tile_images[tile].get_width() * camera.zoom),
-                    int(self.tile_images[tile].get_height() * camera.zoom)
+            try:
+                scaled_tile = pg.transform.scale(
+                    self.tile_images[tile],
+                    (
+                        int(self.tile_images[tile].get_width() * camera.zoom),
+                        int(self.tile_images[tile].get_height() * camera.zoom)
+                    )
                 )
-            )
-            # Adjust position according to zoom and scroll
-            screen.blit(
-                scaled_tile,
-                (
-                    (render_pos[0] + self.grass_tiles.get_width() / 2) * camera.zoom + camera.scroll.x * camera.zoom,
-                    (render_pos[1] - (self.tile_images[tile].get_height() - TILE_SIZE)) * camera.zoom + camera.scroll.y * camera.zoom
+                # Adjust position according to zoom and scroll
+                screen.blit(
+                    scaled_tile,
+                    (
+                        (render_pos[0] + self.grass_tiles.get_width() / 2) * camera.zoom + camera.scroll.x * camera.zoom,
+                        (render_pos[1] - (self.tile_images[tile].get_height() - TILE_SIZE)) * camera.zoom + camera.scroll.y * camera.zoom
+                    )
                 )
-            )
+            except KeyError:
+                print("Clé non trouvé !")
 
 
     def update(self, camera, dt: float):
