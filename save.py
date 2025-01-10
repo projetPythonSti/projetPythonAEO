@@ -1,7 +1,7 @@
 import json
 import os
 import time
-
+# self.path mettre
 def save (world) :
     file_name = input("Veuillez choisir le nom de votre sauvegarde")
     print(f"{file_name} , est-ce bien le nom que vous voulez ?")
