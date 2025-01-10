@@ -27,6 +27,7 @@ class Keep(Building) :
         if distance <= self.attack_range:
             print(f"{self.name} attaque la cible {target.name} et inflige {self.attack_damage} points de dégâts.")
             target.take_damage(self.attack_damage)
+            time.sleep(1)
             return True
         else:
             print(f"{self.name} ne peut pas attaquer {target.name} car hors attaque_range")
