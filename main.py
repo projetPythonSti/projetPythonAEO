@@ -42,5 +42,5 @@ print("\nRessources restantes :")
 for res in resources1:
     print(f"{res.name}: {res.getQuantity()}")
 
-while house.health != 0 :
+while house.health > 0 :
     keep.attack(house)
