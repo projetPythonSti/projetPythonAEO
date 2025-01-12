@@ -422,4 +422,5 @@ if __name__ == "__main__":
     print(player.eventQueue)
     print(player.currentEvents)
     print(player.pastEvents)
+    print(player.playStyle)
 
