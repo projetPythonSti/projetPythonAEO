@@ -118,12 +118,6 @@ class Game_term :
 
         print("Durée de la partie " + str(self.game_duration) + "s ")
 
-    def print_fps (self, term,elapsed) :
-        right_txt = f'fps: {1 / elapsed:2.2f}'
-        return ('\n' + term.normal +
-                term.white_on_blue + term.clear_eol +
-                term.rjust(right_txt, term.width ))
-
 
     def pause (self) :
         term = Terminal()
@@ -155,16 +149,3 @@ class Game_term :
                 val2 = term.inkey()
                 if val2.lower() == 'q':
                     quit()
-
-
-
-def elapsed_timer():
-    """Timer pattern, from https://stackoverflow.com/a/30024601."""
-    start = timeit.default_timer()
-
-    def elapser():
-        return timeit.default_timer() - start
-
-    # pylint: disable=unnecessary-lambda
-    yield lambda: elapser()
-

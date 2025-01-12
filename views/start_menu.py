@@ -1,6 +1,5 @@
 from blessed import Terminal
-
-from save import load
+from save import *
 import os, sys
 
 class Menu :
@@ -34,7 +33,8 @@ class Menu :
                     break
 
                 else :
-                    load()
+                    nsave = Save()
+                    nsave.load_term()
                     break
 
     def set_size_map (self) :

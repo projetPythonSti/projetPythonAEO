@@ -80,6 +80,15 @@ class World:
                 print(self.tiles_dico[(x, y)], end="")
             print("", end="\n")
 
+    def return_world(self):
+        world_representation = []
+        for x in range(self.width):
+            row = []
+            for y in range(self.height):
+                row.append(str(self.tiles_dico[(x, y)]))  # Conversion explicite en chaîne
+            world_representation.append("".join(row))  # Joindre chaque ligne en une chaîne
+        return "\n".join(world_representation)
+
 
     def place_element(self, element):
         place = (element.position.getX(), element.position.getY())
