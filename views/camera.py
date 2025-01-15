@@ -14,7 +14,7 @@ class Camera:
         self.deplacement = pg.Vector2(0, 0)
         self.zoom = 0.2
         self.zoom_speed = 0.1
-        self.speed = 30  # speed for panning (edge-scrolling or keyboard)
+        self.speed = 50  # speed for panning (edge-scrolling or keyboard)
 
         # Internal dx/dy used each frame
         self.dx = 0
@@ -53,9 +53,9 @@ class Camera:
 
         # Keyboard movement
         keys = pg.key.get_pressed()
-        if keys[pg.K_q]:  # left
+        if keys[pg.K_d]:  # left
             self.dx -= self.speed
-        elif keys[pg.K_d]:  # right
+        elif keys[pg.K_q]:  # right
             self.dx += self.speed
         if keys[pg.K_s]:   # down
             self.dy -= self.speed

@@ -62,6 +62,12 @@ class Game:
     def draw(self):
         self.screen.fill((0, 0, 0))
         self.world.draw(self.screen, self.camera)
+        # self.world.draw_grass_tiles(self.screen, self.camera)
+        # self.world.draw_on_map(self.screen, 0, 0, pg.image.load("assets/images/sable.png"), self.camera)
+        # self.world.draw_on_map(self.screen, 0, 1, pg.image.load("assets/images/sable.png"), self.camera)
+        # self.world.draw_on_map(self.screen, (1, 119), pg.image.load("assets/images/sable.png"), self.camera)
+        
+        
         # self.hud.draw(self.screen)
         # for x in range(self.world.grid_width):
         #     for y in range(self.world.grid_height):

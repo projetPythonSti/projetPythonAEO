@@ -1,3 +1,4 @@
+from models.buildings.buildings import Building 
 from collections import defaultdict
 # from resource_manager import ResourceManager
 from utils.setup import TILE_SIZE
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class World_GUI:
-    def __init__(self, entities, grid_width, grid_height, width, height, world):
+    def __init__(self, entities, grid_width, grid_height, width, height, world:World):
         self.grid_width = grid_width
         self.grid_height = grid_height
         self.entities = entities
@@ -28,6 +29,7 @@ class World_GUI:
         self.all = {**self.world_model.villages[0].population(), **self.world_model.villages[1].population(), **self.world_model.ressources}
         self.load_images()
         self.create_world()
+        self.i = 0
         
                 
     def create_world(self):
@@ -107,32 +109,6 @@ class World_GUI:
                 except FileNotFoundError:
                     print(f"No such file : {value.image}")
             
-           
-    # def __init__(self, resource_manager: ResourceManager, entities, hud, grid_length_x, grid_length_y, width, height):
-    #     self.resource_manager = resource_manager
-    #     self.entities = entities
-    #     self.hud = hud
-    #     self.grid_length_x = grid_length_x
-    #     self.grid_length_y = grid_length_y
-    #     self.width = width
-    #     self.height = height
-    #     self.grid = [[None for _ in range(grid_length_y)] for _ in range(grid_length_x)]
-
-    #     self.perlin_scale = grid_length_x / 2
-
-    #     self.grass_tiles = pg.Surface((grid_length_x * TILE_SIZE * 2, grid_length_y * TILE_SIZE + 2 * TILE_SIZE)).convert_alpha()
-    #     self.tile_images = self.resource_manager.images
-    #     # Define self.world as an empty dictionary first
-    #     self.world = {}
-    #     self.create_world()
-    #     self.collision_matrix = self.create_collision_matrix()
-
-    #     self.buildings = {}
-    #     self.workers = {}
-    #     # self.projectiles = []  # Remove this line as it's no longer needed
-
-    #     self.temp_tile = None
-    #     self.examine_tile = None
 
     def compute_screen_position(self, grid_x, grid_y):
         """
@@ -146,7 +122,7 @@ class World_GUI:
         iso_x, iso_y = self.cart_to_iso(cart_x, cart_y)
 
         # Center the map
-        screen_x = iso_x #+ self.grass_tiles.get_width() / 2
+        screen_x = iso_x + self.grass_tiles.get_width() / 2
         screen_y = iso_y
         return screen_x, screen_y
 
@@ -171,23 +147,25 @@ class World_GUI:
                                 return True
         return False
 
-    def can_place_building(self, grid_x, grid_y, size):
-        """Check if a building of given size can be placed at the grid position."""
-        size_x, size_y = size
-        if grid_x + size_x > self.grid_width or grid_y + size_y > self.grid_height:
-            return False
+    # def can_place_building(self, grid_x, grid_y, size):
+    #     """Check if a building of given size can be placed at the grid position."""
+    #     size_x, size_y = size
+    #     if grid_x + size_x > self.grid_width or grid_y + size_y > self.grid_height:
+    #         return False
 
-        for dx in range(size_x):
-            for dy in range(size_y):
-                if not self.is_tile_available(grid_x + dx, grid_y + dy):
-                    return False  # Tile is not available
+    #     for dx in range(size_x):
+    #         for dy in range(size_y):
+    #             if not self.is_tile_available(grid_x + dx, grid_y + dy):
+    #                 return False  # Tile is not available
 
-        if self.is_entity_collision(grid_x, grid_y, size):
-            return False  # Collision with existing entity
+    #     if self.is_entity_collision(grid_x, grid_y, size):
+    #         return False  # Collision with existing entity
 
-        return True
+    #     return True
+    def can_place_building(self, occupied_tiles, position, surface):
+        return all(tile not in set(self.world_model.filled_tiles.values()) for tile in occupied_tiles) and surface[0] + position[0] <= self.grid_width and surface[1] + position[1] <= self.grid_height
 
-    def is_tile_available(self, x, y):
+    # def is_tile_available(self, x, y):
         if (x, y) not in self.world:
             return False
         
@@ -201,7 +179,7 @@ class World_GUI:
 
         return True
 
-    def select_tile(self, grid_pos):
+    # def select_tile(self, grid_pos):
         """Select a tile to place a worker or examine."""
         print(f"Selected tile: {grid_pos}")
         self.selected_tile = grid_pos
@@ -277,39 +255,138 @@ class World_GUI:
             (camera.scroll.x * camera.zoom, camera.scroll.y * camera.zoom)
         )
 
-    def draw_world_tiles(self, screen, camera):
-        for x in range(self.grid_width):
-            for y in range(self.grid_height):
-                render_pos = self.world[x, y]["render_pos"]
-                self.draw_world_tile(screen, render_pos, x, y, camera)
+    # def draw_world_tiles(self, screen, camera):
+    #     for x in range(self.grid_width):
+    #         for y in range(self.grid_height):
+    #             render_pos = self.world[x, y]["render_pos"]
+    #             self.draw_world_tile(screen, render_pos, x, y, camera)
 
-    def draw_element(self, screen, camera, element):
-        position = element.get_position()
-        self.draw_world_tile(screen, self.world[position]["render_pos"], position[0], position[1], camera)
+    # def draw_element(self, screen, camera, element):
+    #     position = element.get_position()
+    #     self.draw_world_tile(screen, self.world[position]["render_pos"], position, camera)
     
-    def draw_world_tile(self, screen, render_pos, x, y, camera):
-        """Draw a single world tile at the specified position."""
-        tile = self.world[x, y]["tile"]
-        if tile != "":
-            # Scale the tile image
-            try:
-                scaled_tile = pg.transform.scale(
-                    self.tile_images[tile],
-                    (
-                        int(self.tile_images[tile].get_width() * camera.zoom),
-                        int(self.tile_images[tile].get_height() * camera.zoom)
-                    )
+    # def draw_world_tile(self, screen, render_pos, position, camera):
+    #     """Draw a single world tile at the specified position."""
+    #     tile = self.world[position]["tile"]
+    #     if tile != "":
+    #         # Scale the tile image
+    #         try:
+    #             scaled_tile = pg.transform.scale(
+    #                 self.tile_images[tile],
+    #                 (
+    #                     int(self.tile_images[tile].get_width() * camera.zoom),
+    #                     int(self.tile_images[tile].get_height() * camera.zoom)
+    #                 )
+    #             )
+    #             # Adjust position according to zoom and scroll
+    #             screen.blit(
+    #                 scaled_tile,
+    #                 (
+    #                     (render_pos[0] + self.grass_tiles.get_width() / 2) * camera.zoom + camera.scroll.x * camera.zoom,
+    #                     (render_pos[1] - (self.tile_images[tile].get_height() - TILE_SIZE)) * camera.zoom + camera.scroll.y * camera.zoom
+    #                 )
+    #             )
+    #         except KeyError:
+    #             print("Clé non trouvé !")
+
+    def draw(self, screen, camera):
+            """Render the world, including buildings."""
+            self.draw_grass_tiles(screen, camera)
+            # self.draw_ressources(screen, camera)
+            self.draw_buildings(screen, camera)
+            # self.draw_large_image(screen, (0,0), pg.image.load("assets/images/buildings/T.png").convert_alpha(), camera)
+            # self.draw_buildings(screen, camera)
+            # self.draw_hp_score(screen, camera)
+            # self.draw_projectiles(screen, camera)
+            # for k in self.world_model.filled_tiles.keys():
+            #     self.draw_on_map(screen, k, pg.image.load("assets/images/sable.png").convert_alpha(), camera)
+
+
+
+    def draw_building(self, screen, building, image, camera):
+        """Draw the building using its isometric position."""
+        building_render_pos = self.compute_screen_position(building.get_position()[0], building.get_position()[1])
+
+        # Apply camera displacement and zoom
+        building_render_pos = (
+            (building_render_pos[0] + camera.deplacement.x) * camera.get_zoom(),
+            (building_render_pos[1] + camera.deplacement.y) * camera.get_zoom()
+        )
+
+        # Adjust for the building image size
+        building_render_pos = (
+            building_render_pos[0] - (image.get_width() * camera.get_zoom()),
+            building_render_pos[1] - (image.get_height() * camera.get_zoom())
+        )
+
+        # Double the building image size and apply zoom
+        doubled_building_image = pg.transform.scale(
+            image,
+            (
+                int(image.get_width() * building.surface[0] * camera.get_zoom()),
+                int(image.get_height() * building.surface[1] * camera.get_zoom())
+            )
+        )
+        # Draw the doubled building image at the adjusted position
+        screen.blit(doubled_building_image, building_render_pos)
+
+        # Render projectiles if the building has a projectile pool
+        # if hasattr(building, 'projectile_pool') and building.projectile_pool:
+        #     logger.info(f"Drawing projectiles for {building.name}")
+        #     building.projectile_pool.draw(screen)
+        #     logger.info(f"Finished drawing projectiles for {building.name}")
+    
+
+    def draw_buildings(self, screen, camera):
+        """Draw all the buildings in the world."""
+        buildings_keys = {"A", "B", "C", "F", "H", "K", "S", "T"}
+        buildings1 = {k:v for k, v in self.world_model.villages[0].population().items() if k in buildings_keys}
+        buildings2 = {k:v for k, v in self.world_model.villages[1].population().items() if k in buildings_keys}
+        
+        for (k1, building1), (k2, building2) in zip(buildings1.items(), buildings2.items()):
+            for b1, b2 in zip(building1.values(), building2.values()):
+                if issubclass(b1.__class__, Building) and self.can_place_building(b1.get_occupied_tiles(), b1.get_position(), b1.surface):
+                    # self.draw_on_map(screen, b1.get_position(), self.tile_images[k1], camera, b1.surface)
+                    self.draw_building(screen, b1, self.tile_images[k1], camera)
+                if issubclass(b2.__class__, Building) and self.can_place_building(b2.get_occupied_tiles(), b2.get_position(), b2.surface):
+                    # self.draw_on_map(screen, b2.get_position(), self.tile_images[k2], camera, b2.surface)
+                    self.draw_building(screen, b2, self.tile_images[k2], camera)
+    
+    
+    
+    def draw_ressources(self, screen, camera):
+        unity_keys = {"a", "h", "s", "v"}
+        units1 = {k:v for k, v in self.world_model.villages[0].population().items() if k in unity_keys}
+        units2 = {k:v for k, v in self.world_model.villages[1].population().items() if k in unity_keys}
+        for (k, ressources), (key1, human1), (key2, human2)  in zip(self.world_model.get_ressources().items(), units1.items(), units2.items()):
+           for _, ressource in ressources.items():
+            self.draw_on_map(screen, ressource.get_position(),  self.tile_images[k], camera)
+        
+    
+    def draw_on_map(self, screen, position, image, camera, surface=None):
+        surfX, surfY = surface[0] if surface else 1, surface[1] if surface else 1
+        # Convert grid position to isometric coordinates
+        render_pos = self.world[position]["render_pos"] if position in self.world else None
+        if render_pos:
+            # Scale the image if necessary (e.g., based on camera zoom)
+            scaled_image = pg.transform.scale(
+                image,
+                (
+                    int(image.get_width() * surfX * camera.zoom),
+                    int(image.get_height() * surfY * camera.zoom)
                 )
-                # Adjust position according to zoom and scroll
-                screen.blit(
-                    scaled_tile,
-                    (
-                        (render_pos[0] + self.grass_tiles.get_width() / 2) * camera.zoom + camera.scroll.x * camera.zoom,
-                        (render_pos[1] - (self.tile_images[tile].get_height() - TILE_SIZE)) * camera.zoom + camera.scroll.y * camera.zoom
-                    )
+            )
+            
+            # Adjust position according to zoom and scroll
+            screen.blit(
+                scaled_image,
+                (
+                    (render_pos[0] + self.grass_tiles.get_width() / 2) * camera.zoom + camera.scroll.x * camera.zoom,
+                    (render_pos[1] - (image.get_height() - TILE_SIZE)) * camera.zoom + camera.scroll.y * camera.zoom
                 )
-            except KeyError:
-                print("Clé non trouvé !")
+            )
+        else:
+            print("This position is out of the map")
 
 
     def update(self, camera, dt: float):
@@ -426,59 +503,6 @@ class World_GUI:
     #     except FileNotFoundError as e:
     #         print(f"Error loading image: {e}")
     #     return images
-
-    def draw(self, screen, camera):
-        """Render the world, including buildings."""
-        self.draw_grass_tiles(screen, camera)
-        # self.draw_world_tiles(screen, camera)
-        for ressources in self.world_model.ressources.values():
-            for element in ressources.values():
-                self.draw_element(screen, camera, element)
-        # self.draw_buildings(screen, camera)
-        # self.draw_hp_score(screen, camera)
-        # self.draw_projectiles(screen, camera)
-
-
-
-    def draw_building(self, screen, building, camera):
-        """Draw the building using its isometric position."""
-        building_render_pos = self.compute_screen_position(building.grid_x, building.grid_y)
-
-        # Apply camera displacement and zoom
-        building_render_pos = (
-            (building_render_pos[0] + camera.deplacement.x) * camera.get_zoom(),
-            (building_render_pos[1] + camera.deplacement.y) * camera.get_zoom()
-        )
-
-        # Adjust for the building image size
-        building_render_pos = (
-            building_render_pos[0] - (building.image.get_width() * camera.get_zoom()),
-            building_render_pos[1] - (building.image.get_height() * camera.get_zoom())
-        )
-
-        # Double the building image size and apply zoom
-        doubled_building_image = pg.transform.scale(
-            building.image,
-            (
-                int(building.image.get_width() * 2 * camera.get_zoom()),
-                int(building.image.get_height() * 2 * camera.get_zoom())
-            )
-        )
-        # Draw the doubled building image at the adjusted position
-        screen.blit(doubled_building_image, building_render_pos)
-
-        # Render projectiles if the building has a projectile pool
-        # if hasattr(building, 'projectile_pool') and building.projectile_pool:
-        #     logger.info(f"Drawing projectiles for {building.name}")
-        #     building.projectile_pool.draw(screen)
-        #     logger.info(f"Finished drawing projectiles for {building.name}")
-        
-
-    def draw_buildings(self, screen, camera):
-        """Draw all the buildings in the world."""
-        for building in self.entities:
-            if isinstance(building, Building):
-                self.draw_building(screen, building, camera)
 
 
     def place_building(self, grid_pos):
