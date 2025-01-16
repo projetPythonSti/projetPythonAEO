@@ -226,7 +226,7 @@ class PlayPauseMenu:
         print("Here is the path: ", path)
         if self.game:
             self.game.game_manager.save_world(path)
-        self.running = True  # Ensure the menu keeps running after saving
+        self.running = False  # Ensure the menu keeps running after saving
 
     def load(self):
         print("Im charging...")

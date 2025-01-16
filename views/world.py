@@ -292,7 +292,7 @@ class World_GUI:
     def draw(self, screen, camera):
             """Render the world, including buildings."""
             self.draw_grass_tiles(screen, camera)
-            # self.draw_ressources(screen, camera)
+            self.draw_entities(screen, camera)
             self.draw_buildings(screen, camera)
             # self.draw_large_image(screen, (0,0), pg.image.load("assets/images/buildings/T.png").convert_alpha(), camera)
             # self.draw_buildings(screen, camera)
@@ -354,14 +354,28 @@ class World_GUI:
     
     
     
-    def draw_ressources(self, screen, camera):
+    def draw_entities(self, screen, camera):
         unity_keys = {"a", "h", "s", "v"}
         units1 = {k:v for k, v in self.world_model.villages[0].population().items() if k in unity_keys}
         units2 = {k:v for k, v in self.world_model.villages[1].population().items() if k in unity_keys}
-        for (k, ressources), (key1, human1), (key2, human2)  in zip(self.world_model.get_ressources().items(), units1.items(), units2.items()):
-           for _, ressource in ressources.items():
-            self.draw_on_map(screen, ressource.get_position(),  self.tile_images[k], camera)
+        for (k, ressources) in self.world_model.get_ressources().items():
+            for (_, ressource) in ressources.items():
+                self.draw_on_map(screen, ressource.get_position(), self.tile_images[k], camera)
+                
+        for k, h in units1.items():
+            surface = None if k in "ah" else (2,2)
+            for _, v in h.items():
+                self.draw_on_map(screen, v.get_position(), self.tile_images[k], camera, surface)
         
+        for k, h in units2.items():
+            surface = None if k in "ah" else (2,2)
+            for _, v in h.items():
+                self.draw_on_map(screen, v.get_position(), self.tile_images[k], camera, surface)
+            
+            
+    def affiche(self, k):
+        
+        print(**k)
     
     def draw_on_map(self, screen, position, image, camera, surface=None):
         surfX, surfY = surface[0] if surface else 1, surface[1] if surface else 1
