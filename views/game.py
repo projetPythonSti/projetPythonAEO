@@ -24,15 +24,8 @@ class Game:
         self.world = World_GUI(self.entities, self.game_manager.world.width, self.game_manager.world.height, self.width, self.height, self.game_manager.world)
         self.BLACK, self.WHITE, self.RED = (0, 0, 0), (255, 255, 255), (255,  70,  70)
         self.playPauseMenu = PlayPauseMenu(self)
-        self.playing = True
     
-    def load_game(self, game_manager, world):
-        self.game_manager.world = world
-        self.game_manager = game_manager
-        self.world = World_GUI(self.entities, self.game_manager.world.width, self.game_manager.world.height, self.width, self.height, self.game_manager.world)
-        
-        
-           
+    
     def run(self):
         self.playing = True
         while self.playing:
@@ -48,20 +41,33 @@ class Game:
                 sys.exit()
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
-                    self.playing = False
+                    self.game_manager.pause()
                     self.game_manager.html_generator()
                     self.playPauseMenu.run()
+                    
+                    #temporaires
+                    # pg.quit()
+                    # sys.exit()
                 
 
     def update(self, dt: float):
         self.camera.update()
-        
+        # Update all entities to handle damage and other interactions
+        for entity in self.entities:
+            if entity.alive:
+                entity.update()
         # self.hud.update()
-        self.world.update(self.screen, self.camera)  # Pass both camera and dt
+        self.world.update(self.camera, dt)  # Pass both camera and dt
 
     def draw(self):
         self.screen.fill((0, 0, 0))
         self.world.draw(self.screen, self.camera)
+        # self.world.draw_grass_tiles(self.screen, self.camera)
+        # self.world.draw_on_map(self.screen, 0, 0, pg.image.load("assets/images/sable.png"), self.camera)
+        # self.world.draw_on_map(self.screen, 0, 1, pg.image.load("assets/images/sable.png"), self.camera)
+        # self.world.draw_on_map(self.screen, (1, 119), pg.image.load("assets/images/sable.png"), self.camera)
+        
+        
         # self.hud.draw(self.screen)
         # for x in range(self.world.grid_width):
         #     for y in range(self.world.grid_height):
