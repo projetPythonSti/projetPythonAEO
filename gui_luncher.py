@@ -16,7 +16,7 @@ class luncher:
 
     def main(self):
         running = True
-        playing = True
+        # playing = True
 
         pg.init()
         pg.mixer.init()
@@ -26,12 +26,12 @@ class luncher:
         screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
         clock = pg.time.Clock()
         
-        world = World(120, 120)
+        world = World(50, 50)
         
         village1 = Model("fabulous", world)
         village2 = Model("hiraculous", world)
-        village1.initialize_villages(1,2,3, gold=200, wood=10, food=300, town_center=1, keeps=2, houses=5, camps=3)
-        village2.initialize_villages(4,5,6, 2, 1, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
+        village1.initialize_villages(50,2,30, 10, gold=200, wood=10, food=300, town_center=1, keeps=2, houses=5, camps=3)
+        village2.initialize_villages(4,50,6, 20, 1, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
         world.fill_ressources(10)
         game_manager = GameManager(1, world)
         game = Game(screen, clock, game_manager)
@@ -41,10 +41,7 @@ class luncher:
         
         while running:
             
-            # while menu_manager.running:
-            #     menu_manager.play_pause_menu.display_menu()
-            
-            while playing:
+            while game.playing:
                 game.run()
     
 

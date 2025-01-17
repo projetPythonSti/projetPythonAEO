@@ -216,6 +216,7 @@ class PlayPauseMenu:
     def play(self):
         print("Play button pressed")
         self.running = False
+        self.game.playing = True
         print("Back to the game")
 
     def save(self):
@@ -226,7 +227,8 @@ class PlayPauseMenu:
         print("Here is the path: ", path)
         if self.game:
             self.game.game_manager.save_world(path)
-        self.running = True  # Ensure the menu keeps running after saving
+        self.running = False  # Ensure the menu keeps running after saving
+        self.game.playing = True
 
     def load(self):
         print("Im charging...")
@@ -251,6 +253,8 @@ class PlayPauseMenu:
                             path=""
             except Exception as e:
                 print(f"Error reading file: {e}")
+        self.running = False
+        self.game.playing = True
             
     
     def quit_game(self):

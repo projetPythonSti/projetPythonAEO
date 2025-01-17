@@ -23,7 +23,7 @@ class Building:
         self.time_building = 3 * time_building / (self.builders + 2)
         self.team = team
         self.position = position if position else Position(rd.randint(0, self.team.world.width - 1), rd.randint(0, self.team.world.height - 1))
-        self.image = f"./assets/images/graphics/{self.name}.png"
+        self.image = f"./assets/images/buildings/{self.name}.png"
 
     def get_cost(self):
         return self.cost
@@ -43,7 +43,7 @@ class Building:
         self.team.world.book_place(self.surface, (self.position.getX(), self.position.getY()))
 
     def get_position(self):
-        return self.position
+        return self.position.getX(), self.position.getY()
 
     def get_surface(self):
         return self.surface
