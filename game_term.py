@@ -10,7 +10,7 @@ import time as t
 import datetime as dt
 from models.unity.Archer import *
 import asyncio
-from pynput import keyboard
+#from pynput import keyboard
 from blessed import Terminal
 from save import *
 import sys
@@ -58,7 +58,6 @@ class Game_term :
                     self.pause()
                 elif val.name == 'KEY_TAB':
                     self.stat()
-
 
                 elif val.lower() == '+':
                     if speed < 20:
@@ -119,7 +118,8 @@ class Game_term :
         #self.world.afficher_console()
         #print(term.home + term.clear)
         self.downright=Position(min(self.upleft.getX()+term.width-4,self.world.width),min(self.upleft.getY()+term.height-8,self.world.height)) #lil minuses here to fit everything nicely
-        self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
+        print(self.world.return_precise_world(self.upleft,self.downright))
+        #self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
         #self.world.show_world()
         print("Place sur le terminal : x",term.width, "y",term.height)
         print("Nb caractères affichés : x",self.downright.getX()-self.upleft.getX(),"y",self.downright.getY()-self.upleft.getY())

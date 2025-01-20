@@ -74,7 +74,7 @@ if __name__ == "__main__" :
 
     """
 if __name__ == "__main__":
-    monde = World(100, 100)
+    monde = random_world({"X":120,"Y":180,"t":"Arabia"})
     village1 = Model("1", monde)
     village2 = Model("2", monde)
     village1.initialize_villages(1, 2, 3, gold=200, wood=100, food=300)

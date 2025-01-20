@@ -50,16 +50,14 @@ def main(term,world):
         pause, dirty = False, True
         t = time.time()
         while True:
-            if dirty or not pause:
-                if not pause:
-                    t = time.time()
-                with elapsed_timer() as elapsed:
-                    outp = world.return_world()
-
-                outp += status(term, elapsed())
-                print(outp, end='')
-                sys.stdout.flush()
-                dirty = False
+            t = time.time()
+            with elapsed_timer() as elapsed:
+                outp = world.return_world()
+                #outp = world.return_precise_world()
+            outp += status(term, elapsed())
+            print(outp, end='')
+            sys.stdout.flush()
+            dirty = False
 
             """
             if pause:
@@ -86,5 +84,8 @@ if __name__ == "__main__":
 
     print('This is back where I came from.')
     """
-    mworld = World(10,10)
+    from randommap import *
+
+    mworld = random_world({"X":50,"Y":140,"t":"GoldRush"})
+
     exit(main(blessed.Terminal(),mworld))
