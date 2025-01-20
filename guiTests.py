@@ -18,23 +18,15 @@ from models.unity.Villager import Villager
 from datetime import datetime
 from views.start_menu import *
 
-from models.Position import Position
-import randommap
-
-from blessed import Terminal
-
 #Le world en paramètre est voué à disparaitre
 def jeu_terminal (world, gm:GameManager):
     running = True
     playing = True
 
-    '''
     # MENU
 
     menu = Menu()
-    menu.start_menu()
-    dico = menu.return_value()
-    '''
+    dico = menu.start_menu()
 
     clock = pg.time.Clock()
     game_term = Game_term(world,clock,gm)
@@ -82,7 +74,7 @@ if __name__ == "__main__" :
 
     """
 if __name__ == "__main__":
-    monde = random_world({"X":120,"Y":120,"t":"GoldRush"})
+    monde = World(100, 100)
     village1 = Model("1", monde)
     village2 = Model("2", monde)
     village1.initialize_villages(1, 2, 3, gold=200, wood=100, food=300)
@@ -104,14 +96,12 @@ if __name__ == "__main__":
     #print(v)
     #print(community)
     gm = GameManager(speed=1, world=monde)
-    '''
     print("Launched GameManager")
-    gm.addUnitToMoveDict(v, Position(0, 0))
+    gm.addUnitToMoveDict(v, Position(40, 40))
     print("Added unit to move dict")
-    gm.addUnitToMoveDict(community["v"]["eq1p6"], Position(10,10))
+    gm.addUnitToMoveDict(community["v"]["eq1p6"], Position(10,20))
     print("Added 2nd unit to move dict")
     print(monde.filled_tiles)
-    '''
     #print(gm.checkUnitsToMove())
     #Boucle pour tester le game manager
     n = 0
