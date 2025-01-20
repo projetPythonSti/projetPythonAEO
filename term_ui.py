@@ -28,6 +28,7 @@ def status(term, elapsed):
             term.clear_eol  +
             term.rjust(right_txt, term.width))
 
+#
 def show_please_wait(term):
     txt_wait = 'please wait ...'
     outp = term.move_yx(term.height - 1, 0) + term.clear_eol + term.center(txt_wait)
@@ -59,6 +60,8 @@ def main(term,world):
                 print(outp, end='')
                 sys.stdout.flush()
                 dirty = False
+
+            """
             if pause:
                 show_paused(term)
 
@@ -70,6 +73,7 @@ def main(term,world):
 
             if inp == ' ':
                 pause = not pause
+            """
 
 
 if __name__ == "__main__":
