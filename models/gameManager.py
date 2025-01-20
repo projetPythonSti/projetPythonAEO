@@ -103,9 +103,6 @@ class GameManager:
                 "moveQueue": path,
             }
 
-
-
-
 if __name__ == "__main__":
     pass
 

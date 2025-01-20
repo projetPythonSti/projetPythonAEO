@@ -62,6 +62,7 @@ def cluster(world,resource,key,repl=50,fade=16): #key is a tuple please
 #and returns a randomly generated World that follows the information
 
 #function that takes a map name, returns a World
+#supported maps : "Arabia", "GoldRush",
 def random_world(dict):
     newworld = World(dict["X"],dict["Y"])
     maptype = dict["t"]
