@@ -10,9 +10,15 @@ import time as t
 import datetime as dt
 from models.unity.Archer import *
 import asyncio
-
+from pynput import keyboard
 from blessed import Terminal
 from save import *
+import sys
+import math
+import time
+import timeit
+import colorsys
+import contextlib
 
 from models.Position import Position
 
@@ -39,45 +45,36 @@ class Game_term :
 
         while self.playing :
             term = Terminal()
-            with term.cbreak():
-                val = ''
-                while 1 :
-                    val = term.inkey(timeout=0.0000000001)
-                    if not val:
-                        self.Turn(speed)
-                    elif val.lower() == 'p':
-                        self.pause()
-                    elif val.name =='KEY_TAB' :
-                        self.stat()
-                    elif val.lower() == 'z':
-                        if self.upleft.getY()>0:
-                            self.upleft.setY(self.upleft.getX()-1)
-                    elif val.lower() == 'q':
-                        if self.upleft.getX()>0:
-                            self.upleft.setX(self.upleft.getY()-1)
-                    elif val.lower() == 's':
-                        if self.upleft.getY()<self.world.height:
-                            self.upleft.setY(self.upleft.getX()+1)
-                    elif val.lower() == 'd':
-                        if self.upleft.getX()<self.world.width:
-                            self.upleft.setX(self.upleft.getY()+1)
+            self.my_inputs(term,speed)
+
+    def my_inputs (self, term,speed):
+        with term.cbreak():
+            val = ''
+            while 1:
+                val = term.inkey(timeout=0.0000000001)
+                if not val:
+                    self.Turn(speed,term)
+                elif val.lower() == 'p':
+                    self.pause()
+                elif val.name == 'KEY_TAB':
+                    self.stat()
 
 
-                    elif val.lower() == '+':
-                        if speed < 20:
-                            speed += 1
-                        print(speed)
-                    elif val.lower() == '-':
-                        if speed > 5:
-                            speed -= 1
-                        print(speed)
+                elif val.lower() == '+':
+                    if speed < 20:
+                        speed += 1
+                    print(speed)
+                elif val.lower() == '-':
+                    if speed > 5:
+                        speed -= 1
+                    print(speed)
 
 
 
 
-    def Turn (self,speed) :
+    def Turn (self,speed,term) :
 
-        self.clock.tick(0.5* (speed/10))
+        self.clock.tick(60)
         now = datetime.now()
         delta = now - self.ltick
         ig_delta = delta * self.speed
@@ -89,9 +86,7 @@ class Game_term :
         # self.update()
         self.gm.checkUnitsToMove()
         self.gm.tick = timeit.default_timer()
-        print(self.world.filled_tiles)
-        #self.world.update_unit_presence()
-        self.draw_term()
+        self.draw_term(term)
 
     def Horloge(self):
         pass
@@ -117,10 +112,10 @@ class Game_term :
         pass
 
 
-    def draw_term (self):
-        term = Terminal()
+    def draw_term (self,term):
 
-        os.system('cls' if os.name == 'nt' else 'clear')
+        #os.system('cls' if os.name == 'nt' else 'clear')
+        sys.stdout.flush()
         #self.world.afficher_console()
         #print(term.home + term.clear)
         self.downright=Position(min(self.upleft.getX()+term.width-4,self.world.width),min(self.upleft.getY()+term.height-8,self.world.height)) #lil minuses here to fit everything nicely

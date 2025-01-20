@@ -10,7 +10,6 @@ from collections import defaultdict
 import random as rd
 import os
 
-from models.Position import Position
 
 class World:
 
@@ -23,14 +22,13 @@ class World:
         26/12/2024@tahakhetib : J'ai apporté des modifs sur ce que @amadou_yaya_diallo
             - Changé le type de l'attribut filled_tiles vers un dictionnaire
             - Modifié les fonctions place_element() et remove_element() pour qu'elle s'adapte au changement de filled_tiles
-        02/01/2025@tahakhetib : J'ai apporté des modifications sur ce que @amadou_yaya_diallo a écrit
+        02/12/2024@tahakhetib : J'ai apporté des modifications sur ce que @amadou_yaya_diallo a écrit
             - Passé le type des éléments du dictionnaire de tiles_dico à Tiles
-        08/01/2025@mgirardo : J'ai inversé x et y pour corriger show_world(). ATTENTION à VOS X ET Y
     """
     def __init__(self, width, height):  # dict of villages in the world
         self.width = width
         self.height = height
-        self.villages = list() #c'est les équipes
+        self.villages = list()
         self.ressources = defaultdict(dict)
         self.tiles_dico = defaultdict(int)  # à chaque clé sera associé une Tuile
         self.filled_tiles = defaultdict(tuple)  #
@@ -99,25 +97,15 @@ class World:
             print(' '+(downright.getX()-upleft.getX())*'v')
         print("upleft.getX = ", upleft.getX(), " upleft.getY = ", upleft.getY())
 
+    def return_world(self):
+        world_representation = []
+        for x in range(self.width):
+            row = []
+            for y in range(self.height):
+                row.append(str(self.tiles_dico[(x, y)]))  # Conversion explicite en chaîne
+            world_representation.append("".join(row))  # Joindre chaque ligne en une chaîne
+        return "\n".join(world_representation)
 
-    '''
-    def show_precise_world(self,upleft:Position,downright:Position):
-        print()
-        if upleft.getX()>0:
-            print(' '+(downright.getY()-upleft.getY())*'ʌ')
-        for x in range(upleft.getX(),downright.getX(),1):
-            if upleft.getY()>0:
-                print('<',end='')
-            for y in range(upleft.getY(),downright.getY(),1):
-                print(self.tiles_dico[(x, y)], end="")
-            if downright.getY()<self.width:
-                print('>',end='')
-            print("", end="\n")
-        if downright.getX()<self.height:
-            print(' '+(downright.getY()-upleft.getY())*'v')
-        # print(f"downright.getX() == {downright.getX()} self.height == {self.height}",end=' ')
-        print("upleft.getX = ",upleft.getX()," upleft.getY = ",upleft.getY())
-    '''
 
     def place_element(self, element):
         place = (element.position.getX(), element.position.getY())
@@ -216,3 +204,4 @@ if __name__ == "__main__":
     monde.remove_element(town_center)
     print("After removing town center")
     monde.show_world()
+

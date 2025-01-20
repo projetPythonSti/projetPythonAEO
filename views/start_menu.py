@@ -1,6 +1,5 @@
 from blessed import Terminal
-
-from save import load
+from save import *
 import os, sys
 
 class Menu :
@@ -34,7 +33,8 @@ class Menu :
                     break
 
                 else :
-                    load()
+                    nsave = Save()
+                    nsave.load_term()
                     break
 
     def set_size_map (self) :
@@ -114,10 +114,10 @@ class Menu :
         print("Appuyez sur q à tout moment pour revenir au menu de démarrage")
         print("Appuyez sur z à tout moment pour revenir à l'étape précédente \n ")
 
-        print("Veuillez choisir l'abondance des ressources (bois et or) sur la carte")
-        print("Appuyez sur p pour un petit nombre de ressource (lean)")
-        print("Appuyez sur m pour un nombre moyen de ressource (mean)")
-        print("Appuyez sur g pour un grand nombre de ressource (marines) \n")
+        print("Veuillez choisir l'abondance de ressource des joueurs en début de partie ")
+        print("Appuyez sur p pour un petit nombre de ressource pour chaque joueur(lean)")
+        print("Appuyez sur m pour un nombre moyen de ressource pour chaque joueur(mean)")
+        print("Appuyez sur g pour un grand nombre de ressource pour chaque joueur(marines) \n")
         with term.cbreak():
             val = ''
             while val.lower() != 's' or val.lower() != 'm' or val.lower() != 'l':
