@@ -63,7 +63,7 @@ class Game:
         self.screen.fill((0, 0, 0))
         self.world.draw(self.screen, self.camera)
         # self.world.draw_grass_tiles(self.screen, self.camera)
-        # self.world.draw_on_map(self.screen, (0, 0), pg.image.load("assets/images/v.png"), self.camera, (2,2))
+        # self.world.draw_on_map(self.screen, (0, 0), pg.image.load("assets/images/buildings/K.png"), self.camera, (0.8,0.8))
         # self.world.draw_on_map(self.screen, 0, 1, pg.image.load("assets/images/sable.png"), self.camera)
         # self.world.draw_on_map(self.screen, (1, 119), pg.image.load("assets/images/sable.png"), self.camera)
         

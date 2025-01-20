@@ -165,7 +165,7 @@ class World_GUI:
     def can_place_building(self, occupied_tiles, position, surface):
         return all(tile not in set(self.world_model.filled_tiles.values()) for tile in occupied_tiles) and surface[0] + position[0] <= self.grid_width and surface[1] + position[1] <= self.grid_height
 
-    # def is_tile_available(self, x, y):
+    def is_tile_available(self, x, y):
         if (x, y) not in self.world:
             return False
         
@@ -303,7 +303,9 @@ class World_GUI:
 
 
 
-    def draw_building(self, screen, building, image, camera):
+    def draw_building(self, screen, building, image, camera, surf=None):
+        surface = surf if surf else building.surface
+        
         """Draw the building using its isometric position."""
         building_render_pos = self.compute_screen_position(building.get_position()[0], building.get_position()[1])
 
@@ -323,8 +325,8 @@ class World_GUI:
         doubled_building_image = pg.transform.scale(
             image,
             (
-                int(image.get_width() * building.surface[0] * camera.get_zoom()),
-                int(image.get_height() * building.surface[1] * camera.get_zoom())
+                int(image.get_width() * surface[0] * camera.get_zoom()),
+                int(image.get_height() * surface[1] * camera.get_zoom())
             )
         )
         # Draw the doubled building image at the adjusted position
@@ -347,9 +349,11 @@ class World_GUI:
             for b1, b2 in zip(building1.values(), building2.values()):
                 if issubclass(b1.__class__, Building) and self.can_place_building(b1.get_occupied_tiles(), b1.get_position(), b1.surface):
                     # self.draw_on_map(screen, b1.get_position(), self.tile_images[k1], camera, b1.surface)
+                    # surface = (0.8,0.7) if k1 == "K" else None
                     self.draw_building(screen, b1, self.tile_images[k1], camera)
                 if issubclass(b2.__class__, Building) and self.can_place_building(b2.get_occupied_tiles(), b2.get_position(), b2.surface):
                     # self.draw_on_map(screen, b2.get_position(), self.tile_images[k2], camera, b2.surface)
+                    # surface = (0.8,0.7) if k2 == "K" else None
                     self.draw_building(screen, b2, self.tile_images[k2], camera)
     
     
@@ -372,10 +376,6 @@ class World_GUI:
             for _, v in h.items():
                 self.draw_on_map(screen, v.get_position(), self.tile_images[k], camera, surface)
             
-            
-    def affiche(self, k):
-        
-        print(**k)
     
     def draw_on_map(self, screen, position, image, camera, surface=None):
         surfX, surfY = surface[0] if surface else 1, surface[1] if surface else 1
