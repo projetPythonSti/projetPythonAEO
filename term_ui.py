@@ -25,7 +25,7 @@ def status(term, elapsed):
     right_txt = f'fps: {1 / elapsed:2.2f}'
     with term.location(0, term.height - 1):
         return ('\n' + term.normal +
-            term.white_on_blue + term.clear_eol  +
+            term.clear_eol  +
             term.rjust(right_txt, term.width))
 
 def show_please_wait(term):
