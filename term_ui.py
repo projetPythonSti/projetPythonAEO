@@ -45,7 +45,7 @@ def show_paused(term):
 
 
 
-def main(term,world):
+def affichage_term(term,world):
     with term.cbreak(), term.hidden_cursor(), term.fullscreen():
         t = time.time()
         while True:
@@ -59,6 +59,8 @@ def main(term,world):
             sys.stdout.flush()
 
 
+def main (term,world):
+    affichage_term(term, world)
 
 
 if __name__ == "__main__":
