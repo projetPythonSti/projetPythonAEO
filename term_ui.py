@@ -47,33 +47,18 @@ def show_paused(term):
 
 def main(term,world):
     with term.cbreak(), term.hidden_cursor(), term.fullscreen():
-        pause, dirty = False, True
         t = time.time()
         while True:
-            if dirty or not pause:
-                if not pause:
-                    t = time.time()
-                with elapsed_timer() as elapsed:
-                    outp = world.return_world()
 
-                outp += status(term, elapsed())
-                print(outp, end='')
-                sys.stdout.flush()
-                dirty = False
+            t = time.time()
+            with elapsed_timer() as elapsed:
+                outp = world.return_world()
 
-            """
-            if pause:
-                show_paused(term)
+            outp += status(term, elapsed())
+            print(outp, end='')
+            sys.stdout.flush()
 
-            inp = term.inkey(timeout=None if pause else 0.01)
-            if inp == '?':
-                assert False, "don't panic"
-            elif inp == '\x0c':
-                dirty = True
 
-            if inp == ' ':
-                pause = not pause
-            """
 
 
 if __name__ == "__main__":
