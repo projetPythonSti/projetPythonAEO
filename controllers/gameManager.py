@@ -35,9 +35,10 @@ class GameManager:
             } 
                     
         '''
-        def __init__(self, speed, world: World ):
+        def __init__(self, speed, world: World,debug=False ):
             self.gameSpeed = speed
             self.world = world
+            self.debug = debug
 
         def getTeamNumber(self, name):
             pattern = r'\d+'
