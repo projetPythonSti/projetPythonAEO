@@ -1,5 +1,7 @@
 import pygame as pg
 from blessed import Terminal
+
+from models.Position import Position
 from save import *
 import sys
 import time
