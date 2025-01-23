@@ -64,9 +64,9 @@ class Game_term :
                 if not val:
                     self.Turn(speed,term)
                 elif val.lower() == 'p':
-                    self.pause()
+                    self.pause(term)
                 elif val.name == 'KEY_TAB':
-                    self.stat()
+                    self.stat(term)
 
 
                 elif val.lower() == '+':
@@ -132,8 +132,7 @@ class Game_term :
         #print("Durée de la partie " + str(self.game_duration) + "s ")
 
 
-    def pause (self) :
-        term = Terminal()
+    def pause (self,term) :
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
@@ -149,9 +148,8 @@ class Game_term :
                     self.save.save_term(self.world)
 
 
-    def stat (self):
+    def stat (self,term):
         #generate
-        term = Terminal()
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
