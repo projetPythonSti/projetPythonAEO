@@ -52,8 +52,8 @@ def main(term,world):
         while True:
             t = time.time()
             with elapsed_timer() as elapsed:
-                outp = world.return_world()
-                #outp = world.return_precise_world()
+                #outp = world.return_world()
+                outp = world.return_precise_world(Position(0,0),Position(20,20))
             outp += status(term, elapsed())
             print(outp, end='')
             sys.stdout.flush()

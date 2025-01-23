@@ -108,7 +108,7 @@ class World:
         return "\n".join(world_representation)
 
     def return_precise_world(self,upleft:Position,downright:Position):
-        world_chunk=""
+        world_chunk="\n\n\n"
         if upleft.getY() > 0:
             world_chunk+=(' ' + (downright.getX() - upleft.getX()) * 'ʌ' + '\n')
         for y in range(upleft.getY(), downright.getY(), 1):
