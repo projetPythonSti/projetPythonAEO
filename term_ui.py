@@ -52,10 +52,10 @@ def affichage_term(term,world):
         while True:
         """
         t = time.time()
-        with elapsed_timer() as elapsed:
-            outp = world.return_world()
+        #with elapsed_timer() as elapsed:
+        outp = world.return_precise_world()
 
-        outp += status(term, elapsed())
+       #outp += status(term, elapsed())
         print(outp, end='')
         sys.stdout.flush()
 
@@ -74,5 +74,8 @@ if __name__ == "__main__":
 
     print('This is back where I came from.')
     """
-    mworld = World(10,10)
+    from randommap import *
+
+    mworld = random_world({"X":50,"Y":140,"t":"GoldRush"})
+
     exit(main(blessed.Terminal(),mworld))

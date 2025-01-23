@@ -33,6 +33,8 @@ class Game_term :
         self.clock = clock
         self.speed = 1
         self.world = world
+        self.upleft = Position(0,0) #changes by player arrow keys, should always start upper left of the map (0,0)
+        self.downright = Position(0, 0) #changes by itself to fit the screen
         self.playing = False
         self.game_duration = 0
         self.save = Save()
@@ -131,6 +133,13 @@ class Game_term :
         sys.stdout.flush()
         #self.world.afficher_console()
         #print(term.home + term.clear)
+
+        """        
+        self.downright=Position(min(self.upleft.getX()+term.width-4,self.world.width),min(self.upleft.getY()+term.height-8,self.world.height)) #lil minuses here to fit everything nicely
+        print(self.world.return_precise_world(self.upleft,self.downright))
+        
+        """
+        #self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
         #self.world.show_world()
         affichage_term(term,self.world)
         #print("Durée de la partie " + str(self.game_duration) + "s ")
