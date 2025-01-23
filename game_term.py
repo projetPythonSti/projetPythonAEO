@@ -159,10 +159,15 @@ class Game_term :
         #print(term.home + term.clear)
         self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-2,self.world.height)) #lil minuses here to fit everything nicely
         print(self.world.return_precise_world(self.upleft,self.downright))
-        if self.downright.getX()-self.upleft.getX()<term.width-2:
+        #prevents going too much right and down
+        if self.downright.getX()-self.upleft.getX()<term.width-2 and self.world.width>term.width:
             self.upleft.setX(self.world.width-term.width+2)
-        if self.downright.getY()-self.upleft.getY()<term.height-2:
+        elif self.world.width < term.width:
+            self.upleft.setX(0)
+        if self.downright.getY()-self.upleft.getY()<term.height-2 and self.world.height>term.height:
             self.upleft.setY(self.world.height-term.height+2)
+        elif self.world.height<term.height:
+            self.upleft.setY(0)
         #self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
         #self.world.show_world()
         #print("Place sur le terminal : x",term.width, "y",term.height)
