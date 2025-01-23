@@ -10,6 +10,7 @@ from collections import defaultdict
 import random as rd
 import os
 
+from models.Position import Position
 
 class World:
 
@@ -74,11 +75,28 @@ class World:
                 self.place_element(v1)
                 self.place_element(v2)
 
-    def show_world(self):
-        for x in range(self.width):
-            for y in range(self.height):
+    def show_world(self): #
+        for y in range(self.height):
+            for x in range(self.width):
                 print(self.tiles_dico[(x, y)], end="")
             print("", end="\n")
+
+    # shows a part of the world, works with two position found in the game's loop
+    def show_precise_world(self,upleft:Position,downright:Position):
+        print()
+        if upleft.getY()>0:
+            print(' '+(downright.getX()-upleft.getX())*'ʌ')
+        for y in range(upleft.getY(),downright.getY(),1):
+            if upleft.getX()>0:
+                print('<', end='')
+            for x in range(upleft.getX(),downright.getX(),1):
+                print(self.tiles_dico[(x, y)], end="")
+            if downright.getX()<self.width:
+                print('>', end='')
+            print("", end="\n")
+        if downright.getY()<self.height:
+            print(' '+(downright.getX()-upleft.getX())*'v')
+        print("upleft.getX = ", upleft.getX(), " upleft.getY = ", upleft.getY())
 
     def return_world(self):
         world_representation = []
@@ -88,6 +106,26 @@ class World:
                 row.append(str(self.tiles_dico[(x, y)]))  # Conversion explicite en chaîne
             world_representation.append("".join(row))  # Joindre chaque ligne en une chaîne
         return "\n".join(world_representation)
+
+    def return_precise_world(self,upleft:Position,downright:Position):
+        world_chunk=""
+        if upleft.getY() > 0:
+            world_chunk+=(' ' + (downright.getX() - upleft.getX()) * 'ʌ' + '\n')
+        for y in range(upleft.getY(), downright.getY(), 1):
+            if upleft.getX() > 0:
+                world_chunk+='<'
+            for x in range(upleft.getX(), downright.getX(), 1):
+                if(self.tiles_dico[(x, y)].contains!=None):
+                    world_chunk+=self.tiles_dico[(x, y)].contains.name[0]
+                else:
+                    world_chunk+=' '
+            if downright.getX() < self.width:
+                world_chunk+='>'
+            world_chunk+='\n'
+        if downright.getY() < self.height:
+            world_chunk+=(' ' + (downright.getX() - upleft.getX()) * 'v')
+        #print("upleft.getX = ", upleft.getX(), " upleft.getY = ", upleft.getY())
+        return world_chunk
 
 
     def place_element(self, element):

@@ -37,6 +37,8 @@ class Game_term :
         self.game_duration = 0
         self.save = Save()
 
+
+# Boucle Principale
     def run_term (self):
         speed = 10
         self.playing = True
@@ -45,30 +47,24 @@ class Game_term :
         t = tup[1]
         del tup
 
-
         while self.playing :
-            self.my_inputs(term,speed)
-
-    def init_term(self):
-        term = Terminal()
-        with term.cbreak(), term.hidden_cursor(), term.fullscreen():
-            t = time.time()
-            return term,t
+            self.my_inputs_turn (term,speed)
 
 
-    def my_inputs (self, term,speed):
+
+    def my_inputs_turn (self, term,speed):
         with term.cbreak():
             val = ''
             while 1:
                 val = term.inkey(timeout=0.0000000001)
                 if not val:
-                    self.Turn(speed,term)
+                    self.turn(speed,term)
                 elif val.lower() == 'p':
                     self.pause(term)
                 elif val.name == 'KEY_TAB':
                     self.stat(term)
 
-
+                #a changer
                 elif val.lower() == '+':
                     if speed < 20:
                         speed += 1
@@ -79,9 +75,7 @@ class Game_term :
                     print(speed)
 
 
-
-
-    def Turn (self,speed,term) :
+    def turn (self,speed,term) :
 
         self.clock.tick(60)
         now = datetime.now()
@@ -96,6 +90,16 @@ class Game_term :
         self.gm.checkUnitsToMove()
         self.gm.tick = timeit.default_timer()
         self.draw_term(term)
+
+
+
+### Fonction intermédiaire
+
+    def init_term(self):
+        term = Terminal()
+        with term.cbreak(), term.hidden_cursor(), term.fullscreen():
+            t = time.time()
+            return term,t
 
     def Horloge(self):
         pass
@@ -149,7 +153,7 @@ class Game_term :
 
 
     def stat (self,term):
-        #generate
+        #generate html
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")

@@ -3,7 +3,6 @@ from collections import defaultdict
 from datetime import datetime
 import time
 import re
-from importlib.resources import Resource
 
 from models.Pathfinding import Pathfinding
 from models.Position import Position
@@ -103,9 +102,6 @@ class GameManager:
                 "type" : unit.name,
                 "moveQueue": path,
             }
-
-
-
 
 if __name__ == "__main__":
     pass

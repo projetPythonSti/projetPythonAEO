@@ -1,12 +1,9 @@
-from importlib.resources import Resource
-
 import pygame as pg
 import sys
 
 import models.ressources.ressources
 from mmonde import World
 from setup import TILE_SIZE
-from models.ressources.mressources import Ressource
 from utils.setup import TILE_SIZE
 import os, sys
 import time
