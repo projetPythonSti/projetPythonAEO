@@ -1,5 +1,4 @@
 import pygame as pg
-
 from blessed import Terminal
 from save import *
 import sys
@@ -24,7 +23,7 @@ class Game :
         self.playing = False
         self.game_duration = 0
         self.save = Save()
-        self.F1 = False
+        self.ffff = False
         self.pygame_on = False
 
 
@@ -103,6 +102,9 @@ class Game :
                     if self.upleft.getX()<self.world.width:
                         self.upleft.setX(self.upleft.getX()+1)
 
+                elif val.name == 'KEY_F1' or val.name == 'KEY_F2' or val.name == 'KEY_F3' or val.name == 'KEY_F4':
+                    self.ffff = not self.ffff
+
 
 
     def turn (self,term) :
@@ -139,9 +141,8 @@ class Game :
 
         sys.stdout.flush()
 
-        if self.F1 :
-            pass
-            # AJOUTER FONCTION DE MAX
+        if self.ffff :
+            self.resources_term(term)
 
         else :
             self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-3,self.world.height)) #lil minuses here to fit everything nicely
@@ -160,6 +161,17 @@ class Game :
     def draw_pygame (self):
         pass
         ### A REMPLIR
+
+    def resources_term(self,term):
+        sys.stdout.flush()
+        infos=""
+        for village in self.world.villages:
+            infos+="Village "+village.name+" ;"
+            infos+=" Wood:"+str(village.ressources["w"])+" Gold:"+str(village.ressources["g"])+" Food:"+str(village.ressources["f"])
+            infos+=" Population:"+str(village.peopleCount)+'/'
+            infos+='\n'
+        infos += '\n' * (term.height - len(self.world.villages) - 2)
+        print(infos)
 
 
     def pause (self,term) :
