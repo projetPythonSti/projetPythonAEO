@@ -3,7 +3,6 @@ import time
 import os, sys
 
 from game import Game
-from game_term import Game_term
 from randommap import *
 from Archer import *
 import asyncio
@@ -12,12 +11,12 @@ def jeu_terminal (world):
     running = True
     playing = True
     clock = pg.time.Clock()
-    game_term = Game_term(world,clock)
+    game_term = Game(world, clock)
 
     while running :
 
         while playing :
-            game_term.run_term()
+            game_term.run()
 
 
 

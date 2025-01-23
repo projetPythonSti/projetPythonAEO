@@ -1,21 +1,9 @@
 import pygame as pg
-import time
-import os, sys
-
 from game import Game
-from game_term import Game_term
 from randommap import *
-from models.unity.Archer import *
-import asyncio
 
-from models.Position import Position
-from models.maps.Tile import Tile
-from models.model import Model
-import models.unity
-from models.World import World
 from models.gameManager import GameManager
-from models.unity.Villager import Villager
-from datetime import datetime
+
 from views.start_menu import *
 
 #Le world en paramètre est voué à disparaitre
@@ -28,13 +16,17 @@ def jeu_terminal (world, gm:GameManager):
     menu = Menu()
     dico = menu.start_menu()
 
+    """
+    IMPORTANT NEED FONCTION TRANSFORME MON DICO EN MONDE
+    """
+
     clock = pg.time.Clock()
-    game_term = Game_term(world,clock,gm)
+    game_term = Game(world, clock, gm)
 
     while running :
 
         while playing :
-            game_term.run_term()
+            game_term.run()
 
 
 
@@ -58,21 +50,6 @@ def jeu_pygame (world) :
 def main () :
     pass
 
-
-if __name__ == "__main__" :
-    """
-    monde = World(100, 100)
-    monde.creer_monde()
-    randomise(monde, 3)
-
-    a1 = Archer(1)
-    a1.position = (1, 2)
-    monde.units.append(a1)
-
-    #main()
-    jeu_terminal(monde)
-
-    """
 if __name__ == "__main__":
     monde = random_world({"X":120,"Y":180,"t":"Arabia"})
     village1 = Model("1", monde)

@@ -1,9 +1,6 @@
-import json
-import os
 import time
 # self.path mettre
 
-import os
 import pickle
 import platform
 
@@ -118,6 +115,13 @@ class Save:
                 "Entrer invalide! Vérifiez que vous avez écrit correctement le nom de la sauvegarde de votre choix. Il faut respect les minuscules et les majuscules ainsi que les extensions.")
             chosen_save = input("Entrer un nom de sauvegarde pour charger une partie :")
         self.load(chosen_save,"assets/data/saves/")
+
+
+    def quick_save (self,world) :
+        self.save(world,"quick_save","assets/data/saves/")
+
+    def quick_load (self) :
+        self.load("quick_save","assets/data/saves/")
 
 
 if __name__ == "__main__":

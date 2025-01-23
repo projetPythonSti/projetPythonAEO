@@ -1,77 +1,194 @@
 import pygame as pg
-import sys
 
-import models.ressources.ressources
-from mmonde import World
-from setup import TILE_SIZE
-from utils.setup import TILE_SIZE
-import os, sys
+from blessed import Terminal
+from save import *
+import sys
 import time
+import timeit
+
+
+#########################################
+## Jeu
+#########################################
 
 class Game :
 
-    def __init__(self, screen, clock,world):
-        self.screen = screen
+    def __init__(self, world,clock, gm):
+        self.ltick = time.time()
+        self.gm = gm
         self.clock = clock
-        self.width, self.height = self.screen.get_size()
+        self.speed = 1
         self.world = world
+        self.upleft = Position(0,0) #changes by player arrow keys, should always start upper left of the map (0,0)
+        self.downright = Position(0, 0) #changes by itself to fit the screen
+        self.playing = False
+        self.game_duration = 0
+        self.save = Save()
+        self.F1 = False
+        self.pygame_on = False
 
+
+# Boucle Principale
     def run (self):
         self.playing = True
-        while self.playing:
-            self.clock.tick(3)
-            self.events()
-            self.update()
-            self.draw()
+        tup = self.init_term()
+        term = tup[0]
+        t = tup[1]
+        del tup
 
-    def run_console (self):
-        self.playing = True
-        while self.playing:
-            self.clock.tick(3)
-            self.events()
-            self.update()
-            self.draw_term()
+        while self.playing :
+            self.my_inputs_turn (term)
 
-    def events (self):
-        for event in pg.event.get():
-            if event.type == pg.QUIT :
-                pg.quit()
-                sys.exit()
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
-                    pg.quit()
-                    sys.exit()
 
-    def update(self):
+
+    def my_inputs_turn (self, term):
+        with term.cbreak():
+            val = ''
+            while 1:
+                val = term.inkey(timeout=0.0000000001)
+                if not val:
+                    self.turn(term)
+                elif val.lower() == 'p':
+                    self.pause(term)
+                elif val.name == 'KEY_TAB':
+                    self.stat(term)
+
+                #a changer
+                elif val.lower() == '+':
+                    if self.speed < 10:
+                        self.speed += 1
+                elif val.lower() == '-':
+                    if self.speed >= 1 :
+                        self.speed -= 1
+
+
+                elif val == 'z':
+                    if self.upleft.getY()>0:
+                        self.upleft.setY(self.upleft.getY()-1)
+                elif val == 'q':
+                    if self.upleft.getX()>0:
+                        self.upleft.setX(self.upleft.getX()-1)
+                elif val == 's':
+                    if self.upleft.getY()<self.world.height:
+                        self.upleft.setY(self.upleft.getY()+1)
+                elif val == 'd':
+                    if self.upleft.getX()<self.world.width:
+                        self.upleft.setX(self.upleft.getX()+1)
+                elif val == 'Z':
+                    self.upleft.setY(self.upleft.getY()-4)
+                    if self.upleft.getY()<0:
+                        self.upleft.setY(0)
+                elif val == 'Q':
+                    self.upleft.setX(self.upleft.getX()-4)
+                    if self.upleft.getX()<0:
+                        self.upleft.setX(0)
+                elif val == 'S':
+                    self.upleft.setY(self.upleft.getY()+4)
+                    if self.upleft.getY()>self.world.height:
+                        self.upleft.setY(self.world.height)
+                elif val == 'D':
+                    self.upleft.setX(self.upleft.getX()+4)
+                    if self.upleft.getX()>self.world.width:
+                        self.upleft.setX(self.world.width)
+                elif val.name == 'KEY_UP':
+                    if self.upleft.getY()>0:
+                        self.upleft.setY(self.upleft.getY()-1)
+                elif val.name == 'KEY_LEFT':
+                    if self.upleft.getX()>0:
+                        self.upleft.setX(self.upleft.getX()-1)
+                elif val.name == 'KEY_DOWN':
+                    if self.upleft.getY()<self.world.height:
+                        self.upleft.setY(self.upleft.getY()+1)
+                elif val.name == 'KEY_RIGHT':
+                    if self.upleft.getX()<self.world.width:
+                        self.upleft.setX(self.upleft.getX()+1)
+
+
+
+    def turn (self,term) :
+        self.clock.tick(60)
+        now = time.time()
+        delta = now - self.ltick
+        ig_delta = delta * self.speed
+        self.game_duration = self.game_duration + ig_delta
+        self.ltick = now
+        # t.sleep(2)
+        #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
+        # self.events()
+        # self.update()
+        self.gm.checkUnitsToMove()
+        self.gm.tick = timeit.default_timer()
+        self.draw_term(term)
+        """
+        Peut changer si besoin 
+        """
+        if self.pygame_on :
+            self.draw_pygame()
+
+
+
+### Fonction intermédiaire
+
+    def init_term(self):
+        term = Terminal()
+        with term.cbreak(), term.hidden_cursor(), term.fullscreen():
+            t = time.time()
+            return term,t
+
+    def draw_term (self,term):
+
+        sys.stdout.flush()
+
+        if self.F1 :
+            pass
+            # AJOUTER FONCTION DE MAX
+
+        else :
+            self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-3,self.world.height)) #lil minuses here to fit everything nicely
+            print(self.world.return_precise_world(self.upleft,self.downright))
+            #prevents going too much right and down
+            if self.downright.getX()-self.upleft.getX()<term.width-2 and self.world.width>term.width:
+                self.upleft.setX(self.world.width-term.width+2)
+            elif self.world.width < term.width:
+                self.upleft.setX(0)
+            if self.downright.getY()-self.upleft.getY()<term.height-3 and self.world.height>term.height:
+                self.upleft.setY(self.world.height-term.height+3)
+            elif self.world.height<term.height:
+                self.upleft.setY(0)
+
+
+    def draw_pygame (self):
         pass
-
-    def draw (self) :
-        self.screen.fill((0,0,0))
-        for x in range (self.world.x):
-            for y in range(self.world.y):
-                sq = self.world.dico[(x,y)].rect
-                rect = pg.Rect(sq[0][0], sq[0][1], TILE_SIZE,TILE_SIZE)
-                if (self.world.dico[(x,y)].contains == " "):
-                    pg.draw.rect(self.screen, (23,0,255),rect,1)
-                    if (len(self.world.dico[(x,y)].unites) != 0):
-                        pg.draw(self.screen, (23,0,255), rect)
-                elif(self.world.dico[(x,y)].contains.__class__ == models.ressources.mressources.Wood):
-                    pg.draw.rect(self.screen, (255,0,0),rect,1)
-                elif(self.world.dico[(x,y)].contains.__class__ == models.ressources.mressources.Gold):
-                    pg.draw.rect(self.screen, (0,255,0),rect,1)
-                elif(self.world.dico[(x,y)].contains.__class__ == models.ressources.mressources.Food):
-                    pg.draw.rect(self.screen,(100,210,255),rect,width=1)
+        ### A REMPLIR
 
 
-
-                #pg.draw.rect(self.screen, (0,0,255),rect,1)
-
-        #pg.display.flip()
-
-    def draw_term (self):
-        self.world.afficher_console()
+    def pause (self,term) :
         os.system('cls' if os.name == 'nt' else 'clear')
+        print("Nous sommes en pause : ")
+        print("Appuyez sur q pour quitter")
+        print("Appuyez sur s pour sauvegarder")
+        print("Appuyez sur r pour reprendre")
+        print(f"IN GAME TIME : {self.game_duration}")
+        print(f"SPEED : {self.speed}")
+        with term.cbreak():
+            val2 = ''
+            while val2.lower() != 'r':
+                val2 = term.inkey()
+                if val2.lower() == 'q':
+                    quit()
+                elif val2.lower() == 's':
+                    self.save.save_term(self.world)
 
 
-
-
+    def stat (self,term):
+        #generate html
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("Nous sommes en pause : ")
+        print("Appuyez sur q pour quitter")
+        print("Appuyez sur r pour reprendre")
+        with term.cbreak():
+            val2 = ''
+            while val2.lower() != 'r':
+                val2 = term.inkey()
+                if val2.lower() == 'q':
+                    quit()
