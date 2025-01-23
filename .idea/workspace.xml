@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="le zqsd marche plus lmao">
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="ai pris des trucs d'etan &#10;travaille sur l'affichage">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game_term.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_term.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/guiTests.py" beforeDir="false" afterPath="$PROJECT_DIR$/guiTests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/World.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/World.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/term_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/term_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -457,7 +453,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737378225003</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="ai pris des trucs d'etan &#10;travaille sur l'affichage">
+      <option name="closed" value="true" />
+      <created>1737385051647</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1737385051649</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -472,7 +476,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="je suis en train de faire buildings" />
     <MESSAGE value="buildings placed and showed on the map&#10;+ adjustments related" />
     <MESSAGE value="maps now generate with town centers and their villagers" />
     <MESSAGE value="some comments in tests.py" />
@@ -497,7 +500,8 @@
     <MESSAGE value="guiTests permet l'affichage d'un World généré aléatoirement, via show_precise_world()" />
     <MESSAGE value="zqsd fonctionne à nouveau dans le terminal" />
     <MESSAGE value="le zqsd marche plus lmao" />
-    <option name="LAST_COMMIT_MESSAGE" value="le zqsd marche plus lmao" />
+    <MESSAGE value="ai pris des trucs d'etan &#10;travaille sur l'affichage" />
+    <option name="LAST_COMMIT_MESSAGE" value="ai pris des trucs d'etan &#10;travaille sur l'affichage" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
