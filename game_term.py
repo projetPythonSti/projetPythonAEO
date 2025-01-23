@@ -19,6 +19,7 @@ import time
 import timeit
 import colorsys
 import contextlib
+from term_ui import *
 
 #########################################
 ## Jeu
@@ -34,14 +35,26 @@ class Game_term :
         self.world = world
         self.playing = False
         self.game_duration = 0
+        self.save = Save()
 
     def run_term (self):
         speed = 10
         self.playing = True
+        tup = self.init_term()
+        term = tup[0]
+        t = tup[1]
+        del tup
+
 
         while self.playing :
-            term = Terminal()
             self.my_inputs(term,speed)
+
+    def init_term(self):
+        term = Terminal()
+        with term.cbreak(), term.hidden_cursor(), term.fullscreen():
+            t = time.time()
+            return term,t
+
 
     def my_inputs (self, term,speed):
         with term.cbreak():
@@ -114,9 +127,9 @@ class Game_term :
         sys.stdout.flush()
         #self.world.afficher_console()
         #print(term.home + term.clear)
-        self.world.show_world()
-
-        print("Durée de la partie " + str(self.game_duration) + "s ")
+        #self.world.show_world()
+        affichage_term(term,self.world)
+        #print("Durée de la partie " + str(self.game_duration) + "s ")
 
 
     def pause (self) :
@@ -133,7 +146,7 @@ class Game_term :
                 if val2.lower() == 'q':
                     quit()
                 elif val2.lower() == 's':
-                    save(self.world)
+                    self.save.save_term(self.world)
 
 
     def stat (self):

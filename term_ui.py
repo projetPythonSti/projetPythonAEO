@@ -46,17 +46,18 @@ def show_paused(term):
 
 
 def affichage_term(term,world):
-    with term.cbreak(), term.hidden_cursor(), term.fullscreen():
+        """
+        with term.cbreak(), term.hidden_cursor(), term.fullscreen():
         t = time.time()
         while True:
+        """
+        t = time.time()
+        with elapsed_timer() as elapsed:
+            outp = world.return_world()
 
-            t = time.time()
-            with elapsed_timer() as elapsed:
-                outp = world.return_world()
-
-            outp += status(term, elapsed())
-            print(outp, end='')
-            sys.stdout.flush()
+        outp += status(term, elapsed())
+        print(outp, end='')
+        sys.stdout.flush()
 
 
 def main (term,world):
