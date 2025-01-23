@@ -4,7 +4,7 @@ from os import terminal_size
 
 import pygame as pg
 import sys
-from mmonde import World
+from models.World import World
 from utils.setup import TILE_SIZE
 import os, sys
 import time as t
@@ -22,6 +22,7 @@ import colorsys
 import contextlib
 
 from models.Position import Position
+from models.model import Model
 
 #########################################
 ## Jeu
@@ -30,7 +31,7 @@ from models.Position import Position
 class Game_term :
 
     def __init__(self, world,clock, gm):
-        self.ltick = datetime.now()
+        self.ltick = time.time()
         self.gm = gm
         self.clock = clock
         self.speed = 1
@@ -39,34 +40,45 @@ class Game_term :
         self.downright = Position(0, 0) #changes by itself to fit the screen
         self.playing = False
         self.game_duration = 0
+        self.save = Save()
 
+        self.ffff = False
+
+
+# Boucle Principale
     def run_term (self):
-        speed = 10
         self.playing = True
+        tup = self.init_term()
+        term = tup[0]
+        t = tup[1]
+        del tup
 
         while self.playing :
-            term = Terminal()
-            self.my_inputs(term,speed)
+            self.my_inputs_turn (term)
 
-    def my_inputs (self, term,speed):
+
+
+    def my_inputs_turn (self, term):
         with term.cbreak():
             val = ''
             while 1:
                 val = term.inkey(timeout=0.0000000001)
                 if not val:
-                    self.Turn(speed,term)
+                    self.turn(term)
                 elif val.lower() == 'p':
-                    self.pause()
+                    self.pause(term)
                 elif val.name == 'KEY_TAB':
-                    self.stat()
+                    self.stat(term)
+
+                #a changer
                 elif val.lower() == '+':
-                    if speed < 20:
-                        speed += 1
-                    print(speed)
+                    if self.speed < 10:
+                        self.speed += 1
                 elif val.lower() == '-':
-                    if speed > 5:
-                        speed -= 1
-                    print(speed)
+                    if self.speed >= 1 :
+                        self.speed -= 1
+
+
                 elif val == 'z':
                     if self.upleft.getY()>0:
                         self.upleft.setY(self.upleft.getY()-1)
@@ -107,25 +119,36 @@ class Game_term :
                 elif val.name == 'KEY_RIGHT':
                     if self.upleft.getX()<self.world.width:
                         self.upleft.setX(self.upleft.getX()+1)
+                elif val.name == 'KEY_F1' or val.name == 'KEY_F2' or val.name == 'KEY_F3' or val.name == 'KEY_F4':
+                    self.ffff = not self.ffff
 
 
-
-
-    def Turn (self,speed,term) :
-
+    def turn (self,term) :
         self.clock.tick(60)
-        now = datetime.now()
+        now = time.time()
         delta = now - self.ltick
         ig_delta = delta * self.speed
-        self.game_duration = self.game_duration + ig_delta.seconds
+        self.game_duration = self.game_duration + ig_delta
         self.ltick = now
         # t.sleep(2)
         #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
         # self.events()
         # self.update()
-        self.gm.checkUnitsToMove()
+        # self.gm.checkUnitsToMove()
         self.gm.tick = timeit.default_timer()
-        self.draw_term(term)
+
+        if self.ffff:
+            self.resources_term(term)
+        else:
+            self.draw_term(term)
+
+### Fonction intermédiaire
+
+    def init_term(self):
+        term = Terminal()
+        with term.cbreak(), term.hidden_cursor(), term.fullscreen():
+            t = time.time()
+            return term,t
 
     def Horloge(self):
         pass
@@ -152,36 +175,39 @@ class Game_term :
 
 
     def draw_term (self,term):
-
-        #os.system('cls' if os.name == 'nt' else 'clear')
         sys.stdout.flush()
-        #self.world.afficher_console()
-        #print(term.home + term.clear)
-        self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-2,self.world.height)) #lil minuses here to fit everything nicely
+        self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-3,self.world.height)) #lil minuses here to fit everything nicely
         print(self.world.return_precise_world(self.upleft,self.downright))
         #prevents going too much right and down
         if self.downright.getX()-self.upleft.getX()<term.width-2 and self.world.width>term.width:
             self.upleft.setX(self.world.width-term.width+2)
-        elif self.world.width < term.width:
+        elif self.world.width<term.width:
             self.upleft.setX(0)
-        if self.downright.getY()-self.upleft.getY()<term.height-2 and self.world.height>term.height:
-            self.upleft.setY(self.world.height-term.height+2)
+        if self.downright.getY()-self.upleft.getY()<term.height-3 and self.world.height>term.height:
+            self.upleft.setY(self.world.height-term.height+3)
         elif self.world.height<term.height:
             self.upleft.setY(0)
-        #self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
-        #self.world.show_world()
-        #print("Place sur le terminal : x",term.width, "y",term.height)
-        #print("Nb caractères affichés : x",self.downright.getX()-self.upleft.getX(),"y",self.downright.getY()-self.upleft.getY())
-        #print("Durée de la partie " + str(self.game_duration) + "s ")
+
+    def resources_term(self,term):
+        sys.stdout.flush()
+        infos=""
+        for village in self.world.villages:
+            infos+="Village "+village.name+" ;"
+            infos+=" Wood:"+str(village.ressources["w"])+" Gold:"+str(village.ressources["g"])+" Food:"+str(village.ressources["f"])
+            infos+=" Population:"+str(village.peopleCount)+'/'
+            infos+='\n'
+        infos += '\n' * (term.height - len(self.world.villages) - 2)
+        print(infos)
 
 
-    def pause (self) :
-        term = Terminal()
+    def pause (self,term) :
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
         print("Appuyez sur s pour sauvegarder")
         print("Appuyez sur r pour reprendre")
+        print(f"IN GAME TIME : {self.game_duration}")
+        print(f"SPEED : {self.speed}")
         with term.cbreak():
             val2 = ''
             while val2.lower() != 'r':
@@ -189,12 +215,11 @@ class Game_term :
                 if val2.lower() == 'q':
                     quit()
                 elif val2.lower() == 's':
-                    save(self.world)
+                    self.save.save_term(self.world)
 
 
-    def stat (self):
-        #generate
-        term = Terminal()
+    def stat (self,term):
+        #generate html
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")

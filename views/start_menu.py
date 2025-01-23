@@ -32,7 +32,7 @@ class Menu :
                     self.set_size_map()
                     break
 
-                else :
+                if val.lower() == 'c' :
                     nsave = Save()
                     nsave.load_term()
                     break
