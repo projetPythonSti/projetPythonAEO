@@ -1,19 +1,36 @@
 import pygame as pg
+import time
+import os, sys
 
 from game import Game
 from views.game_term import Game_term
 from blessed import Terminal
 
 from models.Position import Position
+from models.maps.Tile import Tile
 from models.model import Model
+import models.unity
 from models.World import World
 from controllers.gameManager import GameManager
 from models.unity.Villager import Villager
+from datetime import datetime
+from views.start_menu import *
 
+from models.Position import Position
+import randommap
 
 def jeu_terminal (world, gm:GameManager):
     running = True
     playing = True
+
+    '''
+    # MENU
+
+    menu = Menu()
+    menu.start_menu()
+    dico = menu.return_value()
+    '''
+
     clock = pg.time.Clock()
     game_term = Game_term(world,clock,gm)
 
@@ -60,7 +77,7 @@ if __name__ == "__main__" :
 
     """
 if __name__ == "__main__":
-    monde = World(100, 100)
+    monde = randommap.random_world({"X":120, "Y":120, "t": "GoldRush"})
     village1 = Model("1", monde)
     village2 = Model("2", monde)
     village1.initialize_villages(1, 2, 3, gold=200, wood=100, food=300)
