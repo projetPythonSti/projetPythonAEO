@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="ai pris des trucs d'etan &#10;travaille sur l'affichage">
+    <list default="true" id="82dacc3e-a0a9-4432-8c9d-94415bf32831" name="Changes" comment="game_term caméra fonctionnee">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -461,7 +461,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737385051649</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="game_term caméra fonctionne">
+      <option name="closed" value="true" />
+      <created>1737625690761</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1737625690761</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -476,8 +484,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="buildings placed and showed on the map&#10;+ adjustments related" />
-    <MESSAGE value="maps now generate with town centers and their villagers" />
     <MESSAGE value="some comments in tests.py" />
     <MESSAGE value="tested pathfinding.py with taha and time also" />
     <MESSAGE value="MY THINGS DON'T WORK ANYMORE&#10;imma put amadou's work in my branch" />
@@ -501,7 +507,9 @@
     <MESSAGE value="zqsd fonctionne à nouveau dans le terminal" />
     <MESSAGE value="le zqsd marche plus lmao" />
     <MESSAGE value="ai pris des trucs d'etan &#10;travaille sur l'affichage" />
-    <option name="LAST_COMMIT_MESSAGE" value="ai pris des trucs d'etan &#10;travaille sur l'affichage" />
+    <MESSAGE value="game_term caméra fonctionne" />
+    <MESSAGE value="game_term caméra fonctionnee" />
+    <option name="LAST_COMMIT_MESSAGE" value="game_term caméra fonctionnee" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
