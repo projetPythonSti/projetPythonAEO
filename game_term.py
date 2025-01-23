@@ -48,17 +48,17 @@ class Game_term :
         del tup
 
         while self.playing :
-            self.my_inputs_turn (term,self.speed)
+            self.my_inputs_turn (term)
 
 
 
-    def my_inputs_turn (self, term,speed):
+    def my_inputs_turn (self, term):
         with term.cbreak():
             val = ''
             while 1:
                 val = term.inkey(timeout=0.0000000001)
                 if not val:
-                    self.turn(speed,term)
+                    self.turn(term)
                 elif val.lower() == 'p':
                     self.pause(term)
                 elif val.name == 'KEY_TAB':
@@ -66,11 +66,11 @@ class Game_term :
 
                 #a changer
                 elif val.lower() == '+':
-                    if speed < 10:
-                        speed += 1
+                    if self.speed < 10:
+                        self.speed += 1
                 elif val.lower() == '-':
-                    if speed >= 1 :
-                        speed -= 1
+                    if self.speed >= 1 :
+                        self.speed -= 1
 
 
                 elif val == 'z':
@@ -116,7 +116,7 @@ class Game_term :
 
 
 
-    def turn (self,speed,term) :
+    def turn (self,term) :
         self.clock.tick(60)
         now = time.time()
         delta = now - self.ltick
@@ -171,14 +171,17 @@ class Game_term :
         sys.stdout.flush()
         #self.world.afficher_console()
         #print(term.home + term.clear)
-        self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-2,self.world.height)) #lil minuses here to fit everything nicely
+        self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-3,self.world.height)) #lil minuses here to fit everything nicely
         print(self.world.return_precise_world(self.upleft,self.downright))
-        """
-        if self.downright.getX()-self.upleft.getX()<term.width-2:
+        #prevents going too much right and down
+        if self.downright.getX()-self.upleft.getX()<term.width-2 and self.world.width>term.width:
             self.upleft.setX(self.world.width-term.width+2)
-        if self.downright.getY()-self.upleft.getY()<term.height-2:
-            self.upleft.setY(self.world.height-term.height+2)"""
-
+        elif self.world.width < term.width:
+            self.upleft.setX(0)
+        if self.downright.getY()-self.upleft.getY()<term.height-3 and self.world.height>term.height:
+            self.upleft.setY(self.world.height-term.height+3)
+        elif self.world.height<term.height:
+            self.upleft.setY(0)
         #self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
         #self.world.show_world()
         #affichage_term(term,self.world)
@@ -192,6 +195,7 @@ class Game_term :
         print("Appuyez sur s pour sauvegarder")
         print("Appuyez sur r pour reprendre")
         print(f"IN GAME TIME : {self.game_duration}")
+        print(f"SPEED : {self.speed}")
         with term.cbreak():
             val2 = ''
             while val2.lower() != 'r':
