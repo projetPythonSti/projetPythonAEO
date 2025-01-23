@@ -1,5 +1,6 @@
 import timeit
 from datetime import datetime
+from os import terminal_size
 
 import pygame as pg
 import sys
@@ -159,11 +160,13 @@ class Game_term :
         self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-2,self.world.height)) #lil minuses here to fit everything nicely
         print(self.world.return_precise_world(self.upleft,self.downright))
         if self.downright.getX()-self.upleft.getX()<term.width-2:
-            ()
+            self.upleft.setX(self.world.width-term.width+2)
+        if self.downright.getY()-self.upleft.getY()<term.height-2:
+            self.upleft.setY(self.world.height-term.height+2)
         #self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
         #self.world.show_world()
-        print("Place sur le terminal : x",term.width, "y",term.height)
-        print("Nb caractères affichés : x",self.downright.getX()-self.upleft.getX(),"y",self.downright.getY()-self.upleft.getY())
+        #print("Place sur le terminal : x",term.width, "y",term.height)
+        #print("Nb caractères affichés : x",self.downright.getX()-self.upleft.getX(),"y",self.downright.getY()-self.upleft.getY())
         #print("Durée de la partie " + str(self.game_duration) + "s ")
 
 
