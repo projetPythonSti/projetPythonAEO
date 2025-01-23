@@ -74,22 +74,26 @@ class World:
                 self.place_element(v2)
 
     def show_world(self):
-        for x in range(self.width):
-            for y in range(self.height):
+        for y in range(self.height):
+            for x in range(self.width):
                 print(self.tiles_dico[(x, y)], end="")
             print("", end="\n")
 
 
     def place_element(self, element):
+        print("World : place_element -- In place element")
         place = (element.position.getX(), element.position.getY())
         if place not in self.filled_tiles and place[0] <= self.width and place[1] <= self.height:
+            print("World : place_element ------- Element n'étant pas dans une tuile déjà prise")
             if issubclass(element.__class__, Building) and all(tile not in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
+                print("World : place_element ------- Elt est un batiment")
                 #check if the building can be placed
                 if element.surface[0] + place[0] <= self.width and element.surface[1] + place[1] <= self.height:
                     for x in range(element.surface[0]):
                         for y in range(element.surface[1]):
                             try:
                                 self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(element)
+                                print("World : place_element ------- tiles dico après l'ajout : ", self.tiles_dico[(place[0] + x, place[1] + y)].contains)
                             except KeyError:
                                 print("Y'a une erreur la tout de même faudrait un print ?")
                                 pass
@@ -169,11 +173,11 @@ if __name__ == "__main__":
     print(village1.population())
     print(monde.get_ressources())
     print("Before : ", village1.get_ressources())
-    fo = monde.get_ressources()["fo"]["0"]
-    v.drop_ressources()
-    v.collect(fo)
-    print("After : ", village1.get_ressources())
-    print(v.ressources_dict)
+    #fo = monde.get_ressources()["fo"]["0"]
+    #v.drop_ressources()
+    #v.collect(fo)
+    #print("After : ", village1.get_ressources())
+    #print(v.ressources_dict)
     # print(village2.population())
     # print(monde.get_ressources())
     # print(sorted(monde.filled_tiles, key=lambda x: x[0]), len(monde.filled_tiles))

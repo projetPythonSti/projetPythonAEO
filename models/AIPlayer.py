@@ -102,7 +102,7 @@ class AIPlayer:
             "a" : list(team.community["a"].keys())
         }
         self.topVillageBorder = (0, 0)
-        self.bottomVillageBorder = (0, 0),
+        self.bottomVillageBorder = (0, 0)
         self.gm = gm
         self.eventQueue = []
         self.pastEvents = []
@@ -127,8 +127,13 @@ class AIPlayer:
             self.logger("Minworkers hit, playing now")
             self.setBuildingAction(self.checkBuildings())
             self.setResourceAction(self.team.ressources)
-            for value in self.eventQueue:
-                self.launchAction(value)
+            self.logger(len(self.eventQueue))
+            numberOfActions = 0
+            for k in range(len(self.eventQueue)):
+                numberOfActions += 1
+                self.logger(self.eventQueue[k-1]["action"])
+                self.launchAction(self.eventQueue[k-1])
+            print(numberOfActions)
         else:
             self.logger("RAS")
         self.logger("Voici le nombre de personnes libres",self.getFreePplCount(), "Et le nb de personnes total : ",self.team.get_pplCount())
@@ -190,54 +195,73 @@ class AIPlayer:
 
 
     def checkIfTilesAreOccupied(self, size, position):
-        return self.getOccupiedTiles(size,position) not in list(self.world.filled_tiles.keys())
+        for a in self.getOccupiedTiles(size,position):
+            self.logger("checkIfTilesAreOccupied ----- a values is in filled_tiles ? ", self.world.filled_tiles[a])
+            if a in self.world.filled_tiles.values():
+                self.logger("checkIfTilesAreOccupied ----- value is indeed in filledTiles ", self.world.filled_tiles[a])
+                return True
+            else:
+                pass
+        return False #self.getOccupiedTiles(size,position) in list(self.world.filled_tiles.keys())
 
     def getOccupiedTiles(self,size, position):
         return [(position[0] + x, position[1] + y) for x in range(size[0]) for y in range(size[1])]
 
     def getBuildTarget(self, size):
         selectedPos = None
-        for x in range(self.topVillageBorder[0], self.bottomVillageBorder[0], size[0]):
+        tilesOccupiedFirst = False
+        btVillageBorder = self.bottomVillageBorder[0]
+        for x in range(self.topVillageBorder[0], btVillageBorder, size[0]):
             if x+size[0]>self.bottomVillageBorder[0] or selectedPos is not None:
                 if selectedPos is not None:
-                    pass
+                    self.logger("Found position !")
+                    return selectedPos
                     # When a suitable position has already been found
                 else:
                     # If the position is outside of the borders of the village
                     self.logger("do nothing, outside of village border in the game")
             else:
-                selectedPos = x,self.topVillageBorder[1] if self.checkIfTilesAreOccupied(size, (x, self.bottomVillageBorder[1])) else None
+                self.logger("searching positions north to the building")
+                tileOccupied = self.checkIfTilesAreOccupied(size, (x, self.topVillageBorder[1]-1))
+                self.logger("Check if tiles are occupied result : ", tileOccupied )
+                selectedPos = (x+tilesOccupiedFirst,self.topVillageBorder[1]-tilesOccupiedFirst) if (not tileOccupied) else None
+                self.logger("selectdPos iiiis : ", selectedPos)
         if selectedPos is None:
+            self.logger("searching positions east to the building")
             # Recherche de position disponible à l'est du batiment
             for y in range(self.topVillageBorder[1], self.bottomVillageBorder[1], size[1]):
                 if y+size[0]>self.bottomVillageBorder[1] or selectedPos is not None:
                     if selectedPos is not None:
-                        pass
+                        return selectedPos
                     else:
                         pass
                 else:
+                    self.logger("Check if tiles are occupied result : ",
+                          self.checkIfTilesAreOccupied(size, (x, self.topVillageBorder[1])))
                     selectedPos = self.bottomVillageBorder[0]-size[0],y if self.checkIfTilesAreOccupied(size, (self.bottomVillageBorder[0]-size[0], y)) else None
+                    self.logger("selectdPos iiiis : ", selectedPos)
         if selectedPos is None:
+            self.logger("searching positions west to the building")
             # Recherche de position disponible à l'ouest du batiment
             for y in range(self.topVillageBorder[1], self.bottomVillageBorder[1], size[1]):
                 if y+size[0]>self.bottomVillageBorder[1] or selectedPos is not None:
                     if selectedPos is not None:
-                        pass
+                        return selectedPos
                     else:
                         pass
                 else:
                     selectedPos = self.topVillageBorder[0]-size[0],y if self.checkIfTilesAreOccupied(size, (self.topVillageBorder[0]-size[0], y)) else None
         if selectedPos is None:
             # Recherche de position au sud du batiment
+            self.logger("Searching positions south to the building")
             for x in range(self.topVillageBorder[0], self.bottomVillageBorder[0], size[0]):
                 if x+size[0]>self.bottomVillageBorder[0] or selectedPos is not None:
                     if selectedPos is not None:
-                        pass
+                        return selectedPos
                     else:
                         pass
                 else:
                     selectedPos = x,self.bottomVillageBorder[1] if self.checkIfTilesAreOccupied(size, (x, self.bottomVillageBorder[1])) else None
-        return selectedPos
 
 
     def getBuildingActionDict(self, buildingType):
@@ -289,6 +313,7 @@ class AIPlayer:
               len(resourceCollectEvent["people"]))
         self.eventQueue.append(resourceCollectEvent)
 
+
     def setBuildingAction(self, buildings):
         if buildings["T"] == 0:
             buildingEvent = self.getBuildingActionDict(buildingType="T")
@@ -321,7 +346,7 @@ class AIPlayer:
         pass
 
     def launchResourceAction(self, actionDict):
-        self.logger("J'ai envoyé qqun chercher des ressources attention")
+        #self.logger("J'ai envoyé qqun chercher des ressources attention")
         unitList = actionDict["people"]
         unitTeam = self.gm.getTeamNumber(unitList[0])
         for i in unitList:
@@ -332,7 +357,7 @@ class AIPlayer:
         self.eventQueue.remove(actionDict)
 
     def launchBuildAction(self, actionDict):
-        self.logger("J'ai lancé une construction attention")
+        #self.logger("J'ai lancé une construction attention")
         buildingToBuild = actionDict["infos"]["type"]
         target = actionDict["infos"]["target"]
         newBuilding = BuildingENUM[buildingToBuild].value
@@ -342,10 +367,16 @@ class AIPlayer:
         self.team.community[buildingToBuild][newInstanciatedBuilding.uid] = newInstanciatedBuilding
         for i in newInstanciatedBuilding.get_occupied_tiles():
             self.world.filled_tiles[i] = i
+        if target not in self.world.filled_tiles:
+            self.logger("launchBuildAction----- Le batiment ne semble pas être construit")
+        if self.world.tiles_dico[target].contains is None:
+            self.logger("launchBuildAction----- Batiment absent de la map")
         self.clearBuildAction(actionDict)
         pass
+
     def launchHumanAction(self, actionDict):
-        self.logger("J'ai lancé une attaque attention")
+        pass
+        #self.logger("J'ai lancé une attaque attention")
 
     def launchAction(self, actionDict):
         ActionEnum[actionDict["action"]].value(self,actionDict)
@@ -404,7 +435,7 @@ if __name__ == "__main__":
     #print(gm.checkUnitsToMove())
     #Boucle pour tester le game manager
     n = 0
-    play_style = PlayStyle(minWorkers=20)
+    play_style = PlayStyle(minWorkers=10)
     playStyleMatrix= [
         [4,3,0],
         [2,6,2],
