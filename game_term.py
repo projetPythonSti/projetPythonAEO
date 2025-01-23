@@ -10,7 +10,6 @@ import time as t
 import datetime as dt
 from models.unity.Archer import *
 import asyncio
-from pynput import keyboard
 from blessed import Terminal
 from save import *
 import sys
@@ -75,6 +74,47 @@ class Game_term :
                     if speed > 5:
                         speed -= 1
                     print(speed)
+                elif val == 'z':
+                    if self.upleft.getY()>0:
+                        self.upleft.setY(self.upleft.getY()-1)
+                elif val == 'q':
+                    if self.upleft.getX()>0:
+                        self.upleft.setX(self.upleft.getX()-1)
+                elif val == 's':
+                    if self.upleft.getY()<self.world.height:
+                        self.upleft.setY(self.upleft.getY()+1)
+                elif val == 'd':
+                    if self.upleft.getX()<self.world.width:
+                        self.upleft.setX(self.upleft.getX()+1)
+                elif val == 'Z':
+                    self.upleft.setY(self.upleft.getY()-4)
+                    if self.upleft.getY()<0:
+                        self.upleft.setY(0)
+                elif val == 'Q':
+                    self.upleft.setX(self.upleft.getX()-4)
+                    if self.upleft.getX()<0:
+                        self.upleft.setX(0)
+                elif val == 'S':
+                    self.upleft.setY(self.upleft.getY()+4)
+                    if self.upleft.getY()>self.world.height:
+                        self.upleft.setY(self.world.height)
+                elif val == 'D':
+                    self.upleft.setX(self.upleft.getX()+4)
+                    if self.upleft.getX()>self.world.width:
+                        self.upleft.setX(self.world.width)
+                elif val.name == 'KEY_UP':
+                    if self.upleft.getY()>0:
+                        self.upleft.setY(self.upleft.getY()-1)
+                elif val.name == 'KEY_LEFT':
+                    if self.upleft.getX()>0:
+                        self.upleft.setX(self.upleft.getX()-1)
+                elif val.name == 'KEY_DOWN':
+                    if self.upleft.getY()<self.world.height:
+                        self.upleft.setY(self.upleft.getY()+1)
+                elif val.name == 'KEY_RIGHT':
+                    if self.upleft.getX()<self.world.width:
+                        self.upleft.setX(self.upleft.getX()+1)
+
 
 
     def turn (self,speed,term) :
@@ -133,10 +173,10 @@ class Game_term :
         sys.stdout.flush()
         #self.world.afficher_console()
         #print(term.home + term.clear)
-
-        self.downright=Position(min(self.upleft.getX()+term.width-4,self.world.width),min(self.upleft.getY()+term.height-8,self.world.height)) #lil minuses here to fit everything nicely
+        self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-2,self.world.height)) #lil minuses here to fit everything nicely
         print(self.world.return_precise_world(self.upleft,self.downright))
-
+        if self.downright.getX()-self.upleft.getX()<term.width-2:
+            ()
         #self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
         #self.world.show_world()
         #affichage_term(term,self.world)
