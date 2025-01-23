@@ -3,8 +3,10 @@ import time
 import os, sys
 
 from game import Game
-from views.game_term import Game_term
-from blessed import Terminal
+from game_term import Game_term
+from randommap import *
+from models.unity.Archer import *
+import asyncio
 
 from models.Position import Position
 from models.maps.Tile import Tile
@@ -23,13 +25,10 @@ def jeu_terminal (world, gm:GameManager):
     running = True
     playing = True
 
-    '''
     # MENU
 
     menu = Menu()
-    menu.start_menu()
-    dico = menu.return_value()
-    '''
+    dico = menu.start_menu()
 
     clock = pg.time.Clock()
     game_term = Game_term(world,clock,gm)
