@@ -1,13 +1,10 @@
 import time
-from datetime import datetime
 import timeit
 
 from models.Position import Position
-from models.maps.Tile import Tile
 from models.model import Model
-import models.unity
 from models.World import World
-from models.gameManager import GameManager
+from controllers.gameManager import GameManager
 from models.unity.Villager import Villager
 
 

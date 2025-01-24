@@ -7,14 +7,13 @@ from utils.setup import TILE_SIZE
 import os, sys
 import time as t
 import datetime as dt
-from models.unity.Archer import Unity
-from blessed import Terminal #A implementer
+from models.unity.Archer import *
+import asyncio
 
-################################
-## Partie input
-################################
+from blessed import Terminal
+from save import *
 
-
+from models.Position import Position
 
 #########################################
 ## Jeu
@@ -28,6 +27,8 @@ class Game_term :
         self.clock = clock
         self.speed = 1
         self.world = world
+        self.upleft = Position(0,0) #changes by player arrow keys, should always start upper left of the map (0,0)
+        self.downright = Position(0, 0) #changes by itself to fit the screen
         self.playing = False
         self.game_duration = 0
 
@@ -37,13 +38,31 @@ class Game_term :
 
         while self.playing :
             term = Terminal()
-            print("press 'q' to quit.")
             with term.cbreak():
                 val = ''
-                while val.lower() != 'q':
-                    val = term.inkey(timeout=0.00001)
+                #while val.lower() != 'q':
+                while 1 :
+                    val = term.inkey(timeout=0.0000000001)
                     if not val:
                         self.Turn(speed)
+                    elif val.lower() == 'p':
+                        self.pause()
+                    elif val.name =='KEY_TAB' :
+                        self.stat()
+                    elif val.lower == 'z':
+                        if self.upleft.getX()>0:
+                            self.upleft.setX(self.upleft.getX()-1)
+                    elif val.lower == 'q':
+                        if self.upleft.getY()>0:
+                            self.upleft.setY(self.upleft.getY()-1)
+                    elif val.lower == 's':
+                        if self.upleft.getX()<self.world.height:
+                            self.upleft.setX(self.upleft.getX()+1)
+                    elif val.lower == 'd':
+                        if self.upleft.getY()<self.world.width:
+                            self.upleft.setY(self.upleft.getY()+1)
+
+
                     elif val.lower() == '+':
                         if speed < 20:
                             speed += 1
@@ -52,26 +71,13 @@ class Game_term :
                         if speed > 5:
                             speed -= 1
                         print(speed)
-                    elif val.lower() == 'p':
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        print("Nous sommes en pause : ")
-                        print("Appuyez sur z pour quitter")
-                        print("Appuyez sur r pour reprendre")
-                        with term.cbreak():
-                            val2 = ''
-                            while val2.lower() != 'r':
-                                val2 = term.inkey()
-                                if val2.lower() == 'z' :
-                                    quit()
-                    elif val.lower() == 'q':
-                        quit()
 
-                print(f'bye!{term.normal}')
 
 
 
     def Turn (self,speed) :
-        self.clock.tick(0.5 * (speed/10))
+
+        self.clock.tick(0.5* (speed/10))
         now = datetime.now()
         delta = now - self.ltick
         ig_delta = delta * self.speed
@@ -83,7 +89,7 @@ class Game_term :
         # self.update()
         self.gm.checkUnitsToMove()
         self.gm.tick = timeit.default_timer()
-
+        print(self.world.filled_tiles)
         #self.world.update_unit_presence()
         self.draw_term()
 
@@ -92,18 +98,20 @@ class Game_term :
 
     def events (self): #inutile il me semble
 
-        def on_press(key):
+        """
+            def on_press(key):
             try:
                 print('alphanumeric key {0} pressed'.format(key.char))
             except AttributeError:
                 print('special key {0} pressed'.format(
                     key))
 
-        '''def on_release(key):
+        def on_release(key):
             print('{0} released'.format(key))
             if key == keyboard.Key.esc:
                 # Stop listener
-                return False'''
+                return False
+        """
 
     def update(self):
         pass
@@ -114,8 +122,48 @@ class Game_term :
 
         os.system('cls' if os.name == 'nt' else 'clear')
         #self.world.afficher_console()
-        with term.location(0,term.height-1):
-            #print(term.home + term.clear)
-            self.world.show_world()
+        #print(term.home + term.clear)
+        self.downright=Position(min(self.upleft.getX()+term.width-4,self.world.width),min(self.upleft.getY()+term.height-8,self.world.height)) #lil minuses here to fit everything nicely
+        self.world.show_precise_world(self.upleft,self.downright) #I now use precise world to print a smaller part of the map
+        #self.world.show_world()
+        print("Place sur le terminal : x",term.width, "y",term.height)
+        print("Nb caractères affichés : x",self.downright.getX()-self.upleft.getX(),"y",self.downright.getY()-self.upleft.getY())
+        print("Durée de la partie " + str(self.game_duration) + "s ")
 
-            print("Durée de la partie " + str(self.game_duration) + "s ")
+
+    def pause (self) :
+        term = Terminal()
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("Nous sommes en pause : ")
+        print("Appuyez sur q pour quitter")
+        print("Appuyez sur s pour sauvegarder")
+        print("Appuyez sur r pour reprendre")
+        with term.cbreak():
+            val2 = ''
+            while val2.lower() != 'r':
+                val2 = term.inkey()
+                if val2.lower() == 'q':
+                    quit()
+                elif val2.lower() == 's':
+                    save(self.world)
+
+
+    def stat (self):
+        #generate
+        term = Terminal()
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("Nous sommes en pause : ")
+        print("Appuyez sur q pour quitter")
+        print("Appuyez sur r pour reprendre")
+        with term.cbreak():
+            val2 = ''
+            while val2.lower() != 'r':
+                val2 = term.inkey()
+                if val2.lower() == 'q':
+                    quit()
+
+
+
+
+
+

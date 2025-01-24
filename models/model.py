@@ -17,7 +17,17 @@ from collections import defaultdict
 
 
 class Model:
-    
+    """
+            22/12/2024@tahakhetib - J'ai apporté des modifications à ce fichier sur ce que @amadou_yaya_diallo a écrit
+            - Ajouté une fonction get_name afin d'obtenir le nom d'équipe (utilisé dans Villager.py).
+            - Changé la manière dont les unités sont ajoutées dans initialize_villages() pour faire en sorte que les nouveaux ID soient utilisés
+            - Ajouté un compteur de population pour directement avoir accès au nombre de personnes faisant partie du village (avec le getter associé)
+            04/12/2024@tahakhetib - J'ai ajouté des modifications au-dessus de ce que @amadou_yaya_diallo a écrit
+                - Ajouté un compteur workingPpl qui va permettre aux IA de suivre le nombre de personnes qui doivent travailler.
+            05/12/2024@tahakhetib - J'ai ajouté les modifications au-dessus de ce que @amadou_yaya_diallo a écrit
+                - Retiré les compteurs workingPpl et peopleCount pour une fonction get_pplCount()
+
+    """
     def __init__(self, name, world = None):
         # Dictionary of human, materiel and ressources of the village
         self.community = defaultdict(dict)
@@ -30,16 +40,20 @@ class Model:
                             stables = 0, keeps = 0, houses = 0, farms = 0, camps = 0, barracks = 0, 
                             archery_ranger = 0, wood = 0, food = 0, gold = 0):
         for i in range(archers):
-            self.community["a"][str(i)] = Archer(team=self)
+            a = Archer(team=self)
+            self.community["a"][a.uid] = a
 
         for i in range(horsmen):
-            self.community["h"][str(i)] = Horseman(team = self)
+            h = Horseman(team=self)
+            self.community["h"][h.uid] = h
    
         for i in range(villages):
-            self.community["v"][str(i)] = Villager(team=self)
+            v = Villager(team=self)
+            self.community["v"][v.uid] = v
         
         for i in range(swordsmen):
-            self.community["s"][str(i)] = Swordsman(team=self)
+            s = Swordsman(team=self)
+            self.community["s"][s.uid] = s
         
         for i in range(town_center):
             self.community["T"][str(i)] = TownCenter(team=self)
