@@ -58,6 +58,7 @@ class Game:
         
         # self.hud.update()
         self.world.update(self.screen, self.camera)  # Pass both camera and dt
+        self.draw()
 
     def draw(self):
         self.screen.fill((0, 0, 0))

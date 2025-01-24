@@ -165,21 +165,27 @@ class World_GUI:
     def can_place_building(self, occupied_tiles, position, surface):
         return all(tile not in set(self.world_model.filled_tiles.values()) for tile in occupied_tiles) and surface[0] + position[0] <= self.grid_width and surface[1] + position[1] <= self.grid_height
 
-    def is_tile_available(self, x, y):
-        if (x, y) not in self.world:
+    # def is_tile_available(self, x, y):
+    #     if (x, y) not in self.world:
+    #         return False
+        
+    #     # Check if there's already a building here
+    #     if (x, y) in self.buildings:
+    #         return False
+
+    #     # Check if the tile is marked as a collision in the world (e.g., tree, rock)
+    #     if self.world[(x, y)]["collision"]:
+    #         return False
+
+    #     return True
+
+    def is_tile_available(self, position):
+        if position not in self.world or position in self.world_model.filled_tiles:
             return False
         
-        # Check if there's already a building here
-        if (x, y) in self.buildings:
-            return False
-
-        # Check if the tile is marked as a collision in the world (e.g., tree, rock)
-        if self.world[(x, y)]["collision"]:
-            return False
-
         return True
-
-    # def select_tile(self, grid_pos):
+    
+    def select_tile(self, grid_pos):
         """Select a tile to place a worker or examine."""
         print(f"Selected tile: {grid_pos}")
         self.selected_tile = grid_pos
@@ -345,9 +351,12 @@ class World_GUI:
         buildings1 = {k:v for k, v in self.world_model.villages[0].population().items() if k in buildings_keys}
         buildings2 = {k:v for k, v in self.world_model.villages[1].population().items() if k in buildings_keys}
         
+            
         for (k1, building1), (k2, building2) in zip(buildings1.items(), buildings2.items()):
+            
             for b1, b2 in zip(building1.values(), building2.values()):
                 if issubclass(b1.__class__, Building) and self.can_place_building(b1.get_occupied_tiles(), b1.get_position(), b1.surface):
+                    
                     # self.draw_on_map(screen, b1.get_position(), self.tile_images[k1], camera, b1.surface)
                     # surface = (0.8,0.7) if k1 == "K" else None
                     self.draw_building(screen, b1, self.tile_images[k1], camera)
@@ -402,39 +411,10 @@ class World_GUI:
         else:
             print("This position is out of the map")
 
-
-    def update(self, camera, dt: float):
-        """Update the game world state, handle input for building placement and examination."""
-        mouse_pos = pg.mouse.get_pos()
-        mouse_action = pg.mouse.get_pressed()
-
-        # Handle right-click to reset examined tile and HUD selection
-        self.handle_mouse_right_click(mouse_action)
-        
-        # Reset temporary tile before handling new interactions
-        self.temp_tile = None
-        
-        # If a building is selected in the HUD, handle its placement
-        if self.hud and self.hud.selected_tile:
-            grid_pos = self.mouse_to_grid(mouse_pos[0], mouse_pos[1], camera)
-            if self.can_place_tile(grid_pos):
-                self.place_building(grid_pos)
-        else:
-            # Handle cases when HUD is None or no tile is selected
-            pass  # Add any necessary logic here
-
-        # Update buildings with delta time
-        for entity in self.entities:
-            if entity.alive and  isinstance(entity, Keep):
-                entity.projectile_pool.update(dt, camera=camera)
-                target = entity.find_closest_target()
-                # if target and target.alive:
-                #     #logger.info(f"{entity.name} at position {entity.pos} found target {target.name} at position {target.pos}.")
-                #     entity.attack(target)
-        #         else:
-        #             logger.info(f"{entity.name} at position {entity.pos} found no valid targets to attack.")
-
-
+    def update(self, screen, camera):
+        """Update the world and its entities."""
+        self.draw(screen, camera)
+ 
 
     def find_closest_target(self, building):
         """

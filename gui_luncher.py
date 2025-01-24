@@ -30,14 +30,14 @@ class luncher:
         
         village1 = Model("fabulous", world)
         village2 = Model("hiraculous", world)
-        village1.initialize_villages(50,2,30, 10, gold=200, wood=10, food=300, town_center=1, keeps=2, houses=5, camps=3)
-        village2.initialize_villages(4,50,6, 20, 1, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
-        world.fill_ressources(10)
+        # village1.initialize_villages(50,2,30, 10, gold=200, wood=10, food=300, town_center=1, keeps=2, houses=5, camps=3)
+        # village2.initialize_villages(4,50,6, 20, 1, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
+        village1.initialize_villages(houses=1)
+        village2.initialize_villages(houses=1)
+        # world.fill_ressources(1)
         game_manager = GameManager(1, world)
         game = Game(screen, clock, game_manager)
-        # menu_manager = Menu_manager(screen, game)
-        
-        # world_gui = World_GUI(0, 30, 30, 100, 100, world)
+       
         
         while running:
             

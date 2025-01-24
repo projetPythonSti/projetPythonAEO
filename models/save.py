@@ -35,7 +35,7 @@ class Save:
             self.save_path = path
         else:
             self.save_path += "/save"
-        if self.backup_exist():
+        if self.backup_exist(self.save_path):
             file = open(self.save_path, 'rb')
             datas = pickle.load(file)
             file.close()
@@ -43,7 +43,9 @@ class Save:
 
     def backup_exist(self, path=None):
         if path: self.save_path = path
-        return os.path.exists(self.save_path + "/save")
+        else:
+            self.save_path += "/save"
+        return os.path.exists(self.save_path)
 
 if __name__ == "__main__":
     save = Save()

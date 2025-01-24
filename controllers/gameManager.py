@@ -119,18 +119,20 @@ class GameManager:
     def pause(self):
         #pauses the game
         self.html_generator()
-        self.save_world()
+        # self.save_world()
         
-    def play(self):
-        datas = self.load_from_file()
-        if datas:
-            self.world = datas[0]
+    # def play(self):
+    #     datas = self.load_from_file()
+    #     if datas:
+    #         self.world = datas[0]
     
     def save_world(self, path=None):
         self.save.save(self.world, path) 
     
     def load_from_file(self, path=None):
-        return self.save.load(path)
+        data = self.save.load(path)
+        # print("data", data)
+        self.world = data[0]
     
     def html_generator(self):
         village1, village2 = self.world.villages
