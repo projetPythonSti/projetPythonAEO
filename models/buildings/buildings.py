@@ -41,10 +41,10 @@ class Building:
         self.team.world.book_place(self.surface, (self.position.getX(), self.position.getY()))
 
     def get_position(self):
-        return self.position.getX(), self.position.getY()
+        return self.position
 
-    def get_surface(self):
-        return self.surface
-    
+    def getTPosition(self):
+        return self.position.toTuple()
+
     def __repr__(self):
         return self.name

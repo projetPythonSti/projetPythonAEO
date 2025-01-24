@@ -20,10 +20,9 @@ class GameManager:
         01/01/2025@tahakhetib : J'ai apporté les modifications suivantes
             - Corrigé le code de singe que j'ai écrit
 
-    """
+        """
     tick = timeit.default_timer()
     unitToMove = defaultdict(dict)
-    time_elapse = defaultdict(int)
     '''
         Syntaxe du dictionnaire
         { 
@@ -36,14 +35,12 @@ class GameManager:
         } 
                 
     '''
-    def __init__(self, speed, world: World, debug=False, writeToDisk=False):
+    def __init__(self, speed, world: World,debug=False, writeToDisk=False ):
         self.gameSpeed = speed
         self.world = world
-        self.moving_units = list()
-        # self.save = Save()
         self.debug = debug
         self.writeToDisk = writeToDisk
-        
+        self.save = False
 
     def logger(self, *args, **kwargs):
         if self.debug:
@@ -66,7 +63,7 @@ class GameManager:
         print(substrings)
         return int(substrings[0])
 
- 
+
     def moveUnit(self, uid):
         deltaTime = timeit.default_timer() - self.tick
         unit = self.unitToMove[uid]
@@ -97,13 +94,13 @@ class GameManager:
         begin_time = timeit.default_timer() - self.tick
         self.time_elapse += begin_time
         begin_time_seconds = self.time_elapse[building.uid] / timeit.default_timer().resolution
-        
+
         if begin_time_seconds >= building.time_building:
             self.world.tiles_dico[(building.position.getX(), building.position.getY())].set_contains(building)
-        
+
         #reshow the world here, because le buiding is finish to be built
-        
-        
+
+
 
     def checkUnitsToMove(self):
         if (len(self.unitToMove) == 0):
@@ -124,7 +121,7 @@ class GameManager:
             self.world.filled_tiles[unit.position.toTuple()] = unit.position.toTuple()
         grid = self.world.convertMapToGrid()
         teamNumber = self.getTeamNumber(unit.uid)
-        pathFinding  = Pathfinding(mapGrid=grid, statingPoint= unit.position.toTuple(), goal=destination.toTuple(),)
+        pathFinding  = Pathfinding(mapGrid=grid, statingPoint= unit.position.toTuple(), goal=destination.toTuple(), debug=False)
         path = pathFinding.astar()
         if path.__class__ == bool:
             raise PathfindingException(self.world.tiles_dico[destination.toTuple()])
@@ -148,19 +145,23 @@ class GameManager:
     def pause(self):
         self.html_generator()
 
-    
-    # def save_world(self, path=None):
-    #     self.save.save(self.world, path) 
-    
-    # def load_from_file(self, path=None):
-    #     data = self.save.load(path)
-    #     # print("data", data)
-    #     self.world = data[0]
-    
+        # def play(self):
+        #     datas = self.load_from_file()
+        #     if datas:
+        #         self.world = datas[0]
+
+    def save_world(self, path=None):
+        self.save.save(self.world, path)
+
+    def load_from_file(self, path=None):
+        data = self.save.load(path)
+        # print("data", data)
+        self.world = data[0]
+
     def html_generator(self):
         village1, village2 = self.world.villages
         #iterating on 2 dict at the same time
-        
+
         body = f"""
         <!DOCTYPE html>
         <html lang="fr">
@@ -186,7 +187,7 @@ class GameManager:
             </body>
             </html>
         """
-        
+
         with open("./utils/html/gameStats.html", "w") as file:
             file.write(body)
 

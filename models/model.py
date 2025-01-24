@@ -117,7 +117,7 @@ class Model:
             self.ressources[ressource.get_name()] += ressource.get_quantity()
         else:
             self.ressources[ressource] += quantity
-        
+
     def remove_unit(self, unit):
         self.community[unit.name].pop(str(unit.uid))
         if(issubclass(unit.__class__, Ressource)):

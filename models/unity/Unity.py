@@ -18,9 +18,6 @@ class Unity:
         self.target = target
         self.task = None
         self.image = f"./assets/images/{self.name}.png"
-        
-        # self.team.add_unit(self)
-        # population += 1
     
     def move_unit(self, destination:Position):
         self.position = destination
@@ -50,7 +47,10 @@ class Unity:
     
     def get_position(self):
         return (self.position.getX(), self.position.getY())
-    
+
+    def getTPosition(self):
+        return self.position.toTuple()
+
     def __repr__(self): return f"{self.name}"
     
     def __eq__(self, other): return self.__class__ == other.__class__

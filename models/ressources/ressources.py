@@ -23,7 +23,11 @@ class Ressource:
     #     return self.position
     
     def get_position(self):
-        return (self.position.getX(), self.position.getY())
+        return self.position
+
+    def getTPosition(self):
+        return self.position.toTuple()
+
     
     def set_position(self, x, y):
         self.position.setX(x)

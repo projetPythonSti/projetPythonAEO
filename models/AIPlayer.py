@@ -208,6 +208,8 @@ class AIPlayer:
         ressourceKeyDict = list(map(lambda  x : x, self.world.ressources[resourceType].keys()))
         resourcesPositionList = list(map(lambda x : self.estimateDistance(x.position.toTuple(), topLeftPos) , self.world.ressources[resourceType].values()))
         self.logger("AIPlayer | getNearestRessource---- resPositionList value : ", resourcesPositionList)
+        if len(resourcesPositionList) == 0:
+            return -1
         nearestResourcesIndex = resourcesPositionList.index(min(resourcesPositionList))
         return {
             ressourceKeyDict[nearestResourcesIndex] : resourcesPositionList[nearestResourcesIndex]
@@ -435,6 +437,7 @@ class AIPlayer:
         if len(unitID) == 0:
             return -1
             self.logger("PAS D'UNITE DE DISPONIBLE")
+            return -1
         for i in unitID:
             self.freeUnits["v"].remove(i)
         return {
@@ -455,9 +458,10 @@ class AIPlayer:
         resourceToGet =  min(resDistance, key=resDistance.get)
         #self.logger("Ressource to get is", ResourceTypeENUM[resourceToGet].value)
         resToCollect = self.getNearestRessource(self.topVillageBorder,self.bottomVillageBorder,resourceToGet)
-        resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet) 
-        if resourceCollectEvent == -1:
+        if resToCollect == -1:
             return -1
+        resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet)
+
         self.logger("Added the following resCollect event : \n Type : ", resourceCollectEvent["infos"]["type"], "\t nbOfPpl : ",
               len(resourceCollectEvent["people"]))
         self.eventQueue.append(resourceCollectEvent)
@@ -496,6 +500,9 @@ class AIPlayer:
         pass
 
     def launchResourceAction(self, actionDict):
+        if actionDict["infos"]["target"] is None:
+            self.eventQueue.remove(actionDict)
+            return -1
         #self.logger("J'ai envoyé qqun chercher des ressources attention")
         unitList = actionDict["people"]
         unitTeam = self.gm.getTeamNumber(unitList[0])
@@ -510,6 +517,7 @@ class AIPlayer:
         if not exceptionRaised:
             self.currentEvents.append(actionDict)
             self.eventQueue.remove(actionDict)
+
     def launchBuildAction(self, actionDict):
         #self.logger("J'ai lancé une construction attention")
         buildingToBuild = actionDict["infos"]["type"]
@@ -581,7 +589,7 @@ if __name__ == "__main__":
     # print(village2.population())
     #print(monde.get_ressources())
     #print(v)
-    #print(community)
+    print(community)
     gm = GameManager(speed=1, world=monde)
     print("Launched GameManager")
     gm.addUnitToMoveDict(v, Position(40, 40))
