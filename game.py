@@ -1,7 +1,7 @@
 import pygame as pg
 from blessed import Terminal
 
-from models.AIPlayer import AIPlayer
+from models.AIPlayer import AIPlayer,PlayStyleMatrixEnum
 from save import *
 import sys
 import time
@@ -172,12 +172,17 @@ class Game :
     def resources_term(self,term):
         sys.stdout.flush()
         infos=""
+        n=0
         for village in self.world.villages:
-            infos+="Village "+village.name+" ;"
+            infos+="Village "+village.name+" ;\n"
             infos+=" Wood:"+str(village.ressources["w"])+" Gold:"+str(village.ressources["g"])+" Food:"+str(village.ressources["f"])
             infos+=" Population:"+str(village.peopleCount)+'/'
-            infos+='\n'
-        infos += '\n' * (term.height - len(self.world.villages) - 2)
+            infos+="\n"
+            infos+="Playstyle: "+PlayStyleMatrixEnum(self.players[n].playStyle.playStyleMatrix).name
+            infos+="\nTopBorder: "+str(self.players[n].topVillageBorder)+"  BottomBorder: "+str(self.players[n].bottomVillageBorder)
+            infos+='\n\n'
+            n += 1
+        infos += '\n' * (term.height - ((len(self.world.villages)+1)*4)-2)
         print(infos)
 
 
