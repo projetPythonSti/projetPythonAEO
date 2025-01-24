@@ -34,6 +34,7 @@ from models.model import Model
 from models.ressources.ressources import Ressource, Wood, Gold, Food
 from models.unity.Villager import Villager
 
+output = io.StringIO()
 class PlayStyleMatrixEnum(Enum):
     Aggressive = [
         [2,5,0],
@@ -448,6 +449,7 @@ class AIPlayer:
         unitID = self.getFreePeople(1,"v")
         if len(unitID) == 0:
             self.logger("PAS D'UNITE DE DISPONIBLE")
+            return -1
         for i in unitID:
             self.freeUnits["v"].remove(i)
         return {
@@ -467,8 +469,10 @@ class AIPlayer:
         resDistance = {"w": concernedRes["w"]-resPriority[0],"g" : concernedRes["g"]-resPriority[1], "f" :concernedRes["f"]-resPriority[2]}
         resourceToGet =  min(resDistance, key=resDistance.get)
         #self.logger("Ressource to get is", ResourceTypeENUM[resourceToGet].value)
-        resToCollect = self.getNearestRessource((0,0),(0,4),resourceToGet)
+        resToCollect = self.getNearestRessource(self.topVillageBorder,self.bottomVillageBorder,resourceToGet)
         resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet)
+        if resourceCollectEvent == -1:
+            return -1
         self.logger("Added the following resCollect event : \n Type : ", resourceCollectEvent["infos"]["type"], "\t nbOfPpl : ",
               len(resourceCollectEvent["people"]))
         self.eventQueue.append(resourceCollectEvent)
@@ -592,7 +596,7 @@ if __name__ == "__main__":
     # print(village2.population())
     #print(monde.get_ressources())
     #print(v)
-    #print(community)
+    print(community)
     gm = GameManager(speed=1, world=monde)
     print("Launched GameManager")
     gm.addUnitToMoveDict(v, Position(40, 40))

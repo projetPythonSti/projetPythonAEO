@@ -29,28 +29,35 @@ class Villager(Unity):
         To do : a villager Can collect resources at rate of 25/minute
     """
     def collect(self, ressource):
-        all_collected = sum(self.ressources_dict.values())
-        # quantity_to_collect = ressource.get_quantity()
-        rest = self.carry_max - all_collected
-        quantity_to_collect = rest if rest < ressource.get_quantity() else ressource.get_quantity()
-        
-        if all_collected >= self.carry_max:
-            self.drop_ressources()
-        else:
-            ressource.extract(quantity_to_collect)
-            self.ressources_dict[ressource.get_name().lower()] += quantity_to_collect
-            if all_collected + quantity_to_collect == self.carry_max: # if the villager is full
+        self.task = "collecting"
+        ressources_count = 1
+        if isinstance(ressource, Farm):
+            ressources_count = len(ressource.contains)
+
+        for i in range(ressources_count):
+            # ressource takes the first ressource in the list if it's a farm, else it takes the ressource
+            ressource = ressource.contains[i] if isinstance(ressource, Farm) else ressource
+            all_collected = sum(self.ressources_dict.values())
+            # quantity_to_collect = ressource.get_quantity()
+            rest = self.carry_max - all_collected
+            quantity_to_collect = rest if rest < ressource.get_quantity() else ressource.get_quantity()
+
+            if all_collected >= self.carry_max:
                 self.drop_ressources()
             else:
-                #he has to do other things
-                pass
-        if ressource.get_quantity() == 0:
-            ressource.remove()
-        else:
-            print("nothing to do")
-            #he has to come back to the ressource to finish collecting
-            # self.move(ressource.get_position())
-            #self.collect(ressource)
+                ressource.extract(quantity_to_collect)
+                self.ressources_dict[ressource.get_name().lower()] += quantity_to_collect
+                if all_collected + quantity_to_collect == self.carry_max: # if the villager is full
+                    self.drop_ressources()
+                else:
+                    #he has to do other things
+                    pass
+            if ressource.get_quantity() == 0:
+                ressource.remove()
+            else:
+                #he has to come back to the ressource to finish collecting
+                # self.move(ressource.get_position())
+                self.collect(ressource)
     
     def drop_ressources(self):
         for key, quantity in self.ressources_dict.items():
@@ -61,4 +68,5 @@ class Villager(Unity):
     """
     
     def build(self):
+        self.task = "building"
         return 0

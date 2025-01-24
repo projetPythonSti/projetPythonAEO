@@ -37,38 +37,38 @@ class Pathfinding:
         finalPos = None
         direction = (self.goal[0]-self.startingPoint[0], self.goal[1]-self.startingPoint[1])
         if (direction[0] < 0) and (direction[0]<0) or (direction[0] < 0) and (direction[1] > 0): # Came from northeast, searching for accurate
-            print("NORTHEAST or NORTHWEST or NORTH")
+            self.logger("NORTHEAST or NORTHWEST or NORTH")
             finalPos = (self.goal[0],self.goal[1]-1) if self.checkIfOccupied((self.goal[0],self.goal[1]-1)) else None
-            print("finalPOS now", finalPos)
+            self.logger("finalPOS now", finalPos)
 
 
         elif ((direction[0] > 0) and (direction[1] < 0)) or ((direction[0] < 0) and (direction[1] < 0)) or ((direction[0]==0) and (direction[1] < 0)) : # Came from south, searching for accurate position
-            print("SOUTHEAST or SOUTHWEST or SOUTH")
+            self.logger("SOUTHEAST or SOUTHWEST or SOUTH")
             finalPos = (self.goal[0],self.goal[1]+1) if self.checkIfOccupied((self.goal[0],self.goal[1]+1)) else None
-            print("finalPOS now", finalPos)
+            self.logger("finalPOS now", finalPos)
 
         elif (direction[0] < 0) and (direction[1] == 0):
-            print("EAST")
+            self.logger("EAST")
             finalPos = (self.goal[0]-1,self.goal[1]) if self.checkIfOccupied((self.goal[0]-1,self.goal[1])) else None
-            print("finalPOS now", finalPos)
+            self.logger("finalPOS now", finalPos)
 
         elif (direction[0] > 0) and (direction[1] == 0):
-            print("West")
+            self.logger("West")
             finalPos = (self.goal[0] + 1, self.goal[1]) if self.checkIfOccupied((self.goal[0] + 1, self.goal[1])) else None
-            print("finalPOS now", finalPos)
+            self.logger("finalPOS now", finalPos)
 
         if finalPos is None:
-            print("Found no nearPath")
+            self.logger("Found no nearPath")
             xPos = -1
             yPos = -1
             while finalPos is None and xPos<=1 :
                 finalPos = (self.goal[0] + xPos, self.goal[1] -yPos) if self.checkIfOccupied((self.goal[0]+xPos , self.goal[1]+yPos)) else None
-                print("Xpos val : ", xPos, "Ypos val : ", yPos, "CIO : ",self.checkIfOccupied((self.goal[0]+xPos , self.goal[1]+yPos)))
+                self.logger("Xpos val : ", xPos, "Ypos val : ", yPos, "CIO : ",self.checkIfOccupied((self.goal[0]+xPos , self.goal[1]+yPos)))
                 xPos += 1
                 yPos += 1
             if finalPos is None:
-                print("After all this search foundNoPaths")
-            print("avant de partir, voici finalPos à la fin de checkNeighbors",finalPos)
+                self.logger("After all this search foundNoPaths")
+            self.logger("avant de partir, voici finalPos à la fin de checkNeighbors",finalPos)
             return finalPos
         return finalPos
 
@@ -82,9 +82,9 @@ class Pathfinding:
         oheap = []
         heapq.heappush(oheap, (fscore[self.startingPoint], self.startingPoint))
         if self.mapGrid[self.goal[0]][self.goal[1]]:
-            print("VALUE NOT SHEKED")
+            self.logger("VALUE NOT SHEKED")
             self.goal = self.checkNeighbors(self.goal)
-            print("new goal value = ", self.goal)
+            self.logger("new goal value = ", self.goal)
 
         while oheap:
 
@@ -126,7 +126,7 @@ class Pathfinding:
 #route = astar(grid, self.startingPoint, self.goal)
 #route = route + [self.startingPoint]
 #route = route[::-1]
-#print(route)
+#self.logger(route)
 ##############################################################################
 # plot the path
 ##############################################################################

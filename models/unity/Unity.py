@@ -17,6 +17,9 @@ class Unity:
         self.position = position if position else Position(rd.randint(0, self.team.world.width - 1), rd.randint(0, self.team.world.height - 1))
         self.range = visibility
         self.target = target
+        self.task = None
+        self.image = f"./assets/images/{self.name}.png"
+
         # self.team.add_unit(self)
         # population += 1
     
@@ -37,6 +40,7 @@ class Unity:
     
     def attack(self, enemy):
         #1 attack per second for all units
+        self.task = "Fighting"
         enemy.set_health(enemy.get_health() - self.damage)
     
     def die(self):
@@ -45,6 +49,9 @@ class Unity:
     
     def get_cost(self): return self.cost
     
+    def get_position(self):
+        return (self.position.getX(), self.position.getY())
+
     def __repr__(self): return f"{self.name}"
     
     def __eq__(self, other): return self.__class__ == other.__class__

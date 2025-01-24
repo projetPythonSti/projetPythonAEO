@@ -4,6 +4,7 @@ import os, sys
 
 from game import Game
 from models.AIPlayer import AIPlayer, PlayStyleEnum
+from models.buildings.town_center import TownCenter
 from randommap import *
 from models.unity.Archer import *
 import asyncio
