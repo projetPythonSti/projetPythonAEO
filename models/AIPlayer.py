@@ -1,6 +1,5 @@
 from argparse import Action
 from collections import defaultdict
-from distutils.command.build import build
 from enum import Enum
 from os import fdopen
 from select import select

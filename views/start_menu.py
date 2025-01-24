@@ -39,7 +39,7 @@ class Menu :
 
                 if val.lower() == 'c' :
                     nsave = Save()
-                    data = nsave.load_term()
+                    data = nsave.load_term(term)
                     return tuple(data)
 
             return self.return_value()

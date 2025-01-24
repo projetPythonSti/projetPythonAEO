@@ -229,6 +229,7 @@ class Game :
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
         print("Appuyez sur s pour sauvegarder")
+        print("Appuyez sur c pour charger une partie")
         print("Appuyez sur r pour reprendre")
         print("Appuyez sur p pour activer pygame, puis appuyez sur R")
         print(f"IN GAME TIME : {self.game_duration}")
@@ -244,10 +245,12 @@ class Game :
                     break
 
                 elif val2.lower() =='c':
-                    data = self.save.load_term()
+                    data = self.save.load_term(term)
+
                     if data :
                         self.swap_to_load(data)
                     else : pass
+                    break
 
 
 
@@ -265,10 +268,10 @@ class Game :
                     quit()
 
 
-    def swap_to_load (self,other_game) :
+    def swap_to_load (self,dico) :
         self.ltick = time.time()
-        self.gm = other_game.gm
-        self.players = other_game.players
+        self.gm = dico[1]
+        self.players = dico[2]
         self.speed = 1
-        self.world = other_game.world
-        self.game_duration = other_game.game_duration
+        self.world = dico[0]
+        self.game_duration = dico[3]
