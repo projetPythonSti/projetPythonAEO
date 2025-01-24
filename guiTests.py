@@ -41,7 +41,7 @@ def jeu_terminal (world, gm:GameManager, debug=False):
     menu = Menu()
     dico = menu.start_menu()
 
-    #CREATION DU MONDE ET DES EQUIPES ET DES TCS ET
+    #CREATION DU MONDE ET DES EQUIPES ET DES TCS ET DES VILLAGEOIS
     world = random_world(dico)
     make_teams(dico,world)
     place_tcs(dico,world)
