@@ -8,14 +8,13 @@ class Building:
     04/12/2024@tahakhetib - J'ai ajouté des modification au dessus de ce que @moutanahzir à écrit
                 - ajouté un méthode get_surface() permettant d'obtenir efficacement la surface d'un batiment
     """
-
-    def __init__(self, uid, name, cost, time_building, health, surface, spawn="", population=0, dropPoint=False, position=None, team=None):
+    surface = (1,1)
+    def __init__(self, uid, name, cost, time_building, health, spawn="", population=0, dropPoint=False, position=None, team=None):
         self.uid = uid
         self.name = name
         self.cost = cost
         self.time_building = time_building
         self.health = health
-        self.surface = surface
         self.is_built = False
         self.spawn = spawn
         self.dropPoint = dropPoint

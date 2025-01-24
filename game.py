@@ -1,10 +1,12 @@
 import pygame as pg
 from blessed import Terminal
+
+from models.AIPlayer import AIPlayer
 from save import *
 import sys
 import time
 import timeit
-
+import models.AIPlayer
 
 #########################################
 ## Jeu
@@ -12,9 +14,11 @@ import timeit
 
 class Game :
 
-    def __init__(self, world,clock, gm):
+    def __init__(self, world, clock, gm, players: list[AIPlayer]):
+
         self.ltick = time.time()
         self.gm = gm
+        self.players = players
         self.clock = clock
         self.speed = 1
         self.world = world
@@ -118,8 +122,11 @@ class Game :
         #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
         # self.events()
         # self.update()
-        self.gm.checkUnitsToMove()
-        self.gm.tick = timeit.default_timer()
+        #for a in self.players:
+        #    a.playTurn()
+        #self.gm.checkUnitsToMove()
+        #self.gm.tick = timeit.default_timer()
+
         self.draw_term(term)
         """
         Peut changer si besoin 

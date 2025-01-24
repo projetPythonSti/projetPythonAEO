@@ -36,6 +36,7 @@ class Menu :
                     nsave = Save()
                     nsave.load_term()
                     break
+            return self.return_value()
 
     def set_size_map (self) :
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -97,12 +98,12 @@ class Menu :
                 if val.lower() == 'z' :
                     self.start_menu()
                     break
-                if val.lower() == 'g':
+                if val.lower() == 'g': #GoldRush
                     self.type_map = 'g'
                     self.set_ressources_quantity()
                     break
 
-                if val.lower() == 'r':
+                if val.lower() == 'r': #Map random, Arabia par défaut
                     self.type_map = 'r'
                     self.set_ressources_quantity()
                     break

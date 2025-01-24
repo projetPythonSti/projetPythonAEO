@@ -4,10 +4,15 @@ import numpy as np
 
 
 class Pathfinding:
-    def __init__(self, mapGrid, statingPoint, goal):
+    def __init__(self, mapGrid, statingPoint, goal, debug=False):
         self.mapGrid = mapGrid
         self.startingPoint = statingPoint
         self.goal = goal
+        self.debug = debug
+
+    def logger(self,*args, **kwargs):
+        if self.debug:
+            print(*args, **kwargs)
 
     def heuristic(self,a, b):
         return np.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)
