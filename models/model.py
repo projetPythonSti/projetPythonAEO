@@ -27,8 +27,10 @@ class Model:
             - Ajouté une fonction get_name afin d'obtenir le nom d'équipe (utilisé dans Villager.py).
             - Changé la manière dont les unités sont ajoutées dans initialize_villages() pour faire en sorte que les nouveaux ID soient utilisés
             - Ajouté un compteur de population pour directement avoir accès au nombre de personnes faisant partie du village (avec le getter associé)
-            04/12/2024@tahakhetib - J'ai ajouté des modification au dessus de ce que @amadou_yaya_diallo à écrit
+            04/12/2024@tahakhetib - J'ai ajouté des modifications au-dessus de ce que @amadou_yaya_diallo a écrit
                 - Ajouté un compteur workingPpl qui va permettre aux IA de suivre le nombre de personnes qui doivent travailler.
+            05/12/2024@tahakhetib - J'ai ajouté les modifications au-dessus de ce que @amadou_yaya_diallo a écrit
+                - Retiré les compteurs workingPpl et peopleCount pour une fonction get_pplCount()
 
     """
     def __init__(self, name, world = None):
@@ -36,8 +38,6 @@ class Model:
         # Dictionary of human, materiel and ressources of the village
         self.community = defaultdict(dict)
         self.ressources = defaultdict(int)
-        self.peopleCount = 0
-        self.workingPpl = 0
         self.name = name
         self.world = world
         self.world.add_village(self)
@@ -50,22 +50,18 @@ class Model:
                             stables = 0, keeps = 0, houses = 0, farms = 0, camps = 0, barracks = 0, 
                             archery_ranger = 0, wood = 0, food = 0, gold = 0):
         for i in range(archers):
-            self.peopleCount += 1
             a = Archer(team=self)
             self.community["a"][a.uid] = a
 
         for i in range(horsmen):
-            self.peopleCount += 1
             h = Horseman(team=self)
             self.community["h"][h.uid] = h
    
         for i in range(villages):
-            self.peopleCount += 1
             v = Villager(team=self)
             self.community["v"][v.uid] = v
         
         for i in range(swordsmen):
-            self.peopleCount += 1
             s = Swordsman(team=self)
             self.community["s"][s.uid] = s
         
@@ -177,7 +173,12 @@ class Model:
     def get_name(self):
         return self.name
     def get_pplCount(self):
-        return self.peopleCount
+        villagerNumber = len(self.community["v"])
+        sNumber = len(self.community["s"])
+        hNumber = len(self.community["h"])
+        aNumber = len(self.community["a"])
+        return villagerNumber+sNumber+hNumber+aNumber
+
     def get_ressources(self):
         return self.ressources
 

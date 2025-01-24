@@ -3,19 +3,17 @@ from models.Position import Position
 import random as rd
 
 class Building:
-
     """
-    04/12/2024@tahakhetib - J'ai ajouté des modification au dessus de ce que @moutanahzir à écrit
-                - ajouté un méthode get_surface() permettant d'obtenir efficacement la surface d'un batiment
+                06/12/2024@tahakhetib - J'ai ajouté les modifications au dessus de ce que @amadou_yaya_diallo à écrit
+                    - Passé l'attribut surface en statique afin de pouvoir y accéder sans avoir à créer un Building
     """
-
-    def __init__(self, uid, name, cost, time_building, health, surface, spawn="", population=0, dropPoint=False, position=None, team=None):
+    surface = (1,1)
+    def __init__(self, uid, name, cost, time_building, health, spawn="", population=0, dropPoint=False, position=None, team=None):
         self.uid = uid
         self.name = name
         self.cost = cost
         self.time_building = time_building
         self.health = health
-        self.surface = surface
         self.is_built = False
         self.spawn = spawn
         self.dropPoint = dropPoint
@@ -26,13 +24,13 @@ class Building:
 
     def get_cost(self):
         return self.cost
-    
-    def get_occupied_tiles(self):
-        return [(self.position.getX() + x, self.position.getY() + y) for x in range(self.surface[0]) for y in range(self.surface[1])]
 
+    def get_occupied_tiles(self):
+        return  [(self.position.getX() + x, self.position.getY() + y) for x in range(self.surface[0]) for y in range(self.surface[1])]
+    
     def get_name(self):
         return self.name
-
+    
     # def can_afford(self, player_resources):
     #     for resource, amount_needed in self.cost.items():
     #         if player_resources.get(resource, 0) < amount_needed:
@@ -58,21 +56,19 @@ class Building:
     #     self.is_built = True
     #     print(f"Construction de {self.name} terminée.")
     #     return True
-
+    
     def build(self):
         # print(f"Construction de {self.name} commencée...")
         self.time_building = 3*self.time_building/(self.builders + 2)
         for second in range(self.time_building):
             time.sleep(1)
-
+            
         self.is_built = True
         print(f"Construction de {self.name} terminée.")
         return True
-
+    
     def get_position(self):
         return self.position
 
-    def get_surface(self):
-        return self.surface
     def __repr__(self):
         return self.name

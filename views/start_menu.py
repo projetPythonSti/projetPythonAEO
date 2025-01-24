@@ -3,7 +3,11 @@ from save import *
 import os, sys
 
 class Menu :
+    """
+            23/01/2025@tahakhetib : J'ai apporté des modifications à ce fichier  sur ce que @etan-test-1 a écrit
+                - Ajouté le retour du dictionnaire vers la boucle de jeu afin d'extraire les informations nécessaires à la création des IA,
 
+        """
     def __init__(self):
         self.x = None
         self.y = None
@@ -36,6 +40,7 @@ class Menu :
                     nsave = Save()
                     nsave.load_term()
                     break
+            return self.return_value()
 
     def set_size_map (self) :
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -243,7 +248,7 @@ class Menu :
                     if n >= self.nb_joueur :
                         break
 
-            self.return_value()
+            #self.return_value()
 
 
     def return_value(self):

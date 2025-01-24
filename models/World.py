@@ -1,6 +1,7 @@
 import numpy as np
-import json
 
+from models.Position import Position
+from models.buildings.buildings import Building
 from models.buildings.town_center import TownCenter
 from models.maps.Tile import  Tile
 from models.model import Model  # delete it after finish testing the class World
@@ -8,9 +9,7 @@ from models.unity.Villager import Villager  # delete it after finish testing the
 from models.ressources.ressources import Gold, Wood, Food, Ressource
 from collections import defaultdict
 import random as rd
-import os
 
-from models.Position import Position
 
 class World:
 
@@ -31,8 +30,8 @@ class World:
         self.height = height
         self.villages = list()
         self.ressources = defaultdict(dict)
-        self.tiles_dico = defaultdict(int)  # à chaque clé sera associé une Tuile
-        self.filled_tiles = defaultdict(tuple)  #
+        self.tiles_dico = defaultdict(Tile)  # à chaque clé sera associé une Tuile
+        self.filled_tiles = defaultdict(tuple)
         self.initialise_world()
         # les clés du dico seront de la forme (x,y)
         # self.units  #every unit on the map, a list seems better to me
@@ -75,7 +74,7 @@ class World:
                 self.place_element(v1)
                 self.place_element(v2)
 
-    def show_world(self): #
+    def show_world(self):
         for y in range(self.height):
             for x in range(self.width):
                 print(self.tiles_dico[(x, y)], end="")
@@ -129,20 +128,43 @@ class World:
 
 
     def place_element(self, element):
+        #print("World : place_element -- In place element")
         place = (element.position.getX(), element.position.getY())
-        if (place not in self.filled_tiles.values()):
-            self.tiles_dico[place].set_contains(element)
-            self.filled_tiles[place] = place
-            # update the view of the element
+        if place not in self.filled_tiles and place[0] <= self.width and place[1] <= self.height:
+            #print("World : place_element ------- Element n'étant pas dans une tuile déjà prise")
+            if issubclass(element.__class__, Building) and all(tile not in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
+                #print("World : place_element ------- Elt est un batiment")
+                #check if the building can be placed
+                if element.surface[0] + place[0] <= self.width and element.surface[1] + place[1] <= self.height:
+                    for x in range(element.surface[0]):
+                        for y in range(element.surface[1]):
+                            try:
+                                self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(element)
+                                #print("World : place_element ------- tiles dico après l'ajout : ", self.tiles_dico[(place[0] + x, place[1] + y)].contains)
+                            except KeyError:
+                                #print("Y'a une erreur la tout de même faudrait un print ?")
+                                pass
+                            self.filled_tiles[(place[0] + x, place[1] + y)] = (place[0] +x, place[1]+y)
+            elif not issubclass(element.__class__, Building):
+                self.tiles_dico[place].set_contains(element)
+                self.filled_tiles[place] = place
+            #update the view of the element
 
     def remove_element(self, element):
         place = (element.position.getX(), element.position.getY())
-        self.tiles_dico[place].set_contains(None)
-        self.filled_tiles.pop(place)
-        if (type(element) == Ressource or type(element) == Wood or type(element) == Food or type(element) == Gold):
-            self.ressources[element.name.lower()].pop(str(element.uid))
+        if(issubclass(element.__class__, Building)) and all(tile in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
+            for x in range(element.surface[0]):
+                for y in range(element.surface[1]):
+                    self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(None)
+                    self.filled_tiles.pop[((place[0] + x, place[1] + y))]
+        elif not issubclass(element.__class__, Building):
+            self.tiles_dico[place].set_contains(None)
+            self.filled_tiles.pop(place)
+            #self.ressources[element.name].pop(str(element.uid))
 
-        # update the view of the element
+        #removing element from its team also
+        element.team.remove_unit(element)
+        #update the view of the element
 
     # def afficher_console(self):
     #     # self.update_unit_presence() #updates this everytime we print the map
@@ -177,19 +199,7 @@ class World:
             binary_array[key[0], key[1]] = 0 if value.contains == None else 1
         return binary_array
 
-    """Les deux fonction qui suivent sont utilisées pour la sauvegarde et ne sont pas à utiliser seule """
-    def to_dict (self):
-        return {"width" : self.width, "height" : self.height, "villages" : { v.name : v.to_dict() for v in self.villages }, "ressources" : { k1 : {k2 : self.ressources[k1][k2].to_dict() for k2 in self.ressources[k1].keys()} for k1 in self.ressources.keys()}}
-
-    def to_json(self, file_name=None):
-        """Convert object to JSON and optionally save to file."""
-        data = self.to_dict()
-        if file_name:
-            with open("saves/"+file_name, "w") as f:
-                json.dump(data, f, indent=4)
-        return json.dumps(data, indent=4)
-
-    #def intkey(key): #turns a float key into an int key for dict indexation
+    # def intkey(key): #turns a float key into an int key for dict indexation
     #     return (int(key[0]),int(key[1]))
 
 
@@ -210,11 +220,11 @@ if __name__ == "__main__":
     print(village1.population())
     print(monde.get_ressources())
     print("Before : ", village1.get_ressources())
-    fo = monde.get_ressources()["fo"]["0"]
-    v.drop_ressources()
-    v.collect(fo)
-    print("After : ", village1.get_ressources())
-    print(v.ressources_dict)
+    #fo = monde.get_ressources()["fo"]["0"]
+    #v.drop_ressources()
+    #v.collect(fo)
+    #print("After : ", village1.get_ressources())
+    #print(v.ressources_dict)
     # print(village2.population())
     # print(monde.get_ressources())
     # print(sorted(monde.filled_tiles, key=lambda x: x[0]), len(monde.filled_tiles))
