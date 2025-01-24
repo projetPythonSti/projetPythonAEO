@@ -61,45 +61,47 @@ class PlayPauseMenu:
         print("Play button pressed")
         self.running = False
         self.game.playing = True
-        print("Back to the game")
+        print("Back to the 2.5D game")
 
     def save(self):
-        folder_selector = FolderSelector()
-        folder_selector.master.mainloop()
-        path = folder_selector.folder_path
+        # folder_selector = FolderSelector()
+        # folder_selector.master.mainloop()
+        # path = folder_selector.folder_path
     
-        print("Here is the path: ", path)
-        if self.game:
-            self.game.game_manager.save_world(path)
+        # print("Here is the path: ", path)
+        # if self.game:
+        #     self.game.game_manager.save_world(path)
+        self.game.game_manager.save()
         self.running = False  # Ensure the menu keeps running after saving
         self.game.playing = True
 
     def load(self):
         print("Im charging...")
-        file_selector = FileSelector()
-        file_selector.master.mainloop()
-        path = file_selector.file_path
+        # file_selector = FileSelector()
+        # file_selector.master.mainloop()
+        # path = file_selector.file_path
         
-        if path:
-            try:
-                with open(path, 'rb') as file:
-                    header = file.read(4)
-                    if header.startswith(b'\x89PNG') or header.startswith(b'\xFF\xD8\xFF'):
-                        print("Selected file is an image.")
-                    elif header.startswith(b'%PDF'):
-                        print("Selected file is a PDF document.")
-                    elif header.startswith(b'ID3'):
-                        print("Selected file is an MP3 audio.")
-                    else:
-                        print("Selected file is a binary file.")
-                        # print("Before : ", self.game.game_manager.world.villages[0].population(), self.game.game_manager.world.villages[1].population(), sep="\n")
-                        if self.game:
-                            self.game.game_manager.load_from_file(path)
-                            path=""
-                        # print("After : ", self.game.game_manager.world.villages[0].population(), self.game.game_manager.world.villages[1].population(), sep="\n")
-                        self.game.world.draw(self.game.screen, self.game.camera)
-            except Exception as e:
-                print(f"Error reading file: {e}")
+        # if path:
+        #     try:
+        #         with open(path, 'rb') as file:
+        #             header = file.read(4)
+        #             if header.startswith(b'\x89PNG') or header.startswith(b'\xFF\xD8\xFF'):
+        #                 print("Selected file is an image.")
+        #             elif header.startswith(b'%PDF'):
+        #                 print("Selected file is a PDF document.")
+        #             elif header.startswith(b'ID3'):
+        #                 print("Selected file is an MP3 audio.")
+        #             else:
+        #                 print("Selected file is a binary file.")
+        #                 # print("Before : ", self.game.game_manager.world.villages[0].population(), self.game.game_manager.world.villages[1].population(), sep="\n")
+        #                 if self.game:
+        #                     self.game.game_manager.load_from_file(path)
+        #                     path=""
+        #                 # print("After : ", self.game.game_manager.world.villages[0].population(), self.game.game_manager.world.villages[1].population(), sep="\n")
+        #                 self.game.world.draw(self.game.screen, self.game.camera)
+        #     except Exception as e:
+        #         print(f"Error reading file: {e}")
+        self.game.game_manager.load()
         self.running = False
         self.game.playing = True
             

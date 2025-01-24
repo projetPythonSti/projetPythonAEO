@@ -1,22 +1,15 @@
-import pygame as pg
-import time
-import os, sys
-
-from game import Game
 from models.AIPlayer import AIPlayer, PlayStyleEnum
-from randommap import *
-from models.unity.Archer import *
-from models.Position import Position
-from models.maps.Tile import Tile
-from models.model import Model
-import models.unity
-from models.World import World
 from controllers.gameManager import GameManager
 from models.unity.Villager import Villager
-from datetime import datetime
+from models.buildings.town_center import TownCenter
+import pygame as pg
+from models.unity.Archer import *
+from game import Game
+from randommap import *
+from models.model import Model
+from models.World import World
 from views.start_menu import *
 
-from models.Position import Position
 import randommap
 
 
@@ -105,7 +98,7 @@ if __name__ == "__main__":
     #print(monde.get_ressources())
     #print(v)
     #print(community)
-    gm = GameManager(speed=1, world=monde, debug=False)
+    gm = GameManager(speed=1, world=monde)
     print("Launched GameManager")
     #m.addUnitToMoveDict(v, Position(40, 40))
     print("Added unit to move dict")

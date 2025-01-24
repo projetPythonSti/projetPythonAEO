@@ -1,23 +1,8 @@
-from argparse import Action
-from collections import defaultdict
-from distutils.command.build import build
 from enum import Enum
-from os import fdopen
-from select import select
-from tokenize import tabsize
-from typing import final
 from functools import partial
 import io
 import sys
-
-import numpy as np
-from numpy.f2py.crackfortran import debug
-from numpy.ma.core import nonzero
-
 from models.Exceptions import PathfindingException
-
-output = io.StringIO()
-
 from models.Position import Position
 from models.World import World
 from models.buildings.archery_range import ArcheryRange
@@ -34,6 +19,7 @@ from models.model import Model
 from models.ressources.ressources import Ressource, Wood, Gold, Food
 from models.unity.Villager import Villager
 
+output = io.StringIO()
 class PlayStyleMatrixEnum(Enum):
     Aggressive = [
         [2,5,0],
@@ -447,6 +433,7 @@ class AIPlayer:
         resourceToCollectKey = next(iter(resourceToCollect.keys()))
         unitID = self.getFreePeople(1,"v")
         if len(unitID) == 0:
+            return -1
             self.logger("PAS D'UNITE DE DISPONIBLE")
         for i in unitID:
             self.freeUnits["v"].remove(i)
@@ -467,8 +454,10 @@ class AIPlayer:
         resDistance = {"w": concernedRes["w"]-resPriority[0],"g" : concernedRes["g"]-resPriority[1], "f" :concernedRes["f"]-resPriority[2]}
         resourceToGet =  min(resDistance, key=resDistance.get)
         #self.logger("Ressource to get is", ResourceTypeENUM[resourceToGet].value)
-        resToCollect = self.getNearestRessource((0,0),(0,4),resourceToGet)
-        resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet)
+        resToCollect = self.getNearestRessource(self.topVillageBorder,self.bottomVillageBorder,resourceToGet)
+        resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet) 
+        if resourceCollectEvent == -1:
+            return -1
         self.logger("Added the following resCollect event : \n Type : ", resourceCollectEvent["infos"]["type"], "\t nbOfPpl : ",
               len(resourceCollectEvent["people"]))
         self.eventQueue.append(resourceCollectEvent)

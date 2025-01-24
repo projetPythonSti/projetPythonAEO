@@ -4,7 +4,6 @@ import random as rd
 
 class Unity:
     population = 0
-    
     def __init__(self, uid, name, cost, trainningTime, health, damage, speed, visibility, team, position=None, target = None):
         self.uid = uid
         self.name = name

@@ -10,5 +10,6 @@ class Swordsman(Unity):
         community = team.get_community().get('s')
         # uid = len(community) if community else 0 # 0 if 
         villageName = team.get_name()
-        uid = f"eq{villageName}p{len(community) if community else 0}"
+        uid = f"eq{villageName}p{team.get_pplCount()}"
+
         super().__init__(uid, "s", { "f" : 50, "g" : 20}, 20, 40, 4, 0.9, 1, team=team)

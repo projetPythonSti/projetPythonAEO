@@ -9,5 +9,5 @@ class Horseman(Unity):
         community = team.get_community().get('h')
         # uid = len(community) if community else 0 # 0 if it doesn't exist yet
         villageName = team.get_name()
-        uid = f"eq{villageName}p{len(community) if community else 0}"  # 0 if
+        uid = f"eq{villageName}p{team.get_pplCount()}"
         super().__init__(uid, "h", { "f" : 80, "g" : 20}, 30, 45, 4, 1.2, 1, team=team)

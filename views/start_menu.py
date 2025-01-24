@@ -1,5 +1,5 @@
 from blessed import Terminal
-from save import *
+from models.save import Save
 import os, sys
 
 class Menu :

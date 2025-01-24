@@ -70,10 +70,11 @@ class World:
     def fill_world(self):
         village1, village2 = self.villages
         #iterating on 2 dicts at the same time
-        for pop1, pop2 in zip(village1.population().values(), village2.population().values()):
-            for v1, v2 in zip(pop1.values(), pop2.values()):
-                self.place_element(v1)
-                self.place_element(v2)     
+        elements = {**village1.population(), **village2.population()}
+        for element in elements.values():
+            for v in element.values():
+                self.place_element(v)
+        
     
     def show_world(self):
         for y in range(self.height):

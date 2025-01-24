@@ -10,9 +10,17 @@ class Save:
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
 
-    def save(self, world, path=None):
+    # def save(self, world, path=None):
+    #     self.generate_default_path()
+    #     datas = [world]
+    #     if path: self.save_path = path
+    #     file = open(self.save_path + "/save", 'wb')
+    #     pickle.dump(datas, file)
+    #     file.close()
+    
+    def save(self, game, path=None):
         self.generate_default_path()
-        datas = [world]
+        datas = [game]
         if path: self.save_path = path
         file = open(self.save_path + "/save", 'wb')
         pickle.dump(datas, file)

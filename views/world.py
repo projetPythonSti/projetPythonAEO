@@ -1,6 +1,5 @@
 from models.buildings.buildings import Building 
 from collections import defaultdict
-# from resource_manager import ResourceManager
 from utils.setup import TILE_SIZE
 from models.World import World
 import pygame as pg
@@ -91,9 +90,10 @@ class World_GUI:
     def load_images(self):
         # village1, village2 = self.world_model.villages
         # ressources = self.world_model.ressources
+        
         for key, values in self.all.items():
             if len(values) > 0:
-                self.load_image(key, values['0'])
+                self.load_image(key, list(values.values())[0])
         self.tile_images["grass"] = pg.image.load("assets/images/tilegraphic.png").convert_alpha()
         self.tile_images["eau"] = pg.image.load("assets/images/eau.png").convert_alpha()
         # self.tile_images["sable"] = pg.image.load("assets/images/sable.png").convert_alpha()
@@ -338,11 +338,6 @@ class World_GUI:
         # Draw the doubled building image at the adjusted position
         screen.blit(doubled_building_image, building_render_pos)
 
-        # Render projectiles if the building has a projectile pool
-        # if hasattr(building, 'projectile_pool') and building.projectile_pool:
-        #     logger.info(f"Drawing projectiles for {building.name}")
-        #     building.projectile_pool.draw(screen)
-        #     logger.info(f"Finished drawing projectiles for {building.name}")
     
 
     def draw_buildings(self, screen, camera):
@@ -413,8 +408,14 @@ class World_GUI:
 
     def update(self, screen, camera):
         """Update the world and its entities."""
-        self.draw(screen, camera)
+        # self.draw(screen, camera)
+        pass
  
+    def iso_to_grid(self, iso_x, iso_y):
+        """Helper to convert iso coords back to grid coords."""
+        cart_y = (2 * iso_y - iso_x) / 2
+        cart_x = cart_y + iso_x
+        return int(cart_x // TILE_SIZE), int(cart_y // TILE_SIZE)
 
     def find_closest_target(self, building):
         """
@@ -435,33 +436,22 @@ class World_GUI:
         else:
             print(f"{building.name} found no targets within range.")  # Debug statement
         return closest
-
-
     def remove_projectile_from_tile(self, projectile, old_grid_pos):
         """Remove a projectile from its old tile."""
         if old_grid_pos in self.world:
             tile_data = self.world[old_grid_pos]
             if projectile in tile_data["projectiles"]:
                 tile_data["projectiles"].remove(projectile)
-
-    def iso_to_grid(self, iso_x, iso_y):
-        """Helper to convert iso coords back to grid coords."""
-        cart_y = (2 * iso_y - iso_x) / 2
-        cart_x = cart_y + iso_x
-        return int(cart_x // TILE_SIZE), int(cart_y // TILE_SIZE)
-
     def draw_projectiles(self, screen, camera):
         """Draw all active projectiles with proper screen positioning."""
         for building in self.entities:
             if isinstance(building, Keep):
                 building.projectile_pool.draw(screen)
-
     def update_projectiles(self, dt: float):
         """Update all active projectiles."""
         for building in self.entities:
             if isinstance(building, Keep):
                 building.projectile_pool.update(dt)
-
     def create_collision_matrix(self):
         """Create a matrix for pathfinding where 1 indicates blocked tiles."""
         collision_matrix = []
@@ -475,7 +465,6 @@ class World_GUI:
         for row in collision_matrix:
             print(row)
         return collision_matrix
-
     def mouse_to_grid(self, x, y, camera):
         """Convert mouse position to grid coordinates, accounting for zoom."""
         adjusted_x = (x - camera.scroll.x * camera.zoom - (self.grass_tiles.get_width() / 2) * camera.zoom) / camera.zoom
@@ -487,17 +476,6 @@ class World_GUI:
         grid_x = int(cart_x // TILE_SIZE)
         grid_y = int(cart_y // TILE_SIZE)
         return grid_x, grid_y
-
-    # def draw(self, screen, camera):
-    #     """Render the world, including buildings."""
-    #     try:
-    #         images["tree"] = pg.image.load("assets/graphics/tree.png").convert_alpha()
-    #         images["rock"] = pg.image.load("assets/graphics/rock.png").convert_alpha()
-    #         images["block"] = pg.image.load("assets/graphics/block.png").convert_alpha()
-    #     except FileNotFoundError as e:
-    #         print(f"Error loading image: {e}")
-    #     return images
-
 
     def place_building(self, grid_pos):
         """Place a building at the specified grid position if possible."""

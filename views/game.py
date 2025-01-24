@@ -1,4 +1,5 @@
 # from resource_manager import ResourceManager
+import timeit
 from utils.setup import TILE_SIZE
 from views.camera import Camera
 from views.world import World_GUI
@@ -10,12 +11,12 @@ import sys
 
 class Game:
 
-    def __init__(self, screen, clock, game_manager):
-        
+    def __init__(self, screen, clock, game_manager, players=None):
         self.screen = screen
         self.clock = clock
         self.width, self.height = self.screen.get_size()
         self.entities = list()
+        self.players = players if players else []
         self.game_manager = game_manager #maybe deleted, à revoir
         # self.resource_manager = ResourceManager() #have to be deleted
         # self.hud = Hud(self.resource_manager, self.width, self.height)
@@ -24,18 +25,15 @@ class Game:
         self.world = World_GUI(self.entities, self.game_manager.world.width, self.game_manager.world.height, self.width, self.height, self.game_manager.world)
         self.BLACK, self.WHITE, self.RED = (0, 0, 0), (255, 255, 255), (255,  70,  70)
         self.playPauseMenu = PlayPauseMenu(self)
-        self.playing = True
-    
-    def load_game(self, game_manager, world):
-        self.game_manager.world = world
-        self.game_manager = game_manager
-        self.world = World_GUI(self.entities, self.game_manager.world.width, self.game_manager.world.height, self.width, self.height, self.game_manager.world)
-        
-        
+        self.playing = True      
            
     def run(self):
         self.playing = True
         while self.playing:
+            for a in self.players:
+                a.playTurn()
+            self.game_manager.checkUnitsToMove()
+            self.game_manager.tick = timeit.default_timer()
             dt = self.clock.tick(60) / 1000.0  # Calculate delta time in seconds
             self.events()
             self.update(dt)  # Pass delta time to update
@@ -58,7 +56,6 @@ class Game:
         
         # self.hud.update()
         self.world.update(self.screen, self.camera)  # Pass both camera and dt
-        self.draw()
 
     def draw(self):
         self.screen.fill((0, 0, 0))

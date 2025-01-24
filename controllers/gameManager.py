@@ -1,3 +1,6 @@
+import io
+import sys
+from models.Exceptions import PathfindingException
 from models.Pathfinding import Pathfinding
 from models.Position import Position
 from models.unity.Unity import Unity
@@ -7,7 +10,7 @@ from models.save import Save
 import timeit
 import re
 
-
+gmOutput = io.StringIO()
 class GameManager:
 
 
@@ -33,31 +36,55 @@ class GameManager:
         } 
                 
     '''
-    def __init__(self, speed, world: World):
+    def __init__(self, speed, world: World, debug=False, writeToDisk=False):
         self.gameSpeed = speed
         self.world = world
         self.moving_units = list()
-        self.save = Save()
+        # self.save = Save()
+        self.debug = debug
+        self.writeToDisk = writeToDisk
+        
 
+    def logger(self, *args, **kwargs):
+        if self.debug:
+            if self.writeToDisk:
+                sys.stdout = gmOutput
+                print(*args, **kwargs)
+                sys.stdout = sys.__stdout__
+            else:
+                print(*args, **kwargs)
+    
+    def save(self):
+        self.save = True
+    
+    def load(self):
+        self.load = True
+    
     def getTeamNumber(self, name):
         pattern = r'\d+'
         substrings = re.findall(pattern, name)
         print(substrings)
         return int(substrings[0])
 
+ 
     def moveUnit(self, uid):
         deltaTime = timeit.default_timer() - self.tick
         unit = self.unitToMove[uid]
         unit["timeElapsed"] += deltaTime.real
-        #print("time elapsed : ", unit["timeElapsed"])
+        #self.logger("time elapsed : ", unit["timeElapsed"])
         if unit["timeElapsed"] >= (unit["timeToTile"]):
+            self.world.tiles_dico[unit["moveQueue"][0]].set_contains(None)
+            try:
+                self.world.filled_tiles.pop(unit["moveQueue"][0])
+            except KeyError:
+                print("KeyError")
             unit["moveQueue"] = unit["moveQueue"][1::]
-            unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][id]
-            self.world.remove_element(unitObj)
-            self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][id].position = Position(unit["moveQueue"][0][0],unit["moveQueue"][0][0])
-            self.world.place_element(unitObj)
+            unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][uid]
+            self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][uid].position = Position(unit["moveQueue"][0][0], unit["moveQueue"][0][0])
+            self.world.tiles_dico[unit["moveQueue"][0]].set_contains(unitObj)
+            self.logger("GameManager | moveUnit----- Infos on the nextTile to the next tile :", (unit["moveQueue"][0]))
+            self.world.filled_tiles[unit["moveQueue"][0]] = unit["moveQueue"][0]
             unit["currentTile"] = unit["moveQueue"][0]
-            print("Got to the next tile in", (unit["timeElapsed"]))
             unit["timeElapsed"] = 0
             if (len(unit["moveQueue"]) < 2):
                 unit["moveQueue"] = []
@@ -92,18 +119,20 @@ class GameManager:
                 self.unitToMove.pop(unitToDelete)
 
 
-    def addUnitToMoveDict(self, unit : Unity, destination):
-        if (unit.position.toTuple() not in self.world.filled_tiles.values()):
+    def addUnitToMoveDict(self, unit : Unity, destination : Position):
+        if unit.position.toTuple() not in self.world.filled_tiles.values():
             self.world.filled_tiles[unit.position.toTuple()] = unit.position.toTuple()
         grid = self.world.convertMapToGrid()
         teamNumber = self.getTeamNumber(unit.uid)
-        pathFinding  = Pathfinding(mapGrid=grid, statingPoint= (unit.position.getX(), unit.position.getY()), goal=(destination.getX(), destination.getY()))
+        pathFinding  = Pathfinding(mapGrid=grid, statingPoint= unit.position.toTuple(), goal=destination.toTuple(),)
         path = pathFinding.astar()
         if path.__class__ == bool:
-            print("Found no short path")
+            raise PathfindingException(self.world.tiles_dico[destination.toTuple()])
+            #  : AJOUTER UNE EXCEPTION QUAND IL NE TROUVE VRAIMENT PAS DE CHEMIN
+            #self.logger("Found no short path")
         path = path + [pathFinding.startingPoint]
         path = path[::-1]
-        self.moving_units.append(unit) #adding the unit to the list of moving units
+        self.logger("Unit ADDED TO MOVE DICT")
         self.unitToMove[unit.uid] = {
             "group"     : [],
             "timeToTile" : 1/(unit.speed),
@@ -117,22 +146,16 @@ class GameManager:
         }
 
     def pause(self):
-        #pauses the game
         self.html_generator()
-        # self.save_world()
-        
-    # def play(self):
-    #     datas = self.load_from_file()
-    #     if datas:
-    #         self.world = datas[0]
+
     
-    def save_world(self, path=None):
-        self.save.save(self.world, path) 
+    # def save_world(self, path=None):
+    #     self.save.save(self.world, path) 
     
-    def load_from_file(self, path=None):
-        data = self.save.load(path)
-        # print("data", data)
-        self.world = data[0]
+    # def load_from_file(self, path=None):
+    #     data = self.save.load(path)
+    #     # print("data", data)
+    #     self.world = data[0]
     
     def html_generator(self):
         village1, village2 = self.world.villages

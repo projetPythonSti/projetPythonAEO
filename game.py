@@ -1,12 +1,11 @@
 import pygame as pg
 from blessed import Terminal
-
+from models.Position import Position
 from models.AIPlayer import AIPlayer
-from save import *
+from models.save import *
 import sys
 import time
 import timeit
-import models.AIPlayer
 
 #########################################
 ## Jeu
@@ -139,7 +138,10 @@ class Game :
         """
         if self.pygame_on :
             self.draw_pygame()
-
+        if self.gm.save:
+            pass
+        if self.term_on:
+            self.draw_term
 
 
 ### Fonction intermédiaire
@@ -173,6 +175,12 @@ class Game :
     def draw_pygame (self):
         pass
         ### A REMPLIR
+    
+    def load_game(self, game):
+        pass
+    
+    def load_game(self):
+        pass
 
     def resources_term(self,term):
         sys.stdout.flush()
