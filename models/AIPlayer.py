@@ -514,6 +514,9 @@ class AIPlayer:
         pass
 
     def launchResourceAction(self, actionDict):
+        if actionDict["infos"]["target"] is None:
+            self.eventQueue.remove(actionDict)
+            return -1
         #self.logger("J'ai envoyé qqun chercher des ressources attention")
         unitList = actionDict["people"]
         unitTeam = self.gm.getTeamNumber(unitList[0])
@@ -528,6 +531,7 @@ class AIPlayer:
         if not exceptionRaised:
             self.currentEvents.append(actionDict)
             self.eventQueue.remove(actionDict)
+
     def launchBuildAction(self, actionDict):
         #self.logger("J'ai lancé une construction attention")
         buildingToBuild = actionDict["infos"]["type"]
