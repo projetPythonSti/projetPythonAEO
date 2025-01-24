@@ -1,6 +1,7 @@
 from blessed import Terminal
-from save import *
-import os, sys
+from models.save import *
+import os
+
 
 class Menu :
     """
@@ -38,8 +39,9 @@ class Menu :
 
                 if val.lower() == 'c' :
                     nsave = Save()
-                    nsave.load_term()
-                    break
+                    data = nsave.load_term()
+                    return tuple(data)
+
             return self.return_value()
 
     def set_size_map (self) :

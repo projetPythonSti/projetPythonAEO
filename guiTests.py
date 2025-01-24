@@ -17,6 +17,8 @@ from controllers.gameManager import GameManager
 from models.unity.Villager import Villager
 from datetime import datetime
 from views.start_menu import *
+from models.buildings.town_center import *
+
 
 from models.Position import Position
 import randommap
@@ -40,16 +42,21 @@ def jeu_terminal (world, gm:GameManager, debug=False):
 
     menu = Menu()
     dico = menu.start_menu()
-    clock = pg.time.Clock()
-    playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=debug)
-    game_term = Game(world,clock,gm, players=playersList)
+    if type(dico) == dict :
+        clock = pg.time.Clock()
+        playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=debug)
+        game_term = Game(world,clock,gm, players=playersList)
+
+    else :
+        game_term = dico[0]
+
     while running :
 
         while playing :
             game_term.run()
 
 
-
+"""
 def jeu_pygame (world) :
     running = True
     playing = True
@@ -66,6 +73,7 @@ def jeu_pygame (world) :
         while playing :
 
             game.run()
+"""
 
 def main () :
     pass

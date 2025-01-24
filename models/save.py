@@ -1,10 +1,11 @@
 import time
-# self.path mettre
+from os import killpg
 
+# self.path mettre
+from blessed import Terminal
 import pickle
 import platform
-
-from models.World import *
+import os
 
 
 class Save:
@@ -14,9 +15,9 @@ class Save:
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
 
-    def save(self, world,file_name, path=None):
+    def save(self, game,file_name, path=None):
         self.generate_default_path()
-        datas = [world]
+        datas = [game.gm, game.players,game.world, game.game_duration]
         if path: self.save_path = path
         file = open(self.save_path + file_name, 'wb')
         pickle.dump(datas, file)
@@ -66,34 +67,32 @@ class Save:
         return datas
 
 
+    """
+    Partie de Save et Load pour terminal
+    """
 
-    def save_term(self, world):
-        file_name = input("Veuillez choisir le nom de votre sauvegarde :")
+    def save_term(self, game,term):
+        os.system('cls' if os.name == 'nt' else 'clear')
+        file_name = new_input("Veuillez choisir le nom de votre sauvegarde :",term)
         print(f"{file_name} , est-ce bien le nom que vous voulez ?")
-        confirmation = input(f"o pour oui et n pour non :")
-        while confirmation != 'o':
-            file_name = input("Veuillez choisir un nouveau nom pour votre sauvegarde :")
+        if not confirmation(term) :
+            file_name = new_input("Veuillez choisir le nom de votre sauvegarde :", term)
             print(f"{file_name} , est-ce bien le nom que vous voulez ?")
-            confirmation = input(f"o pour oui et n pour non :")
 
         if file_name:
             if os.path.exists("assets/data/saves/" + file_name):
-                print(
-                    "Il y a déjà une sauvegarde de ce nom. Si vous voulez garder ce nom pour cette sauvegarde, l'ancienne sauvegarde du même non sera écrasé. \nVoulez vous vraiment continuer ? \n")
-                rep = input("Appuyez sur o pour écraser et n pour annuler : ")
-                while rep != "o" and rep != "n":
-                    print("Entrer invalide !")
-                    rep = input("Appuyez sur o pour écraser et n pour revenir en arrière : ")
-                if rep == "o":
-                    self.save(world,file_name,"assets/data/saves/")
-                    print(f"Vous avez enregistre votre sauvegarde sous le nom : {file_name}")
+                print("Il y a déjà une sauvegarde de ce nom. Si vous voulez garder ce nom pour cette sauvegarde, l'ancienne sauvegarde du même non sera écrasé. \nVoulez vous vraiment continuer ?\n")
+                if confirmation(term) :
+                    self.save(game, file_name, "assets/data/saves/")
+                    print(f"Vous avez enregistre votre sauvegarde sous le nom : {file_name} \n")
                     time.sleep(2)
+
                 else:
                     print("Rien n'a été sauvegarder.")
                     time.sleep(2)
                     return None
             else:
-                self.save(world,file_name,"assets/data/saves/")
+                self.save(game, file_name, "assets/data/saves/")
 
     def list_files_in_directory(self, directory):
         """Affiche les fichiers dans le répertoire spécifié."""
@@ -114,17 +113,73 @@ class Save:
             print(
                 "Entrer invalide! Vérifiez que vous avez écrit correctement le nom de la sauvegarde de votre choix. Il faut respect les minuscules et les majuscules ainsi que les extensions.")
             chosen_save = input("Entrer un nom de sauvegarde pour charger une partie :")
-        self.load(chosen_save,"assets/data/saves/")
+        data = self.load(chosen_save, "assets/data/saves/")
+        return data
 
 
-    def quick_save (self,world) :
-        self.save(world,"quick_save","assets/data/saves/")
 
-    def quick_load (self) :
-        self.load("quick_save","assets/data/saves/")
 
+    """
+    Quick_save et Quick_load
+    """
+
+    def quick_save (self,game) :
+        self.save(game,"quick_save", "../assets/data/saves/")
+
+    def quick_load (self,game) :
+        data = self.load("quick_save", "../assets/data/saves/")
+        game.swap(data)
+
+
+"""
+Je sais pas où mettre ces fonctions mais j'en ai besoin et elles sont statique mais pas particulièrement propre à la classe save
+"""
+
+
+def new_input(str, term):
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print(str)
+        with term.cbreak():
+            str_tab = []
+            val = ''
+            val = term.inkey()
+            str_tab.append(val.lower())
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print(str, end='')
+            print(str_tab[0])
+
+            while val.name != 'KEY_ENTER':
+                val = term.inkey()
+                if val.name == 'KEY_BACKSPACE':
+                    if len(str_tab) > 0:
+                        del str_tab[-1]
+                else:
+                    str_tab.append(val.lower())
+
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print(str, end='')
+                for i in range(0, len(str_tab)):
+                    print(str_tab[i], end='')
+                print()
+        string = ''
+        for i in range(0, len(str_tab)-1):
+            string += str_tab[i]
+        return string
+
+def confirmation(term):
+    print("Appuyez sur o pour valider ou sur n pour annuler")
+    with term.cbreak():
+        val= ''
+        while val.lower() != 'o' or val.lower() != 'n' :
+            val = term.inkey()
+            if val.lower() == 'o':
+                return True
+            elif val.lower() == 'n':
+                return False
 
 if __name__ == "__main__":
+
     save = Save()
-    mworld = World(10,10)
-    save.load_term()
+    game = 1
+    term = Terminal()
+    save.save_term(game,term)

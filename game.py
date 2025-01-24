@@ -1,12 +1,12 @@
-import pygame as pg
 from blessed import Terminal
 
 from models.AIPlayer import AIPlayer
-from save import *
-import sys
+from models.save import *
+import sys, os
 import time
 import timeit
-import models.AIPlayer
+from models.Position import *
+
 
 #########################################
 ## Jeu
@@ -14,7 +14,7 @@ import models.AIPlayer
 
 class Game :
     """
-                23/01/2025@tahakhetib : J'ai apporté des modifications à ce fichier  sur ce que @etan-test-1 a écrit
+                23/01/2025@tahakhetib : J'ai apporté des modifications à ce fichier  sur ce que @etan a écrit
                     - Ajouté la liste des IA (players) aux attributs du jeu et leur activité à chaque tour
                         Idée pour plus tard : Pour éviter la surchage du système, au lieu de lancer toutes les IA à chaque frame, plutôt lancer une IA par frame ?
 
@@ -23,15 +23,15 @@ class Game :
     def __init__(self, world, clock, gm, players: list[AIPlayer]):
 
         self.ltick = time.time()
-        self.gm = gm
-        self.players = players
+        self.gm = gm #
+        self.players = players#
         self.clock = clock
         self.speed = 1
-        self.world = world
+        self.world = world #
         self.upleft = Position(0,0) #changes by player arrow keys, should always start upper left of the map (0,0)
         self.downright = Position(0, 0) #changes by itself to fit the screen
         self.playing = False
-        self.game_duration = 0
+        self.game_duration = 0 #
         self.save = Save()
         self.ffff = False
         self.pygame_on = False
@@ -134,13 +134,13 @@ class Game :
         self.gm.tick = timeit.default_timer()
 
         self.draw_term(term)
+
         """
         Peut changer si besoin 
         """
         if self.pygame_on :
             self.draw_pygame()
-
-
+            # IF BLA BLA POUR LA SAVE
 
 ### Fonction intermédiaire
 
@@ -190,7 +190,8 @@ class Game :
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
-        print("Appuyez sur s pour sauvegarder")
+        print("Appuyez sur s pour sauvegarder ")
+        print("Appuyez sur c pour charger une partie")
         print("Appuyez sur r pour reprendre")
         print(f"IN GAME TIME : {self.game_duration}")
         print(f"SPEED : {self.speed}")
@@ -201,7 +202,15 @@ class Game :
                 if val2.lower() == 'q':
                     quit()
                 elif val2.lower() == 's':
-                    self.save.save_term(self.world)
+                    self.save.save_term(self,term)
+                    break
+
+                elif val2.lower() =='c':
+                    data = self.save.load_term()
+                    if data :
+                        self.swap_to_load(data)
+                    else : pass
+
 
 
     def stat (self,term):
@@ -216,3 +225,12 @@ class Game :
                 val2 = term.inkey()
                 if val2.lower() == 'q':
                     quit()
+
+
+    def swap_to_load (self,other_game) :
+        self.ltick = time.time()
+        self.gm = other_game.gm
+        self.players = other_game.players
+        self.speed = 1
+        self.world = other_game.world
+        self.game_duration = other_game.game_duration
