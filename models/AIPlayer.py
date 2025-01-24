@@ -1,15 +1,17 @@
 from argparse import Action
 from collections import defaultdict
-from distutils.command.build import build
 from enum import Enum
 from os import fdopen
 from select import select
 from tokenize import tabsize
 from typing import final
 from functools import partial
+import io
+import sys
 
-import numpy as np
-from numpy.f2py.crackfortran import debug
+from models.Exceptions import PathfindingException
+
+output = io.StringIO()
 
 from models.Position import Position
 from models.World import World
@@ -26,6 +28,24 @@ from controllers.gameManager import GameManager
 from models.model import Model
 from models.ressources.ressources import Ressource, Wood, Gold, Food
 from models.unity.Villager import Villager
+
+class PlayStyleMatrixEnum(Enum):
+    Aggressive = [
+        [2,5,0],
+        [6,3,4],
+        [3,2,8]
+    ]
+    Passive = [
+        [6,1,0],
+        [2,5,1],
+        [1,3,10]
+    ]
+    Builder = [
+        [9,1,0],
+        [2,8,2],
+        [1,4,0]
+    ]
+
 
 
 class BuildingENUM(Enum):
@@ -76,8 +96,10 @@ class PlayStyle:
 
     """
 
-    def __init__(self, minWorkers):
-        self.playStyleMatrix = []
+    def __init__(self, minWorkers, matrix=None):
+        if matrix is None:
+            matrix = []
+        self.playStyleMatrix = matrix
         self.minWorkers = minWorkers
 
 
@@ -87,10 +109,14 @@ class PlayStyle:
     def getPlayStyleMatrix(self):
         return self.playStyleMatrix
 
+class PlayStyleEnum(Enum):
+    a = PlayStyle(minWorkers=10, matrix=PlayStyleMatrixEnum["Aggressive"].value)
+    p = PlayStyle(minWorkers=10, matrix=PlayStyleMatrixEnum["Passive"].value)
+    b = PlayStyle(minWorkers=10, matrix=PlayStyleMatrixEnum["Builder"].value)
 
 class AIPlayer:
     playing = False
-    def __init__(self, team : Model, world : World, playStyle : PlayStyle, level : int, gm : GameManager, debug=False):
+    def __init__(self, team : Model, world : World, playStyle : PlayStyle, level : int, gm : GameManager, debug=False, writeToDisk=False):
         self.team = team
         self.world = world
         self.playStyle = playStyle
@@ -103,15 +129,24 @@ class AIPlayer:
         }
         self.topVillageBorder = (0, 0)
         self.bottomVillageBorder = (0, 0)
+        self.newTopVillageBorder = None
+        self.newBottomVillageBorder = None
         self.gm = gm
         self.eventQueue = []
         self.pastEvents = []
         self.currentEvents = []
         self.debug = debug
+        self.writeToDisk = writeToDisk
+        self.logs = ""
 
     def logger(self,*args, **kwargs):
         if self.debug:
-            print(*args, **kwargs)
+            if self.writeToDisk:
+                sys.stdout = output
+                print(*args, **kwargs)
+                sys.stdout = sys.__stdout__
+            else:
+                print(*args, **kwargs)
 
     def setVillageBorders(self, topLeftPos, bottomRightPos):
         self.topVillageBorder = topLeftPos
@@ -133,11 +168,14 @@ class AIPlayer:
                 numberOfActions += 1
                 self.logger(self.eventQueue[k-1]["action"])
                 self.launchAction(self.eventQueue[k-1])
-            print(numberOfActions)
         else:
+            self.checkActions()
             self.logger("RAS")
         self.logger("Voici le nombre de personnes libres",self.getFreePplCount(), "Et le nb de personnes total : ",self.team.get_pplCount())
         self.logger("------ END OF AI TURN ------")
+
+        if self.writeToDisk:
+            self.writeLogs()
 
 
 
@@ -178,6 +216,7 @@ class AIPlayer:
     def getNearestRessource(self,topLeftPos,bottomRightPos,  resourceType):
         ressourceKeyDict = list(map(lambda  x : x, self.world.ressources[resourceType].keys()))
         resourcesPositionList = list(map(lambda x : self.estimateDistance(x.position.toTuple(), topLeftPos) , self.world.ressources[resourceType].values()))
+        self.logger("AIPlayer | getNearestRessource---- resPositionList value : ", resourcesPositionList)
         nearestResourcesIndex = resourcesPositionList.index(min(resourcesPositionList))
         return {
             ressourceKeyDict[nearestResourcesIndex] : resourcesPositionList[nearestResourcesIndex]
@@ -190,15 +229,18 @@ class AIPlayer:
     def getFreePplCount(self):
         return len(self.freeUnits["v"])+len(self.freeUnits["s"])+len(self.freeUnits["h"])+len(self.freeUnits["a"])
 
+    def isOutOfBound(self, position):
+        return (position[0] <0 or position[0] > self.world.width) or (position[1] <0 or position[1] > self.world.height)
+
     def getFreePeople(self, number : int ,type):
         return self.freeUnits[type][:number]
 
 
     def checkIfTilesAreOccupied(self, size, position):
         for a in self.getOccupiedTiles(size,position):
-            self.logger("checkIfTilesAreOccupied ----- a values is in filled_tiles ? ", self.world.filled_tiles[a])
+            self.logger("AIPlayer | checkIfTilesAreOccupied ----- a values is in filled_tiles ? ", self.world.filled_tiles.__contains__(a) ,"Tile value", a)
             if a in self.world.filled_tiles.values():
-                self.logger("checkIfTilesAreOccupied ----- value is indeed in filledTiles ", self.world.filled_tiles[a])
+                self.logger("AIPlayer | checkIfTilesAreOccupied---- value is indeed in filledTiles ")
                 return True
             else:
                 pass
@@ -207,63 +249,173 @@ class AIPlayer:
     def getOccupiedTiles(self,size, position):
         return [(position[0] + x, position[1] + y) for x in range(size[0]) for y in range(size[1])]
 
-    def getBuildTarget(self, size):
+
+    def getBuildTarget(self, size, tries=0):
         selectedPos = None
-        tilesOccupiedFirst = False
-        btVillageBorder = self.bottomVillageBorder[0]
-        for x in range(self.topVillageBorder[0], btVillageBorder, size[0]):
+        #tilesOccupiedFirst = False
+
+        # POSITION AU NORD - 7
+        for x in range(self.topVillageBorder[0], self.bottomVillageBorder[0], size[0]):
             if x+size[0]>self.bottomVillageBorder[0] or selectedPos is not None:
                 if selectedPos is not None:
-                    self.logger("Found position !")
+                    self.logger("AIPlayer | getBuildTarget---- Found position !")
                     return selectedPos
                     # When a suitable position has already been found
                 else:
                     # If the position is outside of the borders of the village
-                    self.logger("do nothing, outside of village border in the game")
+                    self.logger("AIPlayer | getBuildTarget---- do nothing, outside of village border in the game")
             else:
-                self.logger("searching positions north to the building")
-                tileOccupied = self.checkIfTilesAreOccupied(size, (x, self.topVillageBorder[1]-1))
-                self.logger("Check if tiles are occupied result : ", tileOccupied )
-                selectedPos = (x+tilesOccupiedFirst,self.topVillageBorder[1]-tilesOccupiedFirst) if (not tileOccupied) else None
-                self.logger("selectdPos iiiis : ", selectedPos)
+                generalSize = (size[0] + 1, size[1] + 1)
+                self.logger("AIPlayer | getBuildTarget---- searching positions north to the building")
+                tileOccupied = self.checkIfTilesAreOccupied(generalSize, (x-size[0], self.topVillageBorder[1]))
+                self.logger("AIPlayer | getBuildTarget---- Check if tiles are occupied result : ", tileOccupied )
+                selectedPos = (x-size[0]+1,self.topVillageBorder[1]+1) if (not tileOccupied) else None
+                self.logger("AIPlayer | getBuildTarget---- selectdPos iiiis : ", selectedPos)
+                if selectedPos is not None and self.isOutOfBound(selectedPos):
+                    selectedPos = None
+
+                if selectedPos is not None and selectedPos[0] < self.topVillageBorder[0]:
+                    newVillageBorder = (selectedPos[0]-self.playStyle.playStyleMatrix[1][2],self.topVillageBorder[1])
+                    self.newTopVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
+                if selectedPos is not None and selectedPos[1] < self.topVillageBorder[1]:
+                    newVillageBorder = (self.topVillageBorder[0],selectedPos[1]-self.playStyle.playStyleMatrix[1][2])
+                    self.newTopVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
+
+
+        if selectedPos is not None:
+            return selectedPos
+
+        # POSITION A L'EST - 7
         if selectedPos is None:
-            self.logger("searching positions east to the building")
-            # Recherche de position disponible à l'est du batiment
+            self.logger("AIPlayer | getBuildTarget---- searching positions east to the building")
+            # Recherche de position disponible à l'est du bâtiment
             for y in range(self.topVillageBorder[1], self.bottomVillageBorder[1], size[1]):
                 if y+size[0]>self.bottomVillageBorder[1] or selectedPos is not None:
                     if selectedPos is not None:
+                        self.logger("AIPlayer | getBuildTarget---- Found position !")
                         return selectedPos
                     else:
                         pass
                 else:
-                    self.logger("Check if tiles are occupied result : ",
-                          self.checkIfTilesAreOccupied(size, (x, self.topVillageBorder[1])))
-                    selectedPos = self.bottomVillageBorder[0]-size[0],y if self.checkIfTilesAreOccupied(size, (self.bottomVillageBorder[0]-size[0], y)) else None
-                    self.logger("selectdPos iiiis : ", selectedPos)
+                    generalSize = (size[0]+1, size[1]+1)
+                    tileOccupied = self.checkIfTilesAreOccupied(generalSize, (self.bottomVillageBorder[0] - size[0], y))
+                    selectedPos = (self.bottomVillageBorder[0]-size[0]+1,y+1) if not tileOccupied else None
+                    self.logger("AIPlayer | getBuildTarget---- selectdPos iiiis : ", selectedPos)
+                    if selectedPos is not None and self.isOutOfBound(selectedPos):
+                        selectedPos = None
+
+                    # Checking if the village was possibly extended by a new building
+                    if selectedPos is not None and selectedPos[0] > self.bottomVillageBorder[0]:
+                        newVillageBorder = (selectedPos[0] + self.playStyle.playStyleMatrix[1][2], self.bottomVillageBorder[1])
+                        self.newTopVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
+                    if selectedPos is not None and selectedPos[1] > self.bottomVillageBorder[1]:
+                        newVillageBorder = (self.bottomVillageBorder[0], selectedPos[1]+ self.playStyle.playStyleMatrix[1][2])
+                        self.newTopVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
+
+            if selectedPos is not None:
+                return selectedPos
+
+
+
+        # POSITION A L'OUEST - 7
         if selectedPos is None:
-            self.logger("searching positions west to the building")
+            self.logger("AIPlayer | getBuildTarget---- searching positions west to the building")
             # Recherche de position disponible à l'ouest du batiment
             for y in range(self.topVillageBorder[1], self.bottomVillageBorder[1], size[1]):
                 if y+size[0]>self.bottomVillageBorder[1] or selectedPos is not None:
                     if selectedPos is not None:
+                        self.logger("AIPlayer | getBuildTarget---- Found position !")
                         return selectedPos
                     else:
                         pass
                 else:
-                    selectedPos = self.topVillageBorder[0]-size[0],y if self.checkIfTilesAreOccupied(size, (self.topVillageBorder[0]-size[0], y)) else None
+                    generalSize = (size[0]+1, size[1]+1)
+
+                    tileOccupied = self.checkIfTilesAreOccupied(generalSize, (self.topVillageBorder[0]-size[0], y))
+                    selectedPos = (self.topVillageBorder[0]-size[0]+1,y+1) if not tileOccupied  else None
+                    self.logger("AIPlayer | getBuildTarget---- selectdPos iiiis : ", selectedPos)
+                    if selectedPos is not None and self.isOutOfBound(selectedPos):
+                        selectedPos = None
+
+                    #Checking if the village was possibly extended by a building
+                    if selectedPos is not None and selectedPos[0] < self.topVillageBorder[0]:
+                        newVillageBorder = (selectedPos[0] - self.playStyle.playStyleMatrix[1][2], self.topVillageBorder[1])
+                        self.newTopVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
+                    if selectedPos is not None and selectedPos[1] > self.bottomVillageBorder[1]:
+                        newVillageBorder = (self.topVillageBorder[0], selectedPos[1] + self.playStyle.playStyleMatrix[1][2])
+                        self.newTopVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
+                    elif selectedPos is not None and selectedPos[1] < self.topVillageBorder[1]:
+                        newVillageBorder = (self.topVillageBorder[0], selectedPos[1] - self.playStyle.playStyleMatrix[1][2])
+                        self.newTopVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
+
+            if selectedPos is not None:
+                return selectedPos
+
+        # POSITION AU SUD - 7
         if selectedPos is None:
             # Recherche de position au sud du batiment
-            self.logger("Searching positions south to the building")
+            self.logger("AIPlayer | getBuildTarget---- Searching positions south to the building")
             for x in range(self.topVillageBorder[0], self.bottomVillageBorder[0], size[0]):
                 if x+size[0]>self.bottomVillageBorder[0] or selectedPos is not None:
                     if selectedPos is not None:
+                        self.logger("AIPlayer | getBuildTarget---- Found position !")
+
                         return selectedPos
                     else:
                         pass
                 else:
-                    selectedPos = x,self.bottomVillageBorder[1] if self.checkIfTilesAreOccupied(size, (x, self.bottomVillageBorder[1])) else None
+                    generalSize = (size[0]+1, size[1]+1)
+                    tileOccupied = self.checkIfTilesAreOccupied(generalSize, (x, self.bottomVillageBorder[1]))
+                    selectedPos = (x+1,self.bottomVillageBorder[1]+1) if not tileOccupied else None
+                    self.logger("AIPlayer | getBuildTarget---- selectdPos iiiis : ", selectedPos)
+                    if selectedPos is not None and self.isOutOfBound(selectedPos):
+                        selectedPos = None
 
+                    if selectedPos is not None and selectedPos[0] < self.topVillageBorder[0]:
+                        newVillageBorder = (selectedPos[0] - self.playStyle.playStyleMatrix[1][2], self.topVillageBorder[1])
+                        self.bottomVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
+                    elif selectedPos is not None and selectedPos[0] > self.bottomVillageBorder[0]:
+                        newVillageBorder = (selectedPos[0] - self.playStyle.playStyleMatrix[1][2], self.topVillageBorder[1])
+                        self.newTopVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
+                    if selectedPos is not None and selectedPos[1] > self.bottomVillageBorder[1]:
 
+                        newVillageBorder = (self.topVillageBorder[0], selectedPos[1] - self.playStyle.playStyleMatrix[1][2])
+
+                        self.newTopVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
+            if selectedPos is not None:
+                return selectedPos
+        # If no positions are found, expand the village
+        self.logger("AIPlayer | getBuildTarget---- Time to expand village border")
+        if self.newTopVillageBorder is not None or self.newBottomVillageBorder is not None:
+            self.logger("AIPlayer | getBuildTarget---- new borders were registered")
+            self.topVillageBorder = self.newTopVillageBorder if self.newTopVillageBorder is not None else self.topVillageBorder
+            self.bottomVillageBorder = self.bottomVillageBorder if self.newBottomVillageBorder is not None else self.bottomVillageBorder
+            return self.getBuildTarget(size)
+        else:
+            # If no positions are to be found at all, we expand the
+            self.logger("AIPlayer | getBuildTarget---- No buildings built, so expanding village naturally")
+            villageBorder = [self.topVillageBorder, self.bottomVillageBorder]
+            ax1 = self.world.width-self.topVillageBorder[0]
+            bx1 = abs(0-self.topVillageBorder[0])
+            distancex1 = abs(ax1 - bx1)
+            ay1 = abs(self.world.height-self.topVillageBorder[1])
+            by1 = abs(0-self.topVillageBorder[1])
+            distancey1 = abs(ay1-by1)
+            distanceTuple1 = (distancex1, distancey1)
+            ax2 = self.world.width - self.bottomVillageBorder[0]
+            bx2 = abs(0 - self.bottomVillageBorder[0])
+            distancex2 = abs(ax2 - bx2)
+            ay2 = abs(self.world.height - self.bottomVillageBorder[1])
+            by2 = abs(0 - self.bottomVillageBorder[1])
+            distancey2 = abs(ay2 - by2)
+            distanceTuple2 = (distancex2, distancey2)
+            allDistancesTuple = (distanceTuple1,distanceTuple2)
+            selectedDistanceIndex = allDistancesTuple.index(min(allDistancesTuple))
+            self.topVillageBorder = (self.topVillageBorder[0]-self.playStyle.playStyleMatrix[1][2],self.topVillageBorder[1]-self.playStyle.playStyleMatrix[1][2]) if villageBorder[selectedDistanceIndex] == self.topVillageBorder else self.topVillageBorder
+            self.bottomVillageBorder = (self.bottomVillageBorder[0]+self.playStyle.playStyleMatrix[1][2],self.bottomVillageBorder[1]+self.playStyle.playStyleMatrix[1][2]) if villageBorder[selectedDistanceIndex] == self.bottomVillageBorder else self.bottomVillageBorder
+            if tries<20:
+                tries +=1
+                return self.getBuildTarget(size, tries)
     def getBuildingActionDict(self, buildingType):
         villagerType = "v"
         idList = self.getFreePeople(self.getOptimalBuildingCurve(1), villagerType)
@@ -273,13 +425,16 @@ class AIPlayer:
         for i in idList:
             #self.logger(i)
             self.freeUnits[villagerType].remove(i)
+        buildTarget= self.getBuildTarget(BuildingENUM[buildingType].value.surface)
+        if buildTarget is None:
+            return -1
         return {
             "action": "Build",
             "people": idList,
             "status" : "pending",
             "infos": {
                 "type": buildingType,
-                "target": self.getBuildTarget(BuildingENUM[buildingType].value.surface)
+                "target": buildTarget
             }
         }
 
@@ -336,6 +491,7 @@ class AIPlayer:
                     leastDeveloppedBuildingNumber = buildings[BuildingENUM(i).name]
             #self.logger("Least developped batiment is", BuildingENUM[leastDeveloppedBuildingName].value)
             buildingEvent = self.getBuildingActionDict(leastDeveloppedBuildingName)
+
             if buildingEvent == -1:
                 self.logger("No free units")
                 return -1
@@ -349,19 +505,24 @@ class AIPlayer:
         #self.logger("J'ai envoyé qqun chercher des ressources attention")
         unitList = actionDict["people"]
         unitTeam = self.gm.getTeamNumber(unitList[0])
+        exceptionRaised = False
         for i in unitList:
             self.world.villages[unitTeam-1].community["v"][i].target = self.world.ressources[actionDict["infos"]["type"]][(actionDict["infos"]["targetKey"])]
             targetPosition = Position(actionDict["infos"]["target"][0],actionDict["infos"]["target"][0])
-            self.gm.addUnitToMoveDict(self.world.villages[unitTeam-1].community["v"][i],targetPosition)
-        self.currentEvents.append(actionDict)
-        self.eventQueue.remove(actionDict)
-
+            try:
+                self.gm.addUnitToMoveDict(self.world.villages[unitTeam-1].community["v"][i],targetPosition)
+            except PathfindingException:
+                exceptionRaised = True
+        if not exceptionRaised:
+            self.currentEvents.append(actionDict)
+            self.eventQueue.remove(actionDict)
     def launchBuildAction(self, actionDict):
         #self.logger("J'ai lancé une construction attention")
         buildingToBuild = actionDict["infos"]["type"]
         target = actionDict["infos"]["target"]
         newBuilding = BuildingENUM[buildingToBuild].value
         newInstanciatedBuilding = newBuilding(self.team)
+        self.logger("AIPlayer | launchBuildAction----- ",target)
         newInstanciatedBuilding.position = Position(target[0], target[1])
         self.world.place_element(newInstanciatedBuilding)
         self.team.community[buildingToBuild][newInstanciatedBuilding.uid] = newInstanciatedBuilding
@@ -381,13 +542,20 @@ class AIPlayer:
     def launchAction(self, actionDict):
         ActionEnum[actionDict["action"]].value(self,actionDict)
 
+    def checkActions(self):
+        pass
     def clearBuildAction(self, actionDict):
         for i in actionDict["people"]:
             self.freeUnits["v"].append(i)
         self.pastEvents.append(actionDict)
         self.eventQueue.remove(actionDict)
 
-
+    def writeLogs(self):
+        f = open(f"AILogs{self.team.name}.txt", "a")
+        logs = output.getvalue()
+        output.flush()
+        f.write(logs)
+        self.logs = ""
 
 
 
@@ -438,14 +606,20 @@ if __name__ == "__main__":
     play_style = PlayStyle(minWorkers=10)
     playStyleMatrix= [
         [4,3,0],
-        [2,6,2],
-        [1,3,0]
+        [2,2,2],
+        [1,2,0]
     ]
     play_style.setPlayStyleMatrix(playStyleMatrix)
-    player = AIPlayer(village1, monde, play_style, level=100,gm=gm, debug=True)
+    player = AIPlayer(village1, monde, play_style, level=100,gm=gm, debug=True, writeToDisk=True)
     tcSurface = (tc.position.getX()+tc.surface[0]+playStyleMatrix[1][2], tc.position.getY()+tc.surface[1]+playStyleMatrix[1][2])
     topBorder = (tc.position.getX()-playStyleMatrix[1][2], tc.position.getY()-playStyleMatrix[1][2])
     print("tcSurface is ", tc.position)
+    print("Player is out of bound (200,-40)?", (200,-40))
+    print("Player is out of bound (-200,-40)?", (player.isOutOfBound((-200,-40))))
+    print("Player is out of bound (10,101)?", (player.isOutOfBound((10,101))))
+    print("Player is out of bound (-20,101)?", (player.isOutOfBound((10,101))))
+    print("Player is out of bound (-20,10)?", (player.isOutOfBound((10,101))))
+
     player.setVillageBorders(topBorder, tcSurface)
     for i in range(20):
         player.playTurn()
