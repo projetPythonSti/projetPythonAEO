@@ -10,6 +10,8 @@ class Ressource:
         self.world = world
         self.position = Position(rd.randint(0, self.world.width - 1), rd.randint(0, self.world.height - 1))
         self.uid = uid
+        self.image = f"./assets/images/ressources/{self.name}.png"
+
 
     def get_quantity(self):
         return self.quantity

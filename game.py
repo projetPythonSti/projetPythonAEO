@@ -3,6 +3,7 @@ from blessed import Terminal
 from models.Position import Position
 from models.AIPlayer import AIPlayer
 from models.save import *
+from views.game import Game as PGGame
 import sys
 import time
 import timeit
@@ -16,7 +17,11 @@ class Game :
                 23/01/2025@tahakhetib : J'ai apporté des modifications à ce fichier  sur ce que @etan-test-1 a écrit
                     - Ajouté la liste des IA (players) aux attributs du jeu et leur activité à chaque tour
                         Idée pour plus tard : Pour éviter la surchage du système, au lieu de lancer toutes les IA à chaque frame, plutôt lancer une IA par frame ?
-
+                24/01/2025@tahakhetib : J'ai ajouté des chose sur ce que @etan-test-1 à écrit
+                    - Ajouté un attribut kickstartPg
+                    - Ajouté la prise en charge du démarrage de pygame (touché à turn())
+                    - Créé une fonction initPygame, et draw_pygame()
+                    - ajouté l'attribut term_on pour s'assurer que le terminal est bien allumé
             """
 
     def __init__(self, world, clock, gm, players: list[AIPlayer]):
@@ -34,6 +39,9 @@ class Game :
         self.save = Save()
         self.ffff = False
         self.pygame_on = False
+        self.term_on = True
+        self.pgGame = None
+        self.kickstartPG = False
 
 
 # Boucle Principale
@@ -136,6 +144,12 @@ class Game :
         """
         Peut changer si besoin 
         """
+        if self.kickstartPG:
+            print("KICKSTARTING PYGAME")
+            self.initPygame()
+            self.kickstartPG = False
+            self.pygame_on = self.pgGame is not None
+            pass
         if self.pygame_on :
             self.draw_pygame()
         if self.gm.save:
@@ -145,6 +159,12 @@ class Game :
 
 
 ### Fonction intermédiaire
+    def initPygame(self):
+        pg.init()
+        pg.mixer.init()
+        screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+        clock = pg.time.Clock()
+        self.pgGame = PGGame(screen,clock,self.gm)
 
     def init_term(self):
         term = Terminal()
@@ -173,6 +193,11 @@ class Game :
 
 
     def draw_pygame (self):
+        if self.pgGame is not None:
+            dt = self.pgGame.clock.tick(60) / 1000.0  # Calculate delta time in seconds
+            self.pgGame.events()
+            self.pgGame.update(dt)  # Pass delta time to update
+            self.pgGame.draw()
         pass
         ### A REMPLIR
 
@@ -200,6 +225,7 @@ class Game :
         print("Appuyez sur q pour quitter")
         print("Appuyez sur s pour sauvegarder")
         print("Appuyez sur r pour reprendre")
+        print("Appuyez sur p pour activer pygame, puis appuyez sur R")
         print(f"IN GAME TIME : {self.game_duration}")
         print(f"SPEED : {self.speed}")
         with term.cbreak():
@@ -210,6 +236,8 @@ class Game :
                     quit()
                 elif val2.lower() == 's':
                     self.save.save_term(self.world)
+                elif val2.lower() == 'p':
+                    self.kickstartPG = True
 
 
     def stat (self,term):

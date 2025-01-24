@@ -223,6 +223,8 @@ class AIPlayer:
         ressourceKeyDict = list(map(lambda  x : x, self.world.ressources[resourceType].keys()))
         resourcesPositionList = list(map(lambda x : self.estimateDistance(x.position.toTuple(), topLeftPos) , self.world.ressources[resourceType].values()))
         self.logger("AIPlayer | getNearestRessource---- resPositionList value : ", resourcesPositionList)
+        if len(resourcesPositionList) == 0:
+            return -1
         nearestResourcesIndex = resourcesPositionList.index(min(resourcesPositionList))
         return {
             ressourceKeyDict[nearestResourcesIndex] : resourcesPositionList[nearestResourcesIndex]
@@ -470,9 +472,10 @@ class AIPlayer:
         resourceToGet =  min(resDistance, key=resDistance.get)
         #self.logger("Ressource to get is", ResourceTypeENUM[resourceToGet].value)
         resToCollect = self.getNearestRessource(self.topVillageBorder,self.bottomVillageBorder,resourceToGet)
-        resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet)
-        if resourceCollectEvent == -1:
+        if resToCollect == -1:
             return -1
+        resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet)
+
         self.logger("Added the following resCollect event : \n Type : ", resourceCollectEvent["infos"]["type"], "\t nbOfPpl : ",
               len(resourceCollectEvent["people"]))
         self.eventQueue.append(resourceCollectEvent)

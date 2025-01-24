@@ -44,6 +44,7 @@ class GameManager:
             self.world = world
             self.debug = debug
             self.writeToDisk = writeToDisk
+            self.save = False
 
         def logger(self, *args, **kwargs):
             if self.debug:
