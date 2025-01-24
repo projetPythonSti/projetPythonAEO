@@ -1,10 +1,13 @@
 from blessed import Terminal
-
-from save import load
+from save import *
 import os, sys
 
 class Menu :
+    """
+            23/01/2025@tahakhetib : J'ai apporté des modifications à ce fichier  sur ce que @etan-test-1 a écrit
+                - Ajouté le retour du dictionnaire vers la boucle de jeu afin d'extraire les informations nécessaires à la création des IA,
 
+        """
     def __init__(self):
         self.x = None
         self.y = None
@@ -31,9 +34,13 @@ class Menu :
 
                 if val.lower() =='n' :
                     self.set_size_map()
+                    break
 
-                else :
-                    load()
+                if val.lower() == 'c' :
+                    nsave = Save()
+                    nsave.load_term()
+                    break
+            return self.return_value()
 
     def set_size_map (self) :
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -52,22 +59,27 @@ class Menu :
                 val = term.inkey()
                 if val.lower() == 'q' :
                     self.start_menu()
+                    break
                 if val.lower() == 'z' :
                     self.start_menu()
+                    break
                 if val.lower() == 'p':
                     self.x = 120
                     self.y = 120
                     self.set_type_map()
+                    break
 
                 if val.lower() == 'm':
                     self.x = 240
                     self.y = 240
                     self.set_type_map()
+                    break
 
                 if val.lower() == 'g':
                     self.x = 360
                     self.y = 360
                     self.set_type_map()
+                    break
 
     def set_type_map (self) :
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -86,15 +98,19 @@ class Menu :
                 val = term.inkey()
                 if val.lower() == 'q' :
                     self.start_menu()
+                    break
                 if val.lower() == 'z' :
                     self.start_menu()
+                    break
                 if val.lower() == 'g':
                     self.type_map = 'g'
                     self.set_ressources_quantity()
+                    break
 
                 if val.lower() == 'r':
                     self.type_map = 'r'
                     self.set_ressources_quantity()
+                    break
 
     def set_ressources_quantity (self) :
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -103,29 +119,34 @@ class Menu :
         print("Appuyez sur q à tout moment pour revenir au menu de démarrage")
         print("Appuyez sur z à tout moment pour revenir à l'étape précédente \n ")
 
-        print("Veuillez choisir l'abondance des ressources (bois et or) sur la carte")
-        print("Appuyez sur p pour un petit nombre de ressource (lean)")
-        print("Appuyez sur m pour un nombre moyen de ressource (mean)")
-        print("Appuyez sur g pour un grand nombre de ressource (marines) \n")
+        print("Veuillez choisir l'abondance de ressource des joueurs en début de partie ")
+        print("Appuyez sur p pour un petit nombre de ressource pour chaque joueur(lean)")
+        print("Appuyez sur m pour un nombre moyen de ressource pour chaque joueur(mean)")
+        print("Appuyez sur g pour un grand nombre de ressource pour chaque joueur(marines) \n")
         with term.cbreak():
             val = ''
             while val.lower() != 's' or val.lower() != 'm' or val.lower() != 'l':
                 val = term.inkey()
                 if val.lower() == 'q':
                     self.start_menu()
+                    break
                 if val.lower() == 'z':
                     self.set_size_map()
+                    break
                 if val.lower() == 'p':
                     self.ressources_quantities = 'p'
                     self.set_nb_player()
+                    break
 
                 if val.lower() == 'm':
                     self.ressources_quantities = 'm'
                     self.set_nb_player()
+                    break
 
                 if val.lower() == 'g':
                     self.ressources_quantities = 'g'
                     self.set_nb_player()
+                    break
 
 
     def set_nb_player (self) :
@@ -144,38 +165,47 @@ class Menu :
                 val = term.inkey()
 
                 if val.lower() == 'q':
-                    self.start_menu()
+                    return self.set_ai_behavior()
+                    break
 
                 if val.lower() == 'z':
-                    self.set_size_map()
+                    self.set_ai_behavior()
+                    break
 
                 if val.lower() == '2':
                     self.nb_joueur = 2
                     self.set_ai_behavior()
+                    break
 
                 if val.lower() == '3':
                     self.nb_joueur = 3
                     self.set_ai_behavior()
+                    break
 
                 if val.lower() == '4':
                     self.nb_joueur = 4
                     self.set_ai_behavior()
+                    break
 
                 if val.lower() == '5':
                     self.nb_joueur = 5
                     self.set_ai_behavior()
+                    break
 
                 if val.lower() == '6':
                     self.nb_joueur = 6
                     self.set_ai_behavior()
+                    break
 
                 if val.lower() == '7':
                     self.nb_joueur = 7
                     self.set_ai_behavior()
+                    break
 
                 if val.lower() == '8':
                     self.nb_joueur = 8
                     self.set_ai_behavior()
+                    break
 
     def set_ai_behavior (self) :
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -189,34 +219,36 @@ class Menu :
         print("Appuyez sur p pour une IA passive")
         print("Appuyez sur b pour une IA bâtisseuse")
 
-
         with term.cbreak():
+            n = 0
             val = ''
             while val.lower() != 'a' or val.lower() != 'p' or val.lower() != 'b' :
                 print(f"Veuillez choisir le comportement de l'ia du joueur {n+1}")
                 val = term.inkey()
                 if val.lower() == 'q':
                     self.start_menu()
+                    break
                 if val.lower() == 'z':
                     self.set_size_map()
+                    break
                 if val.lower() == 'a':
                     self.ai_behavior.append('a')
                     n = n + 1
                     if n >= self.nb_joueur :
-                        self.return_value()
+                        break
+
                 if val.lower() == 'p':
                     self.ai_behavior.append('p')
                     n = n + 1
                     if n >= self.nb_joueur :
-                        self.return_value()
+                        break
                 if val.lower() == 'b':
                     self.ai_behavior.append('b')
                     n = n + 1
                     if n >= self.nb_joueur :
-                        self.return_value()
+                        break
 
-
-        print()
+            #self.return_value()
 
 
     def return_value(self):

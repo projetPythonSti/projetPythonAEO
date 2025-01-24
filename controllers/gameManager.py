@@ -1,15 +1,19 @@
+import io
+import sys
 import timeit
 from collections import defaultdict
 from datetime import datetime
 import time
 import re
 
+from models.Exceptions import PathfindingException
 from models.Pathfinding import Pathfinding
 from models.Position import Position
 from models.World import World
 from models.buildings.buildings import Building
 from models.unity.Unity import Unity
 
+gmOutput = io.StringIO()
 
 class GameManager:
 
@@ -35,22 +39,32 @@ class GameManager:
             } 
                     
         '''
-        def __init__(self, speed, world: World,debug=False ):
+        def __init__(self, speed, world: World,debug=False, writeToDisk=False ):
             self.gameSpeed = speed
             self.world = world
             self.debug = debug
+            self.writeToDisk = writeToDisk
 
+        def logger(self, *args, **kwargs):
+            if self.debug:
+                if self.writeToDisk:
+                    sys.stdout = gmOutput
+                    print(*args, **kwargs)
+                    sys.stdout = sys.__stdout__
+                else:
+                    print(*args, **kwargs)
         def getTeamNumber(self, name):
             pattern = r'\d+'
             substrings = re.findall(pattern, name)
             #print(substrings) #prints the subStrings extracted from the unitName
             return int(substrings[0])
 
+
         def moveUnit(self, uid):
             deltaTime = timeit.default_timer() - self.tick
             unit = self.unitToMove[uid]
             unit["timeElapsed"] += deltaTime.real
-            #print("time elapsed : ", unit["timeElapsed"])
+            #self.logger("time elapsed : ", unit["timeElapsed"])
             if unit["timeElapsed"] >= (unit["timeToTile"]):
                 self.world.tiles_dico[unit["moveQueue"][0]].set_contains(None)
                 self.world.filled_tiles.pop(unit["moveQueue"][0])
@@ -58,9 +72,9 @@ class GameManager:
                 unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][uid]
                 self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][uid].position = Position(unit["moveQueue"][0][0], unit["moveQueue"][0][0])
                 self.world.tiles_dico[unit["moveQueue"][0]].set_contains(unitObj)
+                self.logger("GameManager | moveUnit----- Infos on the nextTile to the next tile :", (unit["moveQueue"][0]))
                 self.world.filled_tiles[unit["moveQueue"][0]] = unit["moveQueue"][0]
                 unit["currentTile"] = unit["moveQueue"][0]
-                #print("Got to the next tile in", (unit["timeElapsed"]))
                 unit["timeElapsed"] = 0
                 if (len(unit["moveQueue"]) < 2):
                     unit["moveQueue"] = []
@@ -83,20 +97,20 @@ class GameManager:
                     self.unitToMove.pop(unitToDelete)
 
 
-        def addUnitToMoveDict(self, unit : Unity, destination):
+        def addUnitToMoveDict(self, unit : Unity, destination : Position):
             if unit.position.toTuple() not in self.world.filled_tiles.values():
                 self.world.filled_tiles[unit.position.toTuple()] = unit.position.toTuple()
             grid = self.world.convertMapToGrid()
             teamNumber = self.getTeamNumber(unit.uid)
-            pathFinding  = Pathfinding(mapGrid=grid, statingPoint= (unit.position.getX(), unit.position.getY()), goal=(destination.getX(), destination.getY()))
+            pathFinding  = Pathfinding(mapGrid=grid, statingPoint= unit.position.toTuple(), goal=destination.toTuple(), debug=self.debug)
             path = pathFinding.astar()
             if path.__class__ == bool:
-                pass
+                raise PathfindingException(self.world.tiles_dico[destination.toTuple()])
                 #  : AJOUTER UNE EXCEPTION QUAND IL NE TROUVE VRAIMENT PAS DE CHEMIN
-                #print("Found no short path")
+                #self.logger("Found no short path")
             path = path + [pathFinding.startingPoint]
             path = path[::-1]
-            print("Unit ADDED TO MOVE DICT")
+            self.logger("Unit ADDED TO MOVE DICT")
             self.unitToMove[unit.uid] = {
                 "group"     : [],
                 "timeToTile" : 1/(unit.speed),

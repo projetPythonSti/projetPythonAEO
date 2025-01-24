@@ -1,22 +1,30 @@
 import pygame as pg
 from blessed import Terminal
 
-from models.Position import Position
+from models.AIPlayer import AIPlayer
 from save import *
 import sys
 import time
 import timeit
-
+import models.AIPlayer
 
 #########################################
 ## Jeu
 #########################################
 
 class Game :
+    """
+                23/01/2025@tahakhetib : J'ai apporté des modifications à ce fichier  sur ce que @etan-test-1 a écrit
+                    - Ajouté la liste des IA (players) aux attributs du jeu et leur activité à chaque tour
+                        Idée pour plus tard : Pour éviter la surchage du système, au lieu de lancer toutes les IA à chaque frame, plutôt lancer une IA par frame ?
 
-    def __init__(self, world,clock, gm):
+            """
+
+    def __init__(self, world, clock, gm, players: list[AIPlayer]):
+
         self.ltick = time.time()
         self.gm = gm
+        self.players = players
         self.clock = clock
         self.speed = 1
         self.world = world
@@ -120,8 +128,11 @@ class Game :
         #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
         # self.events()
         # self.update()
+        for a in self.players:
+            a.playTurn()
         self.gm.checkUnitsToMove()
         self.gm.tick = timeit.default_timer()
+
         self.draw_term(term)
         """
         Peut changer si besoin 
@@ -142,7 +153,6 @@ class Game :
     def draw_term (self,term):
 
         sys.stdout.flush()
-
         if self.ffff :
             self.resources_term(term)
 

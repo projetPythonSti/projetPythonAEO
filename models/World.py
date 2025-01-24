@@ -1,5 +1,6 @@
 import numpy as np
 
+from models.Position import Position
 from models.buildings.buildings import Building
 from models.buildings.town_center import TownCenter
 from models.maps.Tile import  Tile
@@ -79,23 +80,69 @@ class World:
                 print(self.tiles_dico[(x, y)], end="")
             print("", end="\n")
 
+    # shows a part of the world, works with two position found in the game's loop
+    def show_precise_world(self,upleft:Position,downright:Position):
+        print()
+        if upleft.getY()>0:
+            print(' '+(downright.getX()-upleft.getX())*'ʌ')
+        for y in range(upleft.getY(),downright.getY(),1):
+            if upleft.getX()>0:
+                print('<', end='')
+            for x in range(upleft.getX(),downright.getX(),1):
+                print(self.tiles_dico[(x, y)], end="")
+            if downright.getX()<self.width:
+                print('>', end='')
+            print("", end="\n")
+        if downright.getY()<self.height:
+            print(' '+(downright.getX()-upleft.getX())*'v')
+        print("upleft.getX = ", upleft.getX(), " upleft.getY = ", upleft.getY())
+
+    def return_world(self):
+        world_representation = []
+        for x in range(self.width):
+            row = []
+            for y in range(self.height):
+                row.append(str(self.tiles_dico[(x, y)]))  # Conversion explicite en chaîne
+            world_representation.append("".join(row))  # Joindre chaque ligne en une chaîne
+        return "\n".join(world_representation)
+
+    def return_precise_world(self,upleft:Position,downright:Position):
+        world_chunk="\n\n\n"
+        if upleft.getY() > 0:
+            world_chunk+=(' ' + (downright.getX() - upleft.getX()) * 'ʌ' + '\n')
+        for y in range(upleft.getY(), downright.getY(), 1):
+            if upleft.getX() > 0:
+                world_chunk+='<'
+            for x in range(upleft.getX(), downright.getX(), 1):
+                if(self.tiles_dico[(x, y)].contains!=None):
+                    world_chunk+=self.tiles_dico[(x, y)].contains.name[0]
+                else:
+                    world_chunk+=' '
+            if downright.getX() < self.width:
+                world_chunk+='>'
+            world_chunk+='\n'
+        if downright.getY() < self.height:
+            world_chunk+=(' ' + (downright.getX() - upleft.getX()) * 'v')
+        #print("upleft.getX = ", upleft.getX(), " upleft.getY = ", upleft.getY())
+        return world_chunk
+
 
     def place_element(self, element):
-        print("World : place_element -- In place element")
+        #print("World : place_element -- In place element")
         place = (element.position.getX(), element.position.getY())
         if place not in self.filled_tiles and place[0] <= self.width and place[1] <= self.height:
-            print("World : place_element ------- Element n'étant pas dans une tuile déjà prise")
+            #print("World : place_element ------- Element n'étant pas dans une tuile déjà prise")
             if issubclass(element.__class__, Building) and all(tile not in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
-                print("World : place_element ------- Elt est un batiment")
+                #print("World : place_element ------- Elt est un batiment")
                 #check if the building can be placed
                 if element.surface[0] + place[0] <= self.width and element.surface[1] + place[1] <= self.height:
                     for x in range(element.surface[0]):
                         for y in range(element.surface[1]):
                             try:
                                 self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(element)
-                                print("World : place_element ------- tiles dico après l'ajout : ", self.tiles_dico[(place[0] + x, place[1] + y)].contains)
+                                #print("World : place_element ------- tiles dico après l'ajout : ", self.tiles_dico[(place[0] + x, place[1] + y)].contains)
                             except KeyError:
-                                print("Y'a une erreur la tout de même faudrait un print ?")
+                                #print("Y'a une erreur la tout de même faudrait un print ?")
                                 pass
                             self.filled_tiles[(place[0] + x, place[1] + y)] = (place[0] +x, place[1]+y)
             elif not issubclass(element.__class__, Building):

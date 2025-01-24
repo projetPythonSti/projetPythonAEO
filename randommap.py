@@ -48,20 +48,23 @@ def sum_tuple(t1,t2):
 #function, on a world, places a cluster of one resource starting from a specific key
 #it grows from the center, based on a replication chance and a fading factor
 def cluster(world,resource,key,repl=50,fade=16): #key is a tuple please
-    #places the original resource
-    world.tiles_dico[key].contains = resource
-    #tries placing more next to it
-    for i in range(-1,2):
-        for j in range(-1,2):
-            if randint(0,100)<repl:
-                newkey = sum_tuple(key,(i,j))
-                if newkey[0]>=0 and newkey[0]<world.width and newkey[1]>=0 and newkey[1]<world.height:
-                    cluster(world,resource,newkey,repl-fade)
+    #checks position ok
+    if key[0] >= 0 and key[0] < world.width and key[1] >= 0 and key[1] < world.height:
+        #places the original resource
+        world.tiles_dico[key].contains = resource
+        #tries placing more next to it
+        for i in range(-1,2):
+            for j in range(-1,2):
+                if randint(0,100)<repl:
+                    newkey = sum_tuple(key,(i,j))
+                    if newkey[0]>=0 and newkey[0]<world.width and newkey[1]>=0 and newkey[1]<world.height:
+                        cluster(world,resource,newkey,repl-fade)
 
 #function that takes a big dict {"X":self.x, "Y": self.y, "q" : self.ressources_quantities, "n" : self.nb_joueur, "b" : self.ai_behavior, "t" : self.type_map }
 #and returns a randomly generated World that follows the information
 
 #function that takes a map name, returns a World
+#supported maps : "Arabia", "GoldRush",
 def random_world(dict):
     newworld = World(dict["X"],dict["Y"])
     maptype = dict["t"]
