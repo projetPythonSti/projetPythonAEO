@@ -41,6 +41,12 @@ def jeu_terminal (world, gm:GameManager, debug=False):
 
     menu = Menu()
     dico = menu.start_menu()
+
+    #CREATION DU MONDE ET DES EQUIPES ET DES TCS ET DES VILLAGEOIS
+    world = random_world(dico)
+    make_teams(dico,world)
+    place_tcs(dico,world)
+
     clock = pg.time.Clock()
     playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=debug)
     game_term = Game(world,clock,gm, players=playersList)
@@ -87,6 +93,7 @@ if __name__ == "__main__" :
 
     """
 if __name__ == "__main__":
+    '''
     monde = randommap.random_world({"X":120, "Y":120, "t": "GoldRush"})
     village1 = Model("1", monde)
     village2 = Model("2", monde)
@@ -108,20 +115,25 @@ if __name__ == "__main__":
     #print(monde.get_ressources())
     #print(v)
     #print(community)
-    gm = GameManager(speed=1, world=monde, debug=False)
+    '''
     print("Launched GameManager")
     #m.addUnitToMoveDict(v, Position(40, 40))
     print("Added unit to move dict")
     #gm.addUnitToMoveDict(community["v"]["eq1p6"], Position(10,20))
     print("Added 2nd unit to move dict")
+    '''
     tc = TownCenter(team=village1)
     tc2= TownCenter(team=village2)
     monde.place_element(tc)
     monde.place_element(tc2)
     monde.villages[0].community["T"][tc.uid] = tc
     monde.villages[1].community["T"][tc2.uid] = tc2
+    '''
     #print(monde.filled_tiles)
     #Boucle pour tester le game manager
+
+    monde = World(1, 1)
+    gm = GameManager(speed=1, world=monde)
     n = 0
     jeu_terminal(monde,gm, False)
 

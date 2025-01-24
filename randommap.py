@@ -1,45 +1,10 @@
-# Old functions to generate maps
-'''
-from mmonde import *
-from random import *
-
-def somme(t1,t2): #somme((1,1),(2,2))=(3,3)
-    total=()
-    for i in range(0,len(t1)):
-        total+=(t1[i]+t2[i],) #virgule permet d'avoir un tuple
-    return total
-
-def placer(monde,cle,ressource,chance=50): #place un cluster d'une ressource autour d'une tuile d'un monde
-    #place le bloc initial
-    monde.dico[cle].contains=ressource
-    #place peut être à côté, récursif
-    for i in range(-1,2):
-        for j in range(-1,2):
-            if(randint(0,100)<=chance): #50% réplication -16% à chaque réplication
-                newkey=somme((i,j),cle)
-                if newkey[0]>=0 and newkey[0]<monde.x and newkey[1]>=0 and newkey[1]<monde.y:
-                    placer(monde,newkey,ressource,chance-16)
-#randomise pourrait être remplacé par une fonction de la même forme pour chaque archetype de maps (arabia,
-def randomise(monde,richesse): #prend un monde, place des clusters de ressources sur un cercle, +de clusters selon la richesse
-    #blocs de wood
-    for i in range(5+richesse*2):
-        x=randint(0,monde.x-1)
-        y=randint(0,monde.y-1)
-        placer(monde,(x,y),Wood())
-        placer(monde,(monde.x-1-x,monde.y-1-y),Wood()) #symétrie centrale
-    #blocs de gold
-    for i in range(1 + richesse):
-        x = randint(0, monde.x - 1)
-        y = randint(0, monde.y - 1)
-        placer(monde, (x, y), Gold(),30)
-        placer(monde, (monde.x-1-x,monde.y-1-y), Gold(), 30)
-    #gold au centre
-    placer(monde, (monde.x // 2, monde.y // 2), Gold(), 80)
-'''
-
 from models.World import World
 from random import randint
+
+from models.buildings.town_center import TownCenter
 from models.ressources.ressources import Wood,Gold
+from models.unity.Villager import Villager
+
 
 #function, returns the sum of two tuples
 def sum_tuple(t1,t2):
@@ -69,21 +34,7 @@ def random_world(dict):
     newworld = World(dict["X"],dict["Y"])
     maptype = dict["t"]
     wealth = int(newworld.width*newworld.height / 4800) # = 3 for a 120x120 , wealth allows resources to scale with map size
-    if maptype == "Arabia": #Medium clusters of wood, open center
-        for _ in range(0,wealth+1): #Some wood on the outskirts
-            number = randint(1,6)
-            x = randint(0,newworld.width//number) ; y = randint(0,newworld.height//(7-number))
-            cluster(newworld,Wood(newworld),(x,y)) ; cluster(newworld,Wood(newworld),(newworld.width-x-1,y))
-            cluster(newworld,Wood(newworld),(newworld.width-x-1,newworld.height-y-1)) ; cluster(newworld,Wood(newworld),(x,newworld.height-y-1))
-        for _ in range(0,wealth+4): #Some lil wood
-            x = randint(0,newworld.width//2) ; y = randint(0,newworld.height//2)
-            cluster(newworld,Wood(newworld),(x,y),50,30) ; cluster(newworld,Wood(newworld),(newworld.width-x-1,y),50,30)
-            cluster(newworld,Wood(newworld),(newworld.width-x-1,newworld.height-y-1),50,30) ; cluster(newworld,Wood(newworld),(x,newworld.height-y-1),50,30)
-        for _ in range(0,wealth): #Some gold around the world
-            x = randint(0,int(newworld.width/2.5)) ; y = randint(0,int(newworld.height/2.5))
-            cluster(newworld,Gold(newworld),(x,y),50,25) ; cluster(newworld,Gold(newworld),(newworld.width-x-1,y),50,25)
-            cluster(newworld,Gold(newworld),(newworld.width-x-1,newworld.height-y-1),50,25) ; cluster(newworld,Gold(newworld),(x,newworld.height-y-1),50,25)
-    elif maptype == "GoldRush": #Most gold in the center
+    if maptype == "g": #Most gold in the center
         for _ in range(0, wealth + 2):  # Some wood on the outskirts
             number = randint(1, 8)
             x = randint(0, newworld.width // number); y = randint(0, newworld.height // (9 - number))
@@ -97,9 +48,112 @@ def random_world(dict):
             x = randint(newworld.width // 4, newworld.width//2); y = randint(newworld.height//4, newworld.height//2)
             cluster(newworld, Gold(newworld), (x, y), 50, 25); cluster(newworld, Gold(newworld), (newworld.width - x - 1, y), 50, 25)
             cluster(newworld, Gold(newworld), (newworld.width - x - 1, newworld.height - y - 1), 50, 25); cluster(newworld, Gold(newworld), (x, newworld.height - y - 1), 50, 25)
-    else:
-        ()
+    else: #Arabia, Medium clusters of wood, open center
+        for _ in range(0, wealth + 1):  # Some wood on the outskirts
+            number = randint(1, 6)
+            x = randint(0, newworld.width // number);
+            y = randint(0, newworld.height // (7 - number))
+            cluster(newworld, Wood(newworld), (x, y));
+            cluster(newworld, Wood(newworld), (newworld.width - x - 1, y))
+            cluster(newworld, Wood(newworld), (newworld.width - x - 1, newworld.height - y - 1));
+            cluster(newworld, Wood(newworld), (x, newworld.height - y - 1))
+        for _ in range(0, wealth + 4):  # Some lil wood
+            x = randint(0, newworld.width // 2);
+            y = randint(0, newworld.height // 2)
+            cluster(newworld, Wood(newworld), (x, y), 50, 30);
+            cluster(newworld, Wood(newworld), (newworld.width - x - 1, y), 50, 30)
+            cluster(newworld, Wood(newworld), (newworld.width - x - 1, newworld.height - y - 1), 50, 30);
+            cluster(newworld, Wood(newworld), (x, newworld.height - y - 1), 50, 30)
+        for _ in range(0, wealth):  # Some gold around the world
+            x = randint(0, int(newworld.width / 2.5));
+            y = randint(0, int(newworld.height / 2.5))
+            cluster(newworld, Gold(newworld), (x, y), 50, 25);
+            cluster(newworld, Gold(newworld), (newworld.width - x - 1, y), 50, 25)
+            cluster(newworld, Gold(newworld), (newworld.width - x - 1, newworld.height - y - 1), 50, 25);
+            cluster(newworld, Gold(newworld), (x, newworld.height - y - 1), 50, 25)
+
     return newworld
+
+#function that makes teams according to number and starting resources
+from models.model import Model
+def make_teams(dict,world):
+    for n in range(1,dict["n"]+1):
+        team = Model(str(n),world)
+        if dict["q"]=="p": #Lean
+            team.initialize_villages(gold=50,wood=200,food=50,villages=3)
+        elif dict["q"]=="m": #Mean
+            team.initialize_villages(gold=2000, wood=2000, food=2000,villages=3)
+        else: #Marines
+            team.initialize_villages(gold=20000, wood=20000, food=20000,villages=15)
+
+#function that clears some space for the TCs and places those, and some starting villagers
+from models.Position import Position
+def place_tcs(dict,world):
+    #values for placement
+    x = randint(12, world.width//3-12)
+    y = randint(12, world.height//3-12)
+    ''' makes it so team1 doesn't always spawn top left, commented for debugging issues
+    n = randint(1,4)
+    if n%2==0:
+        x=world.width-x
+    if n>=3:
+        y=world.height-y
+    '''
+    #clears space
+    for j in range(y-2, y + 14):
+        for i in range(x-2, x + 14):
+            world.tiles_dico[(i,j)].contains=None
+            world.tiles_dico[(world.width-i,world.height-j)].contains=None
+            if dict["n"]>=3:
+                world.tiles_dico[(i, world.height - j)].contains = None
+            if dict["n"]>=4:
+                world.tiles_dico[(world.width - i,j)].contains = None
+    #places TCs
+    tc1 = TownCenter(team=world.villages[0])
+    tc1.position=Position(x+4,y+4)
+    world.place_element(tc1)
+    world.villages[0].community["T"][tc1.uid] = tc1
+    tc2 = TownCenter(team=world.villages[1])
+    tc2.position = Position(world.width-x-6,world.height-y-6)
+    world.place_element(tc2)
+    world.villages[1].community["T"][tc1.uid] = tc2
+    if dict["n"]>=3:
+        tc3 = TownCenter(team=world.villages[2])
+        tc3.position = Position(x+4,world.height-y-6)
+        world.place_element(tc3)
+        world.villages[2].community["T"][tc3.uid] = tc3
+    if dict["n"]>=4:
+        tc4 = TownCenter(team=world.villages[3])
+        tc4.position = Position(world.width-x-6,y+4)
+        world.place_element(tc4)
+        world.villages[3].community["T"][tc4.uid] = tc4
+    #re-places villagers (they got summoned by initialize villages but weren't assigned proper positions)
+    j=y+1
+    for id in world.villages[0].community["v"]:
+        v = world.villages[0].community["v"][id]
+        v.position=Position(x+1,j)
+    j = world.height-y-1
+    for id in world.villages[1].community["v"]:
+        v = world.villages[1].community["v"][id]
+        v.position = Position(world.width-x, j)
+    if dict["n"] >= 3:
+        j = world.height - y - 1
+        for id in world.villages[2].community["v"]:
+            v = world.villages[2].community["v"][id]
+            v.position = Position(x+1, j)
+    if dict["n"] >= 4:
+        j = y+1
+        for id in world.villages[3].community["v"]:
+            v = world.villages[3].community["v"][id]
+            v.position = Position(world.width-x, j)
+    world.fill_world2() #serves units display
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     test = random_world({"X":120,"Y":180,"t":"Arabia"})
