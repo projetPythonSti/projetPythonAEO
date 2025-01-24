@@ -218,7 +218,7 @@ class AIPlayer:
     def getNearestRessource(self,topLeftPos,bottomRightPos,  resourceType):
         ressourceKeyDict = list(map(lambda  x : x, self.world.ressources[resourceType].keys()))
         resourcesPositionList = list(map(lambda x : self.estimateDistance(x.position.toTuple(), topLeftPos) , self.world.ressources[resourceType].values()))
-        self.logger("AIPlayer | getNearestRessource---- resPositionList value : ", resourcesPositionList)
+        self.logger("AIPlayer | getNearestRessource---- resPositionList value : ", ressourceKeyDict)
         if len(resourcesPositionList) == 0:
             return -1
         nearestResourcesIndex = resourcesPositionList.index(min(resourcesPositionList))
@@ -466,12 +466,13 @@ class AIPlayer:
         resPriority = (resPriority[0]*self.level,resPriority[1]*self.level,resPriority[2]*self.level)
         resDistance = {"w": concernedRes["w"]-resPriority[0],"g" : concernedRes["g"]-resPriority[1], "f" :concernedRes["f"]-resPriority[2]}
         resourceToGet =  min(resDistance, key=resDistance.get)
-        #self.logger("Ressource to get is", ResourceTypeENUM[resourceToGet].value)
+        self.logger("Ressource to get is", ResourceTypeENUM[resourceToGet].value)
         resToCollect = self.getNearestRessource(self.topVillageBorder,self.bottomVillageBorder,resourceToGet)
         if resToCollect == -1:
             return -1
         resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet)
-
+        if resourceCollectEvent == -1:
+            return -1
         self.logger("Added the following resCollect event : \n Type : ", resourceCollectEvent["infos"]["type"], "\t nbOfPpl : ",
               len(resourceCollectEvent["people"]))
         self.eventQueue.append(resourceCollectEvent)
@@ -566,11 +567,12 @@ class AIPlayer:
         self.eventQueue.remove(actionDict)
 
     def writeLogs(self):
-        f = open(f"AILogs{self.team.name}.txt", "a")
-        logs = output.getvalue()
-        output.flush()
-        f.write(logs)
-        self.logs = ""
+        if self.debug and self.writeToDisk:
+            f = open(f"AILogs{self.team.name}.txt", "a")
+            logs = output.getvalue()
+            output.flush()
+            f.write(logs)
+            self.logs = ""
 
 
 
@@ -620,7 +622,7 @@ if __name__ == "__main__":
     n = 0
     play_style = PlayStyle(minWorkers=10)
     playStyleMatrix= [
-        [4,3,0],
+        [4,0,0],
         [2,0,2],
         [1,0,0]
     ]

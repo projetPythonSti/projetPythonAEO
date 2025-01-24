@@ -23,15 +23,21 @@ from models.Position import Position
 import randommap
 
 
+"""
+    24/01/2025@tahakhetib : J'ai ajouté des chose sur ce que @maxgigi à écrit
+        - Déplacé le moment de l'initialisation du GameManager afin d'éviter que celui-ci ne soit pas à jour 
+    
+"""
+
 def fillAIPlaystyle(world:World, aiBehavior,gameLevel , gm:GameManager, debug=False):
     aiList = []
 
     for a in range(len(world.villages)):
-        aiList.append(AIPlayer(world.villages[a-1],world,PlayStyleEnum[aiBehavior[a-1]].value,100, gm,debug=debug, writeToDisk=False))
+        aiList.append(AIPlayer(world.villages[a-1],world,PlayStyleEnum[aiBehavior[a-1]].value,100, gm,debug=debug, writeToDisk=True))
     return aiList
 
 
-def jeu_terminal (world, gm:GameManager, debug=False):
+def jeu_terminal (world, debug=False):
     running = True
     playing = True
 
@@ -41,12 +47,12 @@ def jeu_terminal (world, gm:GameManager, debug=False):
 
     menu = Menu()
     dico = menu.start_menu()
-
     #CREATION DU MONDE ET DES EQUIPES ET DES TCS ET DES VILLAGEOIS
     world = random_world(dico)
     make_teams(dico,world)
     place_tcs(dico,world)
-
+    gm = GameManager(speed=1, world=world)
+    print("Jeu_terminal ------ World infos", gm.world.width,gm.world.height)
     clock = pg.time.Clock()
     playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=debug)
     game_term = Game(world,clock,gm, players=playersList)
@@ -133,9 +139,8 @@ if __name__ == "__main__":
     #Boucle pour tester le game manager
 
     monde = World(1, 1)
-    gm = GameManager(speed=1, world=monde)
     n = 0
-    jeu_terminal(monde,gm, False)
+    jeu_terminal(monde, False)
 
 
 

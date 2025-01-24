@@ -1,3 +1,6 @@
+from wcwidth import wcwidth
+
+from models.AIPlayer import ResourceTypeENUM
 from models.World import World
 from random import randint
 
@@ -10,20 +13,44 @@ from models.unity.Villager import Villager
 def sum_tuple(t1,t2):
     return (t1[0]+t2[0],t1[1]+t2[1])
 
+"""
+                24/01/2025@tahakhetib : J'ai ajouté des chose sur ce que @maxgigi à écrit
+                    -Ajouté l'ajout des ressources dans le dictionnaire des ressources du monde
+                        Afin que cela fonctionne correctement, j'ai également crée une nouvelle ressource à partir de celle passée en paramètre 
+                        pour éviter qu'elle en écrase une autre dans le dictionnaire des ressources
+"""
+
+
 #function, on a world, places a cluster of one resource starting from a specific key
 #it grows from the center, based on a replication chance and a fading factor
 def cluster(world,resource,key,repl=50,fade=16): #key is a tuple please
+    resKeys = list(world.ressources[resource.name].keys())
+    newResource = None
+    if resource.name == "w":
+        newResource = Wood(world)
+        if len(resKeys)==0:
+            pass
+        else:
+            newResource.uid = f"{int(resKeys[-1])+1}"
+    elif resource.name == "g":
+        newResource = Gold(world)
+        if len(resKeys) == 0:
+            pass
+        else:
+            newResource.uid = f"{int(resKeys[-1]) + 1}"
+
     #checks position ok
     if key[0] >= 0 and key[0] < world.width and key[1] >= 0 and key[1] < world.height:
         #places the original resource
-        world.tiles_dico[key].contains = resource
+        world.tiles_dico[key].contains = newResource
+        world.ressources[newResource.name][newResource.uid] = newResource
         #tries placing more next to it
         for i in range(-1,2):
             for j in range(-1,2):
                 if randint(0,100)<repl:
                     newkey = sum_tuple(key,(i,j))
                     if newkey[0]>=0 and newkey[0]<world.width and newkey[1]>=0 and newkey[1]<world.height:
-                        cluster(world,resource,newkey,repl-fade)
+                        cluster(world,newResource,newkey,repl-fade)
 
 #function that takes a big dict {"X":self.x, "Y": self.y, "q" : self.ressources_quantities, "n" : self.nb_joueur, "b" : self.ai_behavior, "t" : self.type_map }
 #and returns a randomly generated World that follows the information

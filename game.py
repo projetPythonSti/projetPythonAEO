@@ -140,7 +140,7 @@ class Game :
         self.gm.checkUnitsToMove()
         self.gm.tick = timeit.default_timer()
 
-        self.draw_term(term)
+        #self.draw_term(term)
         """
         Peut changer si besoin 
         """
@@ -149,13 +149,14 @@ class Game :
             self.initPygame()
             self.kickstartPG = False
             self.pygame_on = self.pgGame is not None
+            self.term_on = self.pgGame is None
             pass
         if self.pygame_on :
             self.draw_pygame()
         if self.gm.save:
             pass
         if self.term_on:
-            self.draw_term
+            self.draw_term(term)
 
 
 ### Fonction intermédiaire
@@ -248,6 +249,8 @@ class Game :
                     if data :
                         self.swap_to_load(data)
                     else : pass
+                elif val2.lower() == 'p':
+                    self.kickstartPG = True
 
 
 
