@@ -108,6 +108,15 @@ def place_tcs(dict,world):
                 world.tiles_dico[(i, world.height - j)].contains = None
             if dict["n"]>=4:
                 world.tiles_dico[(world.width - i,j)].contains = None
+            if dict["n"]>=5:
+                world.tiles_dico[(world.width//2-i,j)].contains=None
+            if dict["n"]>=6:
+                world.tiles_dico[(world.width//2-i,world.height-j)].contains=None
+            if dict["n"]>=7:
+                world.tiles_dico[(i,world.height//2-j)].contains=None
+            if dict["n"]>=8:
+                world.tiles_dico[(world.width-i,world.height//2-j)].contains=None
+
     #places TCs
     tc1 = TownCenter(team=world.villages[0])
     tc1.position=Position(x+4,y+4)
@@ -127,6 +136,26 @@ def place_tcs(dict,world):
         tc4.position = Position(world.width-x-6,y+4)
         world.place_element(tc4)
         world.villages[3].community["T"][tc4.uid] = tc4
+    if dict["n"]>=5:
+        tc5 = TownCenter(team=world.villages[4])
+        tc5.position = Position(world.width//2, y+4)
+        world.place_element(tc5)
+        world.villages[4].community["T"][tc5.uid] = tc5
+    if dict["n"]>=6:
+        tc6 = TownCenter(team=world.villages[5])
+        tc6.position = Position(world.width//2, world.height - y - 6)
+        world.place_element(tc6)
+        world.villages[5].community["T"][tc6.uid] = tc6
+    if dict["n"]>=7:
+        tc7 = TownCenter(team=world.villages[6])
+        tc7.position = Position(x+4, world.height//2)
+        world.place_element(tc7)
+        world.villages[6].community["T"][tc7.uid] = tc7
+    if dict["n"]>=8:
+        tc8 = TownCenter(team=world.villages[7])
+        tc8.position = Position(world.width-x-6, world.height//2)
+        world.place_element(tc8)
+        world.villages[7].community["T"][tc8.uid] = tc8
     #re-places villagers (they got summoned by initialize villages but weren't assigned proper positions)
     j=y+1
     for id in world.villages[0].community["v"]:
@@ -146,12 +175,23 @@ def place_tcs(dict,world):
         for id in world.villages[3].community["v"]:
             v = world.villages[3].community["v"][id]
             v.position = Position(world.width-x, j)
+    if dict["n"] >= 5:
+        for id in world.villages[4].community["v"]:
+            v = world.villages[4].community["v"][id]
+            v.position = Position(world.width//2-2, y+2)
+    if dict["n"] >= 6:
+        for id in world.villages[5].community["v"]:
+            v = world.villages[5].community["v"][id]
+            v.position = Position(world.width//2-2, world.height-y)
+    if dict["n"] >= 7:
+        for id in world.villages[6].community["v"]:
+            v = world.villages[6].community["v"][id]
+            v.position = Position(x+2, world.height//2)
+    if dict["n"] >= 8:
+        for id in world.villages[7].community["v"]:
+            v = world.villages[7].community["v"][id]
+            v.position = Position(world.width-x, world.height//2)
     world.fill_world2() #serves units display
-
-
-
-
-
 
 
 
