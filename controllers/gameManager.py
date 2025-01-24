@@ -44,6 +44,7 @@ class GameManager:
             self.world = world
             self.debug = debug
             self.writeToDisk = writeToDisk
+            self.save = False
 
         def logger(self, *args, **kwargs):
             if self.debug:
@@ -67,7 +68,10 @@ class GameManager:
             #self.logger("time elapsed : ", unit["timeElapsed"])
             if unit["timeElapsed"] >= (unit["timeToTile"]):
                 self.world.tiles_dico[unit["moveQueue"][0]].set_contains(None)
-                self.world.filled_tiles.pop(unit["moveQueue"][0])
+                try:
+                    self.world.filled_tiles.pop(unit["moveQueue"][0])
+                except KeyError:
+                    print("KeyError")
                 unit["moveQueue"] = unit["moveQueue"][1::]
                 unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][uid]
                 self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][uid].position = Position(unit["moveQueue"][0][0], unit["moveQueue"][0][0])
@@ -80,6 +84,19 @@ class GameManager:
                     unit["moveQueue"] = []
                 else:
                     unit["nextTile"] = unit["moveQueue"][1]
+
+        def buiding_process(self, building):
+            building.begin_building()
+            self.time_elapse[building.uid] = 0
+            begin_time = timeit.default_timer() - self.tick
+            self.time_elapse += begin_time
+            begin_time_seconds = self.time_elapse[building.uid] / timeit.default_timer().resolution
+
+            if begin_time_seconds >= building.time_building:
+                self.world.tiles_dico[(building.position.getX(), building.position.getY())].set_contains(building)
+
+            #reshow the world here, because le buiding is finish to be built
+
 
 
         def checkUnitsToMove(self):
@@ -102,7 +119,7 @@ class GameManager:
                 self.world.filled_tiles[unit.position.toTuple()] = unit.position.toTuple()
             grid = self.world.convertMapToGrid()
             teamNumber = self.getTeamNumber(unit.uid)
-            pathFinding  = Pathfinding(mapGrid=grid, statingPoint= unit.position.toTuple(), goal=destination.toTuple(), debug=self.debug)
+            pathFinding  = Pathfinding(mapGrid=grid, statingPoint= unit.position.toTuple(), goal=destination.toTuple(), debug=False)
             path = pathFinding.astar()
             if path.__class__ == bool:
                 raise PathfindingException(self.world.tiles_dico[destination.toTuple()])
@@ -122,6 +139,56 @@ class GameManager:
                 "type" : unit.name,
                 "moveQueue": path,
             }
+
+        def pause(self):
+            self.html_generator()
+
+            # def play(self):
+            #     datas = self.load_from_file()
+            #     if datas:
+            #         self.world = datas[0]
+
+        def save_world(self, path=None):
+            self.save.save(self.world, path)
+
+        def load_from_file(self, path=None):
+            data = self.save.load(path)
+            # print("data", data)
+            self.world = data[0]
+
+        def html_generator(self):
+            village1, village2 = self.world.villages
+            #iterating on 2 dict at the same time
+
+            body = f"""
+            <!DOCTYPE html>
+            <html lang="fr">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Game Stats</title>
+            </head>
+            <body>
+                <h1>Welcome to the Game</h1>
+                <p>You made a pause, so here are current information about the world</p>
+                <ul>
+                
+            """
+            for pop1, pop2 in zip(village1.population().values(), village2.population().values()):
+                for v1, v2 in zip(pop1.values(), pop2.values()):
+                    body += f"""
+                    <li>Unit {v2.__class__} is at position ({v2.position.getX()}, {v2.position.getY()}) and his life is {v2.health}</li>
+                    <li>Unit {v1.__class__} is at position ({v1.position.getX()}, {v1.position.getY()}) and his life is {v1.health}</li>
+                    """
+            body += """ 
+                </ul> 
+                </body>
+                </html>
+            """
+
+            with open("./utils/html/gameStats.html", "w") as file:
+                file.write(body)
+
 
 if __name__ == "__main__":
     pass

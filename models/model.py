@@ -38,6 +38,8 @@ class Model:
         # Dictionary of human, materiel and ressources of the village
         self.community = defaultdict(dict)
         self.ressources = defaultdict(int)
+        self.peopleCount = 0
+        self.workingPpl = 0
         self.name = name
         self.world = world
         self.world.add_village(self)
@@ -50,18 +52,22 @@ class Model:
                             stables = 0, keeps = 0, houses = 0, farms = 0, camps = 0, barracks = 0, 
                             archery_ranger = 0, wood = 0, food = 0, gold = 0):
         for i in range(archers):
+            self.peopleCount += 1
             a = Archer(team=self)
             self.community["a"][a.uid] = a
 
         for i in range(horsmen):
+            self.peopleCount += 1
             h = Horseman(team=self)
             self.community["h"][h.uid] = h
    
         for i in range(villages):
+            self.peopleCount += 1
             v = Villager(team=self)
             self.community["v"][v.uid] = v
         
         for i in range(swordsmen):
+            self.peopleCount += 1
             s = Swordsman(team=self)
             self.community["s"][s.uid] = s
         
@@ -95,37 +101,6 @@ class Model:
 
     # def initialize_unit(self, unit):
     #     self.community[unit.name][str(unit.uid)] = unit
-
-    def initialise_villages(self, archers = 0, horsmen = 0, swordsmen = 0, villages = 0, town_center = 0,
-                            stables = 0, keeps = 0, houses = 0, farms = 0, camps = 0, barracks = 0, 
-                            archery_ranger = 0, wood = 0, food = 0, gold = 0):
-        for _ in range(archers):
-            Archer(team=self)
-        for _ in range(horsmen):
-            Horseman(team = self)
-        for _ in range(villages):
-            Villager(team=self)
-        for _ in range(swordsmen):
-            Swordsman(team=self)
-        for _ in range(town_center):
-            TownCenter(team=self)
-        for _ in range(archery_ranger): 
-            ArcheryRange(team=self)
-        for _ in range(barracks):
-            Barracks(team=self)
-        for _ in range(camps):
-            Camp(team=self)
-        for _ in range(farms):
-            Farm(team=self)
-        for _ in range(houses):
-            House(team=self)
-        for _ in range(keeps):
-            Keep(team=self)
-        for _ in range(stables):
-            Stable(team=self)
-        self.ressources["w"] += wood
-        self.ressources["g"] += gold
-        self.ressources["f"] += food
       
     #return a tuple that contains à dict of all village content and the length of it
     def population(self):
@@ -152,7 +127,7 @@ class Model:
             self.ressources[ressource.get_name()] += ressource.get_quantity()
         else:
             self.ressources[ressource] += quantity
-        
+
     def remove_unit(self, unit):
         self.community[unit.name].pop(str(unit.uid))
         if(issubclass(unit.__class__, Ressource)):
@@ -170,17 +145,16 @@ class Model:
     
     def get_community(self):
         return self.community
-    def get_name(self):
-        return self.name
-    def get_pplCount(self):
-        villagerNumber = len(self.community["v"])
-        sNumber = len(self.community["s"])
-        hNumber = len(self.community["h"])
-        aNumber = len(self.community["a"])
-        return villagerNumber+sNumber+hNumber+aNumber
 
     def get_ressources(self):
         return self.ressources
+
+    def get_name(self):
+        return self.name
+
+    def get_pplCount(self):
+        return self.peopleCount
+
 
 
 if __name__ == "__main__":

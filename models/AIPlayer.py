@@ -34,6 +34,7 @@ from models.model import Model
 from models.ressources.ressources import Ressource, Wood, Gold, Food
 from models.unity.Villager import Villager
 
+output = io.StringIO()
 class PlayStyleMatrixEnum(Enum):
     Aggressive = [
         [2,5,0],
@@ -222,6 +223,8 @@ class AIPlayer:
         ressourceKeyDict = list(map(lambda  x : x, self.world.ressources[resourceType].keys()))
         resourcesPositionList = list(map(lambda x : self.estimateDistance(x.position.toTuple(), topLeftPos) , self.world.ressources[resourceType].values()))
         self.logger("AIPlayer | getNearestRessource---- resPositionList value : ", resourcesPositionList)
+        if len(resourcesPositionList) == 0:
+            return -1
         nearestResourcesIndex = resourcesPositionList.index(min(resourcesPositionList))
         return {
             ressourceKeyDict[nearestResourcesIndex] : resourcesPositionList[nearestResourcesIndex]
@@ -448,6 +451,7 @@ class AIPlayer:
         unitID = self.getFreePeople(1,"v")
         if len(unitID) == 0:
             self.logger("PAS D'UNITE DE DISPONIBLE")
+            return -1
         for i in unitID:
             self.freeUnits["v"].remove(i)
         return {
@@ -467,8 +471,11 @@ class AIPlayer:
         resDistance = {"w": concernedRes["w"]-resPriority[0],"g" : concernedRes["g"]-resPriority[1], "f" :concernedRes["f"]-resPriority[2]}
         resourceToGet =  min(resDistance, key=resDistance.get)
         #self.logger("Ressource to get is", ResourceTypeENUM[resourceToGet].value)
-        resToCollect = self.getNearestRessource((0,0),(0,4),resourceToGet)
+        resToCollect = self.getNearestRessource(self.topVillageBorder,self.bottomVillageBorder,resourceToGet)
+        if resToCollect == -1:
+            return -1
         resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet)
+
         self.logger("Added the following resCollect event : \n Type : ", resourceCollectEvent["infos"]["type"], "\t nbOfPpl : ",
               len(resourceCollectEvent["people"]))
         self.eventQueue.append(resourceCollectEvent)
@@ -507,6 +514,9 @@ class AIPlayer:
         pass
 
     def launchResourceAction(self, actionDict):
+        if actionDict["infos"]["target"] is None:
+            self.eventQueue.remove(actionDict)
+            return -1
         #self.logger("J'ai envoyé qqun chercher des ressources attention")
         unitList = actionDict["people"]
         unitTeam = self.gm.getTeamNumber(unitList[0])
@@ -521,6 +531,7 @@ class AIPlayer:
         if not exceptionRaised:
             self.currentEvents.append(actionDict)
             self.eventQueue.remove(actionDict)
+
     def launchBuildAction(self, actionDict):
         #self.logger("J'ai lancé une construction attention")
         buildingToBuild = actionDict["infos"]["type"]
@@ -592,7 +603,7 @@ if __name__ == "__main__":
     # print(village2.population())
     #print(monde.get_ressources())
     #print(v)
-    #print(community)
+    print(community)
     gm = GameManager(speed=1, world=monde)
     print("Launched GameManager")
     gm.addUnitToMoveDict(v, Position(40, 40))

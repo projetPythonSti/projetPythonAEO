@@ -19,14 +19,16 @@ class Building:
         self.dropPoint = dropPoint
         self.population = population
         self.builders = 1
+        self.time_building = 3 * time_building / (self.builders + 2)
         self.team = team
         self.position = position if position else Position(rd.randint(0, self.team.world.width - 1), rd.randint(0, self.team.world.height - 1))
+        self.image = f"./assets/images/buildings/{self.name}.png"
 
     def get_cost(self):
         return self.cost
 
     def get_occupied_tiles(self):
-        return  [(self.position.getX() + x, self.position.getY() + y) for x in range(self.surface[0]) for y in range(self.surface[1])]
+        return [(self.position.getX() + x, self.position.getY() + y) for x in range(self.surface[0]) for y in range(self.surface[1])]
     
     def get_name(self):
         return self.name
@@ -69,6 +71,9 @@ class Building:
     
     def get_position(self):
         return self.position
+
+    def getTPosition(self):
+        return self.position.toTuple()
 
     def __repr__(self):
         return self.name

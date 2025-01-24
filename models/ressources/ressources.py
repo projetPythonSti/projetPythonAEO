@@ -10,6 +10,8 @@ class Ressource:
         self.world = world
         self.position = Position(rd.randint(0, self.world.width - 1), rd.randint(0, self.world.height - 1))
         self.uid = uid
+        self.image = f"./assets/images/ressources/{self.name}.png"
+
 
 
     def to_dict(self):
@@ -23,6 +25,10 @@ class Ressource:
     
     def get_position(self):
         return self.position
+
+    def getTPosition(self):
+        return self.position.toTuple()
+
     
     def set_position(self, x, y):
         self.position.setX(x)

@@ -74,7 +74,13 @@ class World:
                 self.place_element(v1)
                 self.place_element(v2)
 
-    def show_world(self):
+    def fill_world2(self):
+        for village in self.villages:
+            for pop in village.population().values():
+                for v in pop.values():
+                    self.place_element(v)
+
+    def show_world(self): #
         for y in range(self.height):
             for x in range(self.width):
                 print(self.tiles_dico[(x, y)], end="")

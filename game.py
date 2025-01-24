@@ -1,12 +1,12 @@
+import pygame as pg
 from blessed import Terminal
-
-from models.AIPlayer import AIPlayer
+from models.Position import Position
+from models.AIPlayer import AIPlayer, PlayStyleMatrixEnum
 from models.save import *
-import sys, os
+from views.game import Game as PGGame
+import sys
 import time
 import timeit
-from models.Position import *
-
 
 #########################################
 ## Jeu
@@ -14,27 +14,34 @@ from models.Position import *
 
 class Game :
     """
-                23/01/2025@tahakhetib : J'ai apporté des modifications à ce fichier  sur ce que @etan a écrit
+                23/01/2025@tahakhetib : J'ai apporté des modifications à ce fichier  sur ce que @etan-test-1 a écrit
                     - Ajouté la liste des IA (players) aux attributs du jeu et leur activité à chaque tour
                         Idée pour plus tard : Pour éviter la surchage du système, au lieu de lancer toutes les IA à chaque frame, plutôt lancer une IA par frame ?
-
+                24/01/2025@tahakhetib : J'ai ajouté des chose sur ce que @etan-test-1 à écrit
+                    - Ajouté un attribut kickstartPg
+                    - Ajouté la prise en charge du démarrage de pygame (touché à turn())
+                    - Créé une fonction initPygame, et draw_pygame()
+                    - ajouté l'attribut term_on pour s'assurer que le terminal est bien allumé
             """
 
     def __init__(self, world, clock, gm, players: list[AIPlayer]):
 
         self.ltick = time.time()
-        self.gm = gm #
-        self.players = players#
+        self.gm = gm
+        self.players = players
         self.clock = clock
         self.speed = 1
-        self.world = world #
+        self.world = world
         self.upleft = Position(0,0) #changes by player arrow keys, should always start upper left of the map (0,0)
         self.downright = Position(0, 0) #changes by itself to fit the screen
         self.playing = False
-        self.game_duration = 0 #
+        self.game_duration = 0
         self.save = Save()
         self.ffff = False
         self.pygame_on = False
+        self.term_on = True
+        self.pgGame = None
+        self.kickstartPG = False
 
 
 # Boucle Principale
@@ -134,15 +141,30 @@ class Game :
         self.gm.tick = timeit.default_timer()
 
         self.draw_term(term)
-
         """
         Peut changer si besoin 
         """
+        if self.kickstartPG:
+            print("KICKSTARTING PYGAME")
+            self.initPygame()
+            self.kickstartPG = False
+            self.pygame_on = self.pgGame is not None
+            pass
         if self.pygame_on :
             self.draw_pygame()
-            # IF BLA BLA POUR LA SAVE
+        if self.gm.save:
+            pass
+        if self.term_on:
+            self.draw_term
+
 
 ### Fonction intermédiaire
+    def initPygame(self):
+        pg.init()
+        pg.mixer.init()
+        screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+        clock = pg.time.Clock()
+        self.pgGame = PGGame(screen,clock,self.gm)
 
     def init_term(self):
         term = Terminal()
@@ -171,18 +193,34 @@ class Game :
 
 
     def draw_pygame (self):
+        if self.pgGame is not None:
+            dt = self.pgGame.clock.tick(60) / 1000.0  # Calculate delta time in seconds
+            self.pgGame.events()
+            self.pgGame.update(dt)  # Pass delta time to update
+            self.pgGame.draw()
         pass
         ### A REMPLIR
+
+    def load_game(self, game):
+        pass
+
+    def load_game(self):
+        pass
 
     def resources_term(self,term):
         sys.stdout.flush()
         infos=""
+        n=0
         for village in self.world.villages:
-            infos+="Village "+village.name+" ;"
+            infos+="Village "+village.name+" ;\n"
             infos+=" Wood:"+str(village.ressources["w"])+" Gold:"+str(village.ressources["g"])+" Food:"+str(village.ressources["f"])
             infos+=" Population:"+str(village.peopleCount)+'/'
-            infos+='\n'
-        infos += '\n' * (term.height - len(self.world.villages) - 2)
+            infos+="\n"
+            infos+="Playstyle: "+PlayStyleMatrixEnum(self.players[n].playStyle.playStyleMatrix).name
+            infos+="\nTopBorder: "+str(self.players[n].topVillageBorder)+"  BottomBorder: "+str(self.players[n].bottomVillageBorder)
+            infos+='\n\n'
+            n += 1
+        infos += '\n' * (term.height - ((len(self.world.villages)+1)*4)-2)
         print(infos)
 
 
@@ -190,9 +228,9 @@ class Game :
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
-        print("Appuyez sur s pour sauvegarder ")
-        print("Appuyez sur c pour charger une partie")
+        print("Appuyez sur s pour sauvegarder")
         print("Appuyez sur r pour reprendre")
+        print("Appuyez sur p pour activer pygame, puis appuyez sur R")
         print(f"IN GAME TIME : {self.game_duration}")
         print(f"SPEED : {self.speed}")
         with term.cbreak():
