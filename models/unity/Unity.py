@@ -52,6 +52,9 @@ class Unity:
     def get_position(self):
         return (self.position.getX(), self.position.getY())
 
+    def getTPosition(self):
+        return self.position.toTuple()
+
     def __repr__(self): return f"{self.name}"
     
     def __eq__(self, other): return self.__class__ == other.__class__

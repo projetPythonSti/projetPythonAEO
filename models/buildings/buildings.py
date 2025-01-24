@@ -72,5 +72,8 @@ class Building:
     def get_position(self):
         return self.position
 
+    def getTPosition(self):
+        return self.position.toTuple()
+
     def __repr__(self):
         return self.name

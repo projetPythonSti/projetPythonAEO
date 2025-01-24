@@ -313,7 +313,7 @@ class World_GUI:
         surface = surf if surf else building.surface
         
         """Draw the building using its isometric position."""
-        building_render_pos = self.compute_screen_position(building.get_position()[0], building.get_position()[1])
+        building_render_pos = self.compute_screen_position(building.getTPosition()[0], building.getTPosition()[1])
 
         # Apply camera displacement and zoom
         building_render_pos = (
@@ -350,12 +350,12 @@ class World_GUI:
         for (k1, building1), (k2, building2) in zip(buildings1.items(), buildings2.items()):
             
             for b1, b2 in zip(building1.values(), building2.values()):
-                if issubclass(b1.__class__, Building) and self.can_place_building(b1.get_occupied_tiles(), b1.get_position(), b1.surface):
+                if issubclass(b1.__class__, Building) and self.can_place_building(b1.get_occupied_tiles(), b1.getTPosition(), b1.surface):
                     
                     # self.draw_on_map(screen, b1.get_position(), self.tile_images[k1], camera, b1.surface)
                     # surface = (0.8,0.7) if k1 == "K" else None
                     self.draw_building(screen, b1, self.tile_images[k1], camera)
-                if issubclass(b2.__class__, Building) and self.can_place_building(b2.get_occupied_tiles(), b2.get_position(), b2.surface):
+                if issubclass(b2.__class__, Building) and self.can_place_building(b2.get_occupied_tiles(), b2.getTPosition(), b2.surface):
                     # self.draw_on_map(screen, b2.get_position(), self.tile_images[k2], camera, b2.surface)
                     # surface = (0.8,0.7) if k2 == "K" else None
                     self.draw_building(screen, b2, self.tile_images[k2], camera)
@@ -368,17 +368,17 @@ class World_GUI:
         units2 = {k:v for k, v in self.world_model.villages[1].population().items() if k in unity_keys}
         for (k, ressources) in self.world_model.get_ressources().items():
             for (_, ressource) in ressources.items():
-                self.draw_on_map(screen, ressource.get_position(), self.tile_images[k], camera)
+                self.draw_on_map(screen, ressource.getTPosition(), self.tile_images[k], camera)
                 
         for k, h in units1.items():
             surface = None if k in "ah" else (2,2)
             for _, v in h.items():
-                self.draw_on_map(screen, v.get_position(), self.tile_images[k], camera, surface)
+                self.draw_on_map(screen, v.getTPosition(), self.tile_images[k], camera, surface)
         
         for k, h in units2.items():
             surface = None if k in "ah" else (2,2)
             for _, v in h.items():
-                self.draw_on_map(screen, v.get_position(), self.tile_images[k], camera, surface)
+                self.draw_on_map(screen, v.getTPosition(), self.tile_images[k], camera, surface)
             
     
     def draw_on_map(self, screen, position, image, camera, surface=None):
