@@ -47,15 +47,23 @@ def jeu_terminal (world, debug=False):
 
     menu = Menu()
     dico = menu.start_menu()
-    #CREATION DU MONDE ET DES EQUIPES ET DES TCS ET DES VILLAGEOIS
-    world = random_world(dico)
-    make_teams(dico,world)
-    place_tcs(dico,world)
-    gm = GameManager(speed=1, world=world)
-    print("Jeu_terminal ------ World infos", gm.world.width,gm.world.height)
-    clock = pg.time.Clock()
-    playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=debug)
-    game_term = Game(world,clock,gm, players=playersList)
+    while dico is None :
+        menu.start_menu()
+    if type(dico) == tuple :
+        clock = pg.time.Clock()
+        game_term = Game(dico[0],clock,dico[1],dico[3])
+
+    else :
+        #CREATION DU MONDE ET DES EQUIPES ET DES TCS ET DES VILLAGEOIS
+        world = random_world(dico)
+        make_teams(dico,world)
+        place_tcs(dico,world)
+        gm = GameManager(speed=1, world=world)
+        clock = pg.time.Clock()
+        playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=debug)
+        game_term = Game(world,clock,gm, players=playersList)
+        game_term.kickstartPG = dico["d"]
+
     while running :
 
         while playing :

@@ -7,6 +7,9 @@ class Menu :
     """
             23/01/2025@tahakhetib : J'ai apporté des modifications à ce fichier  sur ce que @etan-test-1 a écrit
                 - Ajouté le retour du dictionnaire vers la boucle de jeu afin d'extraire les informations nécessaires à la création des IA,
+            25/01/2025@tahakhetib : J'ai apporté des modifications sur ce que @etan-test-1 à écrit
+                - Ajouté un attribut debug pour lancer automatiquement une partie pré-faite avec PyGame automatiquement lancé
+                - Ajouté la prise en charge de l'input pour activer ce mode debug (start_menu(), ajout d'un if et pré-remplissages des attributs de la partie et retour du dictionnaire)
 
         """
     def __init__(self):
@@ -16,6 +19,7 @@ class Menu :
         self.ressources_quantities = None
         self.nb_joueur = 0
         self.ai_behavior = []
+        self.debug = False
 
 #MENU DE DEMARRAGE
     def start_menu (self) :
@@ -26,6 +30,7 @@ class Menu :
         print("Appuyez sur q pour quitter le jeu")
         print("Appuyez sur n pour créer une nouvelle partie")
         print("Appuyez sur c charger une partie sauvegardé")
+        print("Appuyez sur k pour lancer le mode Debug PyGame")
         with term.cbreak():
             val = ''
             while val.lower() != 'n' or val.lower() != 'c':
@@ -39,9 +44,17 @@ class Menu :
 
                 if val.lower() == 'c' :
                     nsave = Save()
-                    data = nsave.load_term()
+                    data = nsave.load_term(term)
                     return tuple(data)
-
+                if val.lower() == 'k':
+                    self.x = 120
+                    self.y = 120
+                    self.type_map = 'g'
+                    self.nb_joueur = 2
+                    self.ai_behavior = ["a", "a"]
+                    self.ressources_quantities = 'g'
+                    self.debug = True
+                    return self.return_value()
             return self.return_value()
 
     def set_size_map (self) :
@@ -254,7 +267,7 @@ class Menu :
 
 
     def return_value(self):
-        return {"X":self.x, "Y": self.y, "q" : self.ressources_quantities, "n" : self.nb_joueur, "b" : self.ai_behavior, "t" : self.type_map }
+        return {"X":self.x, "Y": self.y, "q" : self.ressources_quantities, "n" : self.nb_joueur, "b" : self.ai_behavior, "t" : self.type_map,"d": self.debug}
 
     def reset(self):
         self.x = None
