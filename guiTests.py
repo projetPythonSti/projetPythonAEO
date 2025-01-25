@@ -2,6 +2,7 @@ import pygame as pg
 import time
 import os, sys
 
+from enum import Enum
 from game import Game
 from models.AIPlayer import AIPlayer, PlayStyleEnum
 from models.buildings.town_center import TownCenter
@@ -28,6 +29,20 @@ import randommap
         - Déplacé le moment de l'initialisation du GameManager afin d'éviter que celui-ci ne soit pas à jour 
     
 """
+
+
+class PyGameDebugWorldENUM(Enum):
+    width = 120
+    height = 120
+    ressourceQuantity = 'g'
+    playersNumber = 2
+    aisBehavior = ["a","a"]
+    mapType = 'g'
+
+def getPygameDebugWorld():
+    return {"X": 120, "Y": 120, "q": 'g', "n": 2, "b": ['a','a'],
+            "t": 'g', "d": True}
+
 
 def fillAIPlaystyle(world:World, aiBehavior,gameLevel , gm:GameManager, debug=False):
     aiList = []

@@ -1,4 +1,6 @@
 from blessed import Terminal
+
+from guiTests import getPygameDebugWorld, PyGameDebugWorldENUM
 from models.save import *
 import os
 
@@ -10,6 +12,8 @@ class Menu :
             25/01/2025@tahakhetib : J'ai apporté des modifications sur ce que @etan-test-1 à écrit
                 - Ajouté un attribut debug pour lancer automatiquement une partie pré-faite avec PyGame automatiquement lancé
                 - Ajouté la prise en charge de l'input pour activer ce mode debug (start_menu(), ajout d'un if et pré-remplissages des attributs de la partie et retour du dictionnaire)
+                - Remplacé la ligne précédente par une Enum PyGameDebugWorldENUM
+
 
         """
     def __init__(self):
@@ -47,14 +51,15 @@ class Menu :
                     data = nsave.load_term(term)
                     return tuple(data)
                 if val.lower() == 'k':
-                    self.x = 120
-                    self.y = 120
-                    self.type_map = 'g'
-                    self.nb_joueur = 2
-                    self.ai_behavior = ["a", "a"]
-                    self.ressources_quantities = 'g'
+                    self.x = PyGameDebugWorldENUM.width.value
+                    self.y = PyGameDebugWorldENUM.height.value
+                    self.type_map = PyGameDebugWorldENUM.mapType.value
+                    self.nb_joueur = PyGameDebugWorldENUM.playersNumber.value
+                    self.ai_behavior = PyGameDebugWorldENUM.aisBehavior.value
+                    self.ressources_quantities = PyGameDebugWorldENUM.ressourceQuantity.value
                     self.debug = True
                     return self.return_value()
+
             return self.return_value()
 
     def set_size_map (self) :
