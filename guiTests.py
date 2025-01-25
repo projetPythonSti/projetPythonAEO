@@ -27,7 +27,8 @@ import randommap
 """
     24/01/2025@tahakhetib : J'ai ajouté des chose sur ce que @maxgigi à écrit
         - Déplacé le moment de l'initialisation du GameManager afin d'éviter que celui-ci ne soit pas à jour 
-    
+    25/01/2025@tahakhetib: J'ai ajouté des choses sur ce que @etan-test-1 à écrit
+        - Ajouté un ENUM décrivant les caractéristiques du monde et pris en charge le nouveau mode débug pygame
 """
 
 
@@ -66,7 +67,7 @@ def jeu_terminal (world, debug=False):
         menu.start_menu()
     if type(dico) == tuple :
         clock = pg.time.Clock()
-        game_term = Game(dico[0],clock,dico[1],dico[3])
+        game_term = Game(dico[0],clock,dico[1],dico[2],gameDuration=dico[3])
 
     else :
         #CREATION DU MONDE ET DES EQUIPES ET DES TCS ET DES VILLAGEOIS

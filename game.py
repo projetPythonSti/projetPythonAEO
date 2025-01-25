@@ -22,9 +22,11 @@ class Game :
                     - Ajouté la prise en charge du démarrage de pygame (touché à turn())
                     - Créé une fonction initPygame, et draw_pygame()
                     - ajouté l'attribut term_on pour s'assurer que le terminal est bien allumé
+                25/01/2025@tahakhetib : J'ai ajouté des choses sur ce que @etan-test1 à écrit
+                    - Ajouté un attribut optionnel au init() de la classe pour spécifier le temps du jeu, nécessaire lors du chargement de la sauvegarde
             """
 
-    def __init__(self, world, clock, gm, players: list[AIPlayer]):
+    def __init__(self, world, clock, gm, players: list[AIPlayer], gameDuration=0):
 
         self.ltick = time.time()
         self.gm = gm
@@ -35,7 +37,7 @@ class Game :
         self.upleft = Position(0,0) #changes by player arrow keys, should always start upper left of the map (0,0)
         self.downright = Position(0, 0) #changes by itself to fit the screen
         self.playing = False
-        self.game_duration = 0
+        self.game_duration = gameDuration
         self.save = Save()
         self.ffff = False
         self.pygame_on = False
