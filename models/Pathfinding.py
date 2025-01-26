@@ -72,7 +72,6 @@ class Pathfinding:
             return finalPos
         return finalPos
 
-
     def astar(self):
         neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # ,(1,1),(1,-1),(-1,1),(-1,-1)]
         close_set = set()
@@ -122,6 +121,8 @@ class Pathfinding:
 
         return False
 
+    def maxfinding(self): #returns a list of tuples, calls astar if problem
+        ()
 
 #route = astar(grid, self.startingPoint, self.goal)
 #route = route + [self.startingPoint]
