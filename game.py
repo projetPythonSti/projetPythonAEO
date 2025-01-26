@@ -176,8 +176,7 @@ class Game :
         for village in self.world.villages:
             infos+="Village "+village.name+" ;\n"
             infos+=" Wood:"+str(village.ressources["w"])+" Gold:"+str(village.ressources["g"])+" Food:"+str(village.ressources["f"])
-            infos+=" Population:"+str(village.peopleCount)+'/'
-            infos+="\n"
+            infos+=" Population:"+str(village.peopleCount)+'/'+"(nb max)"
             infos+="Playstyle: "+PlayStyleMatrixEnum(self.players[n].playStyle.playStyleMatrix).name
             infos+="\nTopBorder: "+str(self.players[n].topVillageBorder)+"  BottomBorder: "+str(self.players[n].bottomVillageBorder)
             infos+='\n\n'
