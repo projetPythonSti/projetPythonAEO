@@ -1,6 +1,6 @@
 from blessed import Terminal
 
-from guiTests import getPygameDebugWorld, PyGameDebugWorldENUM
+from guiTests import PyGameDebugWorldENUM
 from models.save import *
 import os
 

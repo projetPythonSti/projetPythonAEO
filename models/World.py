@@ -5,6 +5,7 @@ from models.buildings.buildings import Building
 from models.buildings.town_center import TownCenter
 from models.maps.Tile import  Tile
 from models.model import Model  # delete it after finish testing the class World
+from models.unity.Unity import Unity
 from models.unity.Villager import Villager  # delete it after finish testing the class World
 from models.ressources.ressources import Gold, Wood, Food, Ressource
 from collections import defaultdict
@@ -24,6 +25,9 @@ class World:
             - Modifié les fonctions place_element() et remove_element() pour qu'elle s'adapte au changement de filled_tiles
         02/12/2024@tahakhetib : J'ai apporté des modifications sur ce que @amadou_yaya_diallo a écrit
             - Passé le type des éléments du dictionnaire de tiles_dico à Tiles
+        26/01/2024@tahakhetib : J'ai apporté les modifications sur ce que @amadou_yaya_diallo à écrit
+            - Ajouté un nouveau dictionnaire contenant uniquement les unités et les tuiles sur lesquelles elle sont.
+            - Ajouté une fonction mettant à jour la position
     """
     def __init__(self, width, height):  # dict of villages in the world
         self.width = width
@@ -32,6 +36,7 @@ class World:
         self.ressources = defaultdict(dict)
         self.tiles_dico = defaultdict(Tile)  # à chaque clé sera associé une Tuile
         self.filled_tiles = defaultdict(tuple)
+        self.unitTiles = defaultdict(list)
         self.initialise_world()
         # les clés du dico seront de la forme (x,y)
         # self.units  #every unit on the map, a list seems better to me
@@ -79,6 +84,13 @@ class World:
             for pop in village.population().values():
                 for v in pop.values():
                     self.place_element(v)
+    def fill_unitDict(self, position, unit):
+        self.unitTiles[position].append(unit)
+
+
+    def updateUnitPos(self,oldPos ,position, unit):
+        self.unitTiles[oldPos].remove(unit)
+        self.unitTiles[position].append(unit)
 
     def show_world(self): #
         for y in range(self.height):
@@ -120,8 +132,8 @@ class World:
             if upleft.getX() > 0:
                 world_chunk+='<'
             for x in range(upleft.getX(), downright.getX(), 1):
-                if(self.tiles_dico[(x, y)].contains!=None):
-                    world_chunk+=self.tiles_dico[(x, y)].contains.name[0]
+                if(self.tiles_dico[(x, y)].contains!=None and (x,y)):
+                        world_chunk+=self.tiles_dico[(x, y)].contains.name[0]
                 else:
                     world_chunk+=' '
             if downright.getX() < self.width:

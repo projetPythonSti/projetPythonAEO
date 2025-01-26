@@ -4,8 +4,12 @@ import random as rd
 
 class Building:
     """
-                06/12/2024@tahakhetib - J'ai ajouté les modifications au dessus de ce que @amadou_yaya_diallo à écrit
+                06/01/2025@tahakhetib - J'ai ajouté les modifications au dessus de ce que @amadou_yaya_diallo à écrit
                     - Passé l'attribut surface en statique afin de pouvoir y accéder sans avoir à créer un Building
+                25/01/2025@tahahkhetib - J'ai ajouté des modifications au dessus de ce que @amadou_yaya_diallo à écrit
+                    - Changé la définition de l'UID au niveau de toutes les classes filles de Building
+                26/01/2025@tahahkhetib - J'ai ajouté des modifications au dessus de ce que @amadou_yaya_diallo à écrit
+                    - Supprimé la ligne self.time_building = 3*ksjfl afin de garder le calcul du temps pour construire au niveau du GameManager
     """
     surface = (1,1)
     def __init__(self, uid, name, cost, time_building, health, spawn="", population=0, dropPoint=False, position=None, team=None):
@@ -19,7 +23,7 @@ class Building:
         self.dropPoint = dropPoint
         self.population = population
         self.builders = 1
-        self.time_building = 3 * time_building / (self.builders + 2)
+        #self.time_building = 3 * time_building / (self.builders + 2)
         self.team = team
         self.position = position if position else Position(rd.randint(0, self.team.world.width - 1), rd.randint(0, self.team.world.height - 1))
         self.image = f"./assets/images/buildings/{self.name}.png"

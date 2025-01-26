@@ -2,10 +2,15 @@ from models.buildings.buildings import Building
 from models.ressources.ressources import Food
 
 class Farm(Building):
+  """
+      25/01/2025@tahakhetib - j'ai apporté des modification sur ce que @amadou_yaya_diallo a écrit
+        - Changé la définition du l'UID -> Passage à une string basé sur le numéro d'équipe + la taille de la communauté.
+
+    """
   surface = (2, 2)  # 2x2
   def __init__(self, team):
-    community = team.get_community().get('F'),
-    uid = len(community) if community else 0 # 0 if it doesn't exist yet
+
+    uid = f"eq{team.name}b{team.get_bldCount()}"
     super().__init__(
       uid,
       name = "F",

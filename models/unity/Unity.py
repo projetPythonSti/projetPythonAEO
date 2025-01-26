@@ -4,7 +4,14 @@ import random as rd
 
 class Unity:
     population = 0
-    
+
+    """
+    26/01/2025@tahakhetib :  J'ai apporté les modification suivantes sur le fichier (ce que j'ai écrit)
+                - Ajouté une fonction isInRange() pour vérifier si une autre position est dans la zone d'attaque de l'unité
+                - Ajouté une fonction estimateDistance() pour obtenir la distance entre 2 éléments, sert dans la fonction isInRange()
+                - Ajouté une fonction pour vérifier l'avancement de la construction d'un batiment
+
+    """
     def __init__(self, uid, name, cost, trainningTime, health, damage, speed, visibility, team, position=None, target = None):
         self.uid = uid
         self.name = name
@@ -54,6 +61,14 @@ class Unity:
 
     def getTPosition(self):
         return self.position.toTuple()
+
+
+    def estimateDistance(self, pos1 : tuple, pos2 : tuple):
+        return abs(pos2[0] - pos1[0]), abs(pos2[1] - pos1[1])
+
+    def isInRange(self, position : tuple[int,int]):
+        distance = self.estimateDistance(self.position.toTuple(), position)
+        return distance[0] <= self.range and distance[0]<= self.range
 
     def __repr__(self): return f"{self.name}"
     

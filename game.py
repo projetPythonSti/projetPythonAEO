@@ -21,9 +21,13 @@ class Game :
                     - Ajouté un attribut kickstartPg
                     - Ajouté la prise en charge du démarrage de pygame (touché à turn())
                     - Créé une fonction initPygame, et draw_pygame()
-                    - ajouté l'attribut term_on pour s'assurer que le terminal est bien allumé
-                25/01/2025@tahakhetib : J'ai ajouté des choses sur ce que @etan-test1 à écrit
-                    - Ajouté un attribut optionnel au init() de la classe pour spécifier le temps du jeu, nécessaire lors du chargement de la sauvegarde
+                    - Ajouté l'attribut term_on pour s'assurer que le terminal est bien allumé
+                25/01/2025@tahakhetib : J'ai ajouté des choses sur ce que @etan-test1 a écrit
+                    - Ajouté un attribut optionnel à l'init() de la classe pour spécifier le temps du jeu, nécessaire lors du chargement de la sauvegarde
+                    - Ajouté un attribut dérivé playerNumber représentant le nombre de joueurs dans le jeu, et ajouté l'attribut activePlayer pour faire jouer une IA par Frame au lieu de toutes les IA par frame
+                    - Modifié la fonction checkUnitToMove() par checkModifications() afin d'exécuter toutes les actions du gameManager en une seule fonction
+                26/01/2025@tahkhetib
+                    - synchronisé le Speed du jeu avec celle du GameManager
             """
 
     def __init__(self, world, clock, gm, players: list[AIPlayer], gameDuration=0):
@@ -31,6 +35,8 @@ class Game :
         self.ltick = time.time()
         self.gm = gm
         self.players = players
+        self.playerNumber = len(players)
+        self.activePlayer = 0
         self.clock = clock
         self.speed = 1
         self.world = world
@@ -70,15 +76,18 @@ class Game :
                     self.pause(term)
                 elif val.name == 'KEY_TAB':
                     self.stat(term)
-
+                #for debugging purposes only - To be removed after testing
+                elif val.lower() == 'k' :
+                    assert False
                 #a changer
                 elif val.lower() == '+':
                     if self.speed < 10:
                         self.speed += 1
+                        self.gm.gameSpeed += 1
                 elif val.lower() == '-':
                     if self.speed >= 1 :
                         self.speed -= 1
-
+                        self.gm.gameSpeed -= 1
 
                 elif val == 'z':
                     if self.upleft.getY()>0:
@@ -137,9 +146,13 @@ class Game :
         #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
         # self.events()
         # self.update()
-        for a in self.players:
-            a.playTurn()
-        self.gm.checkUnitsToMove()
+        if self.activePlayer<self.playerNumber:
+            self.players[self.activePlayer].playTurn()
+            self.activePlayer +=1
+        else:
+            self.activePlayer = 0
+            self.players[self.activePlayer].playTurn()
+        self.gm.checkModifications()
         self.gm.tick = timeit.default_timer()
 
         #self.draw_term(term)
@@ -158,6 +171,7 @@ class Game :
         if self.gm.save:
             pass
         if self.term_on:
+            pass
             self.draw_term(term)
 
 
