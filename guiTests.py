@@ -2,6 +2,7 @@ import pygame as pg
 import time
 import os, sys
 
+from enum import Enum
 from game import Game
 from models.AIPlayer import AIPlayer, PlayStyleEnum
 from models.buildings.town_center import TownCenter
@@ -23,15 +24,36 @@ from models.Position import Position
 import randommap
 
 
+"""
+    24/01/2025@tahakhetib : J'ai ajouté des chose sur ce que @maxgigi à écrit
+        - Déplacé le moment de l'initialisation du GameManager afin d'éviter que celui-ci ne soit pas à jour 
+    25/01/2025@tahakhetib: J'ai ajouté des choses sur ce que @etan-test-1 à écrit
+        - Ajouté un ENUM décrivant les caractéristiques du monde et pris en charge le nouveau mode débug pygame
+"""
+
+
+class PyGameDebugWorldENUM(Enum):
+    width = 120
+    height = 120
+    ressourceQuantity = 'g'
+    playersNumber = 2
+    aisBehavior = ["a","a"]
+    mapType = 'g'
+
+def getPygameDebugWorld():
+    return {"X": 120, "Y": 120, "q": 'g', "n": 2, "b": ['a','a'],
+            "t": 'g', "d": True}
+
+
 def fillAIPlaystyle(world:World, aiBehavior,gameLevel , gm:GameManager, debug=False):
     aiList = []
 
     for a in range(len(world.villages)):
-        aiList.append(AIPlayer(world.villages[a-1],world,PlayStyleEnum[aiBehavior[a-1]].value,100, gm,debug=debug, writeToDisk=False))
+        aiList.append(AIPlayer(world.villages[a-1],world,PlayStyleEnum[aiBehavior[a-1]].value,100, gm,debug=debug, writeToDisk=True))
     return aiList
 
 
-def jeu_terminal (world, gm:GameManager, debug=False):
+def jeu_terminal (world, debug=False):
     running = True
     playing = True
 
@@ -41,21 +63,22 @@ def jeu_terminal (world, gm:GameManager, debug=False):
 
     menu = Menu()
     dico = menu.start_menu()
-    while dico == None :
+    while dico is None :
         menu.start_menu()
     if type(dico) == tuple :
         clock = pg.time.Clock()
-        game_term = Game(dico[0],clock,dico[1],dico[3])
+        game_term = Game(dico[0],clock,dico[1],dico[2],gameDuration=dico[3])
 
     else :
         #CREATION DU MONDE ET DES EQUIPES ET DES TCS ET DES VILLAGEOIS
         world = random_world(dico)
         make_teams(dico,world)
         place_tcs(dico,world)
-
+        gm = GameManager(speed=1, world=world)
         clock = pg.time.Clock()
         playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=debug)
         game_term = Game(world,clock,gm, players=playersList)
+        game_term.kickstartPG = dico["d"]
 
     while running :
 
@@ -140,9 +163,8 @@ if __name__ == "__main__":
     #Boucle pour tester le game manager
 
     monde = World(1, 1)
-    gm = GameManager(speed=1, world=monde)
     n = 0
-    jeu_terminal(monde,gm, False)
+    jeu_terminal(monde, False)
 
 
 

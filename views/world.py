@@ -1,10 +1,11 @@
 from models.buildings.buildings import Building 
 from collections import defaultdict
+
+from models.buildings.keep import Keep
 from utils.setup import TILE_SIZE
 from models.World import World
 import pygame as pg
 import random
-import noise
 #from buildings import Building, TownCentre, House, Camp, Farm, Barracks, Stable, ArcheryRange, Keep, ProjectilePool, Projectile
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -56,7 +57,7 @@ class World_GUI:
         miny = min(y for _, y in iso_poly)
 
         r = random.randint(1, 100)
-        perlin = 100 * noise.pnoise2(grid_x / self.perlin_scale, grid_y / self.perlin_scale)
+        perlin = 100 * 2
 
         if "w" in self.world_model.ressources and "g" in self.world_model.ressources:
             if (perlin >= 15) or (perlin <= -35):
