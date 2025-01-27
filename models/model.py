@@ -31,6 +31,13 @@ class Model:
                 - Ajouté un compteur workingPpl qui va permettre aux IA de suivre le nombre de personnes qui doivent travailler.
             05/12/2024@tahakhetib - J'ai ajouté les modifications au-dessus de ce que @amadou_yaya_diallo a écrit
                 - Retiré les compteurs workingPpl et peopleCount pour une fonction get_pplCount()
+            25/01/2025@tahakhetib - j'ai apporté des modification sur ce que @amadou_yaya_diallo a écrit
+                - Evité un bug en mettant à jour le compteur peopleCount lorsqu'on ajoute une unité
+                - Ajouté le compteur buildingCount afin de pouvoir assigner des UID au buildings
+            26/01/2025@tahakhetib - j'ai ajoutés des choses au dessus de ce que @amadou_yaya_diallo a écrit
+                - Ajouté un dictionnaire de gens du village morts lol
+                - Ajouté une fonction marquant les villageois comme mort
+
 
     """
     def __init__(self, name, world = None):
@@ -39,9 +46,11 @@ class Model:
         self.community = defaultdict(dict)
         self.ressources = defaultdict(int)
         self.peopleCount = 0
+        self.buildingCount = 0
         self.workingPpl = 0
         self.name = name
         self.world = world
+        self.deads = defaultdict()
         self.world.add_village(self)
 
     def to_dict(self):
@@ -72,27 +81,36 @@ class Model:
             self.community["s"][s.uid] = s
         
         for i in range(town_center):
+            self.buildingCount +=1
             self.community["T"][str(i)] = TownCenter(team=self)
         
         for i in range(archery_ranger):
+            self.buildingCount +=1
             self.community["A"][str(i)] = ArcheryRange(team=self)
 
         for i in range(barracks):
+            self.buildingCount +=1
+
             self.community["B"][str(i)] = Barracks(team=self)
 
         for i in range(camps):
+            self.buildingCount +=1
             self.community["C"][str(i)] = Camp(team=self)
 
         for i in range(farms):
+            self.buildingCount +=1
             self.community["F"][str(i)] = Farm(team=self)
 
         for i in range(houses):
+            self.buildingCount +=1
             self.community["H"][str(i)] = House(team=self)
 
         for i in range(keeps):
+            self.buildingCount +=1
             self.community["K"][str(i)] = Keep(team=self)
 
         for i in range(stables):
+            self.buildingCount +=1
             self.community["S"][str(i)] = Stable(team=self)
         
         self.ressources["w"] += wood
@@ -113,11 +131,10 @@ class Model:
         if(self.has_enough_resources(unit.get_cost())):
             # if issubclass(unit.__class__, Building):
             #     unit.build()
-
+            self.peopleCount += 1
             self.community[unit.name][str(unit.uid)] = unit
             for ressource, cost in unit.get_cost().items():
                 self.ressources[ressource] -= cost
-
     """
         takes ressources to add, and update the village ressources
     """
@@ -127,7 +144,8 @@ class Model:
             self.ressources[ressource.get_name()] += ressource.get_quantity()
         else:
             self.ressources[ressource] += quantity
-
+    def add_building(self):
+        self.buildingCount += 1
     def remove_unit(self, unit):
         self.community[unit.name].pop(str(unit.uid))
         if(issubclass(unit.__class__, Ressource)):
@@ -142,7 +160,12 @@ class Model:
             if not self.ressources.get(resource) or  self.ressources.get(resource) <= cost:
                 return False
         return True
-    
+
+    def markAsDead(self, unit):
+        self.world.removeUnitPos(unit.position.toTuple(), unit)
+        self.community[unit.name].pop(unit.uid)
+        self.deads[unit.uid] = unit.uid
+
     def get_community(self):
         return self.community
 
@@ -154,8 +177,8 @@ class Model:
 
     def get_pplCount(self):
         return self.peopleCount
-
-
+    def get_bldCount(self):
+        return self.buildingCount
 
 if __name__ == "__main__":
     model = Model("Mine")

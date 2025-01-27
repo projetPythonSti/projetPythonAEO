@@ -1,3 +1,5 @@
+import timeit
+
 import pygame as pg
 import time
 import os, sys
@@ -40,16 +42,14 @@ class PyGameDebugWorldENUM(Enum):
     aisBehavior = ["a","a"]
     mapType = 'g'
 
-def getPygameDebugWorld():
-    return {"X": 120, "Y": 120, "q": 'g', "n": 2, "b": ['a','a'],
-            "t": 'g', "d": True}
+
 
 
 def fillAIPlaystyle(world:World, aiBehavior,gameLevel , gm:GameManager, debug=False):
     aiList = []
 
     for a in range(len(world.villages)):
-        aiList.append(AIPlayer(world.villages[a-1],world,PlayStyleEnum[aiBehavior[a-1]].value,100, gm,debug=debug, writeToDisk=True))
+        aiList.append(AIPlayer(world.villages[a-1],world,PlayStyleEnum[aiBehavior[a-1]].value,100, gm,debug=debug, writeToDisk=False))
     return aiList
 
 
@@ -74,15 +74,18 @@ def jeu_terminal (world, debug=False):
         world = random_world(dico)
         make_teams(dico,world)
         place_tcs(dico,world)
-        gm = GameManager(speed=1, world=world)
+        gm = GameManager(speed=1, world=world,debug=False)
         clock = pg.time.Clock()
-        playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=debug)
+        gm.tick = timeit.default_timer()
+        playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=False)
         game_term = Game(world,clock,gm, players=playersList)
         game_term.kickstartPG = dico["d"]
+        print(game_term.playerNumber)
 
     while running :
 
         while playing :
+            print("NEW GAMEEEE")
             game_term.run()
 
 
@@ -146,11 +149,11 @@ if __name__ == "__main__":
     #print(v)
     #print(community)
     '''
-    print("Launched GameManager")
+    #print("Launched GameManager")
     #m.addUnitToMoveDict(v, Position(40, 40))
-    print("Added unit to move dict")
+    #print("Added unit to move dict")
     #gm.addUnitToMoveDict(community["v"]["eq1p6"], Position(10,20))
-    print("Added 2nd unit to move dict")
+    #print("Added 2nd unit to move dict")
     '''
     tc = TownCenter(team=village1)
     tc2= TownCenter(team=village2)
@@ -164,7 +167,7 @@ if __name__ == "__main__":
 
     monde = World(1, 1)
     n = 0
-    jeu_terminal(monde, False)
+    jeu_terminal(monde, True)
 
 
 

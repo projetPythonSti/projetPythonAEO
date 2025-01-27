@@ -5,6 +5,7 @@ from models.buildings.buildings import Building
 from models.buildings.town_center import TownCenter
 from models.maps.Tile import  Tile
 from models.model import Model  # delete it after finish testing the class World
+from models.unity.Unity import Unity
 from models.unity.Villager import Villager  # delete it after finish testing the class World
 from models.ressources.ressources import Gold, Wood, Food, Ressource
 from collections import defaultdict
@@ -24,6 +25,10 @@ class World:
             - Modifié les fonctions place_element() et remove_element() pour qu'elle s'adapte au changement de filled_tiles
         02/12/2024@tahakhetib : J'ai apporté des modifications sur ce que @amadou_yaya_diallo a écrit
             - Passé le type des éléments du dictionnaire de tiles_dico à Tiles
+        26/01/2024@tahakhetib : J'ai apporté les modifications sur ce que @amadou_yaya_diallo à écrit
+            - Ajouté un nouveau dictionnaire contenant uniquement les unités et les tuiles sur lesquelles elle sont.
+            - Ajouté une fonction mettant à jour la position d'une unit
+            - modifié la fonction d'affichage return_precise_world afin que les unités et batiments deviennent rouge si leur santé est inférieure à leur santé nominale
     """
     def __init__(self, width, height):  # dict of villages in the world
         self.width = width
@@ -32,6 +37,7 @@ class World:
         self.ressources = defaultdict(dict)
         self.tiles_dico = defaultdict(Tile)  # à chaque clé sera associé une Tuile
         self.filled_tiles = defaultdict(tuple)
+        self.unitTiles = defaultdict(dict)
         self.initialise_world()
         # les clés du dico seront de la forme (x,y)
         # self.units  #every unit on the map, a list seems better to me
@@ -78,8 +84,32 @@ class World:
         for village in self.villages:
             for pop in village.population().values():
                 for v in pop.values():
+
                     self.place_element(v)
 
+
+
+
+    def updateUnitPos(self,oldPos ,position, unit):
+        self.unitTiles[oldPos]["elements"].remove(unit)
+        try:
+            self.unitTiles[oldPos]["elements"][0]
+        except:
+            self.unitTiles.pop(oldPos)
+        if position not in self.unitTiles:
+            self.unitTiles[position] = {
+                "filled": True,
+                "elements": [unit]
+            }
+        else:
+            self.unitTiles[position]["filled"] = True
+            self.unitTiles[position]["elements"] += [unit]
+    def removeUnitPos(self, pos,unit):
+        self.unitTiles[pos]["elements"].remove(unit)
+        try:
+            self.unitTiles[pos]["elements"][0]
+        except:
+            self.unitTiles.pop(pos)
     def show_world(self): #
         for y in range(self.height):
             for x in range(self.width):
@@ -112,7 +142,7 @@ class World:
             world_representation.append("".join(row))  # Joindre chaque ligne en une chaîne
         return "\n".join(world_representation)
 
-    def return_precise_world(self,upleft:Position,downright:Position):
+    def return_precise_world(self,upleft:Position,downright:Position,term):
         world_chunk="\n\n\n"
         if upleft.getY() > 0:
             world_chunk+=(' ' + (downright.getX() - upleft.getX()) * 'ʌ' + '\n')
@@ -120,8 +150,10 @@ class World:
             if upleft.getX() > 0:
                 world_chunk+='<'
             for x in range(upleft.getX(), downright.getX(), 1):
-                if(self.tiles_dico[(x, y)].contains!=None):
-                    world_chunk+=self.tiles_dico[(x, y)].contains.name[0]
+                if (x,y) in self.unitTiles and self.unitTiles[(x,y)]["elements"] is not []:
+                    world_chunk += self.unitTiles[(x, y)]["elements"][0].personalizedStr(term)
+                elif(self.tiles_dico[(x, y)].contains!=None):
+                        world_chunk+=self.tiles_dico[(x, y)].contains.personalizedStr(term)
                 else:
                     world_chunk+=' '
             if downright.getX() < self.width:
@@ -137,23 +169,34 @@ class World:
         #print("World : place_element -- In place element")
         place = (element.position.getX(), element.position.getY())
         if place not in self.filled_tiles and place[0] <= self.width and place[1] <= self.height:
-            #print("World : place_element ------- Element n'étant pas dans une tuile déjà prise")
+            print("World : place_element ------- Element n'étant pas dans une tuile déjà prise")
             if issubclass(element.__class__, Building) and all(tile not in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
-                #print("World : place_element ------- Elt est un batiment")
+                print("World : place_element ------- Elt est un batiment, voici le batiment -> " ,element.name)
                 #check if the building can be placed
                 if element.surface[0] + place[0] <= self.width and element.surface[1] + place[1] <= self.height:
                     for x in range(element.surface[0]):
                         for y in range(element.surface[1]):
                             try:
                                 self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(element)
-                                #print("World : place_element ------- tiles dico après l'ajout : ", self.tiles_dico[(place[0] + x, place[1] + y)].contains)
                             except KeyError:
                                 #print("Y'a une erreur la tout de même faudrait un print ?")
                                 pass
                             self.filled_tiles[(place[0] + x, place[1] + y)] = (place[0] +x, place[1]+y)
             elif not issubclass(element.__class__, Building):
-                self.tiles_dico[place].set_contains(element)
-                self.filled_tiles[place] = place
+                if issubclass(element.__class__, Unity):
+                    if place not in self.unitTiles:
+                        self.unitTiles[place] = {
+                            "filled" : True,
+                            "elements" : []
+                        }
+                        self.unitTiles[place]["elements"] += [element]
+                    else:
+                        self.unitTiles[place]["filled"] = True
+                        self.unitTiles[place]["elements"] += [element]
+
+                else:
+                    self.tiles_dico[place].set_contains(element)
+                    self.filled_tiles[place] = place
             #update the view of the element
 
     def remove_element(self, element):
@@ -163,9 +206,15 @@ class World:
                 for y in range(element.surface[1]):
                     self.tiles_dico[(place[0] + x, place[1] + y)].set_contains(None)
                     self.filled_tiles.pop[((place[0] + x, place[1] + y))]
+
         elif not issubclass(element.__class__, Building):
-            self.tiles_dico[place].set_contains(None)
-            self.filled_tiles.pop(place)
+            if issubclass(element.__class__, Unity):
+                if self.unitTiles[place]["filled"]:
+                    self.unitTiles[place]["elements"].remove(element)
+            else:
+                self.tiles_dico[place].set_contains(None)
+                self.filled_tiles.pop(place)
+
             #self.ressources[element.name].pop(str(element.uid))
 
         #removing element from its team also
