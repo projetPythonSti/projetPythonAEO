@@ -53,6 +53,10 @@ class Model:
         self.deads = defaultdict()
         self.world.add_village(self)
 
+    def to_dict(self):
+        return {"community" : {k1 : { k2 : {"X" : self.community[k1][k2].position.getX(), "Y" : self.community[k1][k2].position.getY()} for k2 in self.community[k1].keys()} for k1 in self.community.keys()}, "ressources du village" : { k : v for k,v in self.ressources.items()}}
+
+
     def initialize_villages(self, archers = 0, horsmen = 0, swordsmen = 0, villages = 0, town_center = 0,
                             stables = 0, keeps = 0, houses = 0, farms = 0, camps = 0, barracks = 0, 
                             archery_ranger = 0, wood = 0, food = 0, gold = 0):

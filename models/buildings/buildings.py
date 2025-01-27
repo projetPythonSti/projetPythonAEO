@@ -92,5 +92,16 @@ class Building:
 
     def personalizedStr(self,term): return f"{term.red if self.health<BuildingHealthENUM[self.name].value else term.normal}{self.name}{term.normal}"
 
+    def to_json(self):
+        return {
+            "id": self.uid,
+            "name": self.name,
+            "health": self.health,
+            "isBuilt": self.is_built,
+            "builders": self.builders,
+            "teamID": self.team.name, #int(x) if its not an integer please
+            "position": self.position.to_json(),
+        }
+
     def __repr__(self):
         return self.name

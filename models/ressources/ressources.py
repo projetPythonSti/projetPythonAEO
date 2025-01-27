@@ -13,6 +13,10 @@ class Ressource:
         self.image = f"./assets/images/ressources/{self.name}.png"
 
 
+
+    def to_dict(self):
+        return {"name" : self.name, "quantity" : self.quantity, "position" : (self.position.getX(),self.position.getY()),"uid" : self.uid}
+
     def get_quantity(self):
         return self.quantity
     
