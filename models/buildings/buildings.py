@@ -1,7 +1,18 @@
 import time
+from enum import Enum
+
 from models.Position import Position
 import random as rd
 
+class BuildingHealthENUM(Enum):
+    T = 1000
+    A = 500
+    B = 500
+    C = 200
+    F = 100
+    H = 200
+    K = 800
+    S = 500
 class Building:
     """
                 06/01/2025@tahakhetib - J'ai ajouté les modifications au dessus de ce que @amadou_yaya_diallo à écrit
@@ -78,6 +89,8 @@ class Building:
 
     def getTPosition(self):
         return self.position.toTuple()
+
+    def personalizedStr(self,term): return f"{term.red if self.health<BuildingHealthENUM[self.name].value else term.normal}{self.name}{term.normal}"
 
     def __repr__(self):
         return self.name

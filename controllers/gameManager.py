@@ -13,6 +13,7 @@ from models.Pathfinding import Pathfinding
 from models.Position import Position
 from models.World import World
 from models.buildings.buildings import Building
+from models.ressources.ressources import Ressource
 from models.unity.Unity import Unity
 from enum import Enum
 gmOutput = io.StringIO()
@@ -42,6 +43,8 @@ class GameManager:
                 - Corrigé le bug faisant qu'une unité n'avançait pas correctement dans la bonne direction
                 - Corrigé l'algorithme de recherche de position près des batiments
                 - Ajouté une fonction pour vérifier l'avancement de la construction d'un batiment
+                - Ajouté les fonctions pour initier un combat
+                - Ajouté les fonctions pour initer une collecte de ressources
 
         """
         tick = timeit.default_timer()
@@ -79,6 +82,9 @@ class GameManager:
             } 
         '''
         unitAttack = defaultdict(dict)
+
+        ressourceToCollect = defaultdict(dict)
+
         def __init__(self, speed, world: World,debug=False, writeToDisk=False ):
             self.gameSpeed = speed
             self.world = world
@@ -86,7 +92,7 @@ class GameManager:
             self.writeToDisk = writeToDisk
             self.save = False
             self.attackDict = defaultdict(list)
-
+            self.pastAttacks = defaultdict(dict)
         def logger(self, *args, **kwargs):
             if self.debug:
                 if self.writeToDisk:
@@ -105,6 +111,8 @@ class GameManager:
             self.logger("--------- End Of CBTB ---------")
             self.checkUnitToAttack()
             self.logger("--------- End Of CUTA ---------")
+            self.checkResourceToCollect()
+            self.logger("--------- End Of CUTA ---------")
             self.logger("--------- Game Manager End ---------")
 
         def getTeamNumber(self, name):
@@ -120,19 +128,13 @@ class GameManager:
             unit["timeElapsed"] += (deltaTime.real*self.gameSpeed)
             #self.logger("time elapsed : ", unit["timeElapsed"])
             if unit["timeElapsed"] >= (unit["timeToTile"]):
-                self.world.tiles_dico[unit["moveQueue"][0]].set_contains(None)
-                try:
-                    self.world.filled_tiles.pop(unit["moveQueue"][0])
-                except KeyError:
-                    print("KeyError")
-                unit["moveQueue"] = unit["moveQueue"][1::]
                 unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][uid]
+                self.world.updateUnitPos(unit["moveQueue"][0], unit["moveQueue"][1], unitObj)
+                unit["moveQueue"] = unit["moveQueue"][1::]
                 self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][uid].position = Position(unit["moveQueue"][0][0], unit["moveQueue"][0][1])
-                self.world.tiles_dico[unit["moveQueue"][0]].set_contains(unitObj)
-                #self.logger("GameManager | moveUnit----- My position is ,",self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][uid].position)
+                self.logger("GameManager | moveUnit----- My position is ,",self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][uid].position)
                 #self.logger("GameManager | moveUnit----- Got to the next tile in : ", unit["timeElapsed"],"supposed to get in : ", unit["timeToTile"])
-                #self.logger("GameManager | moveUnit----- Infos on the nextTile to the next tile :", (unit["moveQueue"][0]), "lastTile is", (unit["goal"]))
-                self.world.filled_tiles[unit["moveQueue"][0]] = unit["moveQueue"][0]
+                self.logger("GameManager | moveUnit----- Infos on the nextTile to the next tile :", (unit["moveQueue"][0]), "lastTile is", (unit["goal"]))
                 unit["currentTile"] = unit["moveQueue"][0]
                 unit["timeElapsed"] = 0
                 if (len(unit["moveQueue"]) < 2):
@@ -168,12 +170,67 @@ class GameManager:
                 pass
                 #self.logger("GameManager | buildBuilding--- Waiting for builders")
 
+        def collectResources(self, uid):
+            deltaTime = timeit.default_timer() - self.tick
+            resToCollect = self.ressourceToCollect[uid]
+            # Line to check if the quantity to collect on said resource is still up to date
+            realResQuantity = resToCollect["resourceQuantity"] if resToCollect["resourceQuantity"]<= self.world.ressources[resToCollect["resourceType"]][resToCollect["resourceID"]].quantity else self.world.ressources[resToCollect["resourceType"]][resToCollect["resourceID"]].quantity
+            resToCollect["resourceQuantity"] = realResQuantity
+            gameDTTime = (deltaTime.real*self.gameSpeed)
+            unitInstance = self.world.villages[resToCollect["unitTeam"]-1].community["v"][uid]
+            dpDistance = unitInstance.estimateDistance(unitInstance.position.toTuple(), resToCollect["nearDPPos"])
+            if not resToCollect["routeStarted"]:
+                if dpDistance< (1,1):
+                    resToCollect["routeStarted"] = True
+                    self.addUnitToMoveDict(unitInstance, Position(resToCollect["resourceTarget"][0],resToCollect["resourceTarget"][1]), prePath=resToCollect["pathToDP"][-1::])
+                else:
+                    self.logger("GameManager | collectResources--- Still not been to the nearestDP")
+                    return -1
+            resDistance = unitInstance.estimateDistance(unitInstance.position.toTuple(), resToCollect["resourceTarget"])
+            unitSpaceLeft = unitInstance.spaceLeft()
+            timeToFillPouch = int(unitSpaceLeft*60/25)
+            if resDistance <= (1,1):
+                self.logger("GameManager | collectResources--- Near to the ressource, begin collecting")
+                if resToCollect["timeElapsed"] < timeToFillPouch and not resToCollect["full"]:
+                    resToCollect["timeElapsed"] +=  gameDTTime
+                elif resToCollect["timeElapsed"] > timeToFillPouch:
+                    self.logger("GameManager | collectResources--- Pouch should be filled now")
+                    quantityToCollect = unitSpaceLeft if unitSpaceLeft <= resToCollect["resourceQuantity"] else resToCollect["resourceQuantity"]
+                    unitInstance.pouch[resToCollect["resourceType"]] += quantityToCollect
+                    resToCollect["resourceQuantity"] -=  quantityToCollect
+                    resToCollect["full"] = unitInstance.isFull()
+                elif resToCollect["full"]:
+                    self.logger("GameManager | collectResources--- Pouch is filled")
+                    self.addUnitToMoveDict(unitInstance,resToCollect["nearDPPos"], prePath=resToCollect["pathToDP"])
+
+            else:
+                if resToCollect["full"]:
+                    self.logger("GameManager | collectResources--- Full and going back to DP")
+                    if dpDistance <= (1,1):
+                        self.logger("GameManager | collectResources--- Arrived to DP")
+                        unitInstance.dropResources()
+                        resToCollect["full"] = False
+                        resToCollect["finished"] = resToCollect["quantity"] == 0
+                        if resToCollect["finished"]:
+                            pass
+                        else:
+                            self.addUnitToMoveDict(unitInstance, resToCollect["nearDPPos"],prePath=resToCollect["pathToDP"][-1::])
+                    else:
+                        self.logger("GameManager | collectResources--- Waiting to arrive to DP")
+                else:
+                    self.logger("GameManager | collectResources--- Waiting to arrive to Resource")
+
         def attackUnit(self, uid):
             self.logger("GameManager | attackUnit--- Ennemi à attaquer")
-            deltaTime = timeit.default_timer() - self.tick
+            deltaTime = (timeit.default_timer() - self.tick)
+            gameDeltaTime = deltaTime*self.gameSpeed
             attackingUnit = self.unitAttack[uid]
+
             attackingUnitInstance = self.world.villages[attackingUnit["team"]-1].community[attackingUnit["type"]][uid]
             targetPosition = attackingUnit["targetPosition"]
+            if attackingUnit["targetID"] in self.world.villages[attackingUnit["targetTeam"]-1].deads:
+                attackingUnit["success"] = True
+                return -1
             targetInstance = self.world.villages[attackingUnit["targetTeam"]-1].community[attackingUnit["targetType"]][attackingUnit["targetID"]]
             self.logger("Game manager attackUnit--- Position unité,: ",attackingUnitInstance.position, "Position à atteindre :",targetInstance.position)
             if attackingUnit["movingTarget"]:
@@ -190,13 +247,19 @@ class GameManager:
                     self.attackDict[attackingUnit["targetTeam"]] += [(attackingUnit["targetType"], uid,attackingUnitInstance.team.name)]
                 attackingUnit["targetInRange"] = True
                 if targetInstance.health < 0:
-                    attackingUnit["success"] = True
-                    if type(targetInstance) is Unity:
-                        targetInstance.die()
+                    self.unitAttack[uid]["success"] = True
+                    if issubclass(targetInstance.__class__, Unity):
+                        self.logger("GameManager | attackUnit--- HA IL EST MORT ")
+                        self.logger(f"GameManager | En ce jour funeste nous honorons la mémoire de",attackingUnit["targetID"])
+                        #targetInstance.die()
+
+                        self.world.villages[attackingUnit["targetTeam"]-1].markAsDead(targetInstance)
+                        self.pastAttacks[uid] = self.unitAttack[uid]
                     else:
-                        self.logger("GameManager | attackUnit--- Seems to be a building completely destroyed")
+                        self.logger("GameManager | attackUnit--- Seems to be a building who's been destroyed")
                 else:
-                    self.world.villages[attackingUnit["targetTeam"] - 1].community[attackingUnit["targetType"]][attackingUnit["targetID"]].health -= attackingUnitInstance.damage*deltaTime
+                    self.logger(f"GameManager | attackUnit---{attackingUnitInstance.damage*gameDeltaTime} PV enlevés  ")
+                    self.world.villages[attackingUnit["targetTeam"] - 1].community[attackingUnit["targetType"]][attackingUnit["targetID"]].health -= attackingUnitInstance.damage*gameDeltaTime
 
 
 
@@ -217,7 +280,6 @@ class GameManager:
         def checkUnitsToMove(self):
             if len(self.unitToMove) == 0:
                 pass
-                #print("No unit to move")
             else:
                 unitToDelete = ""
                 for k in self.unitToMove:
@@ -238,6 +300,15 @@ class GameManager:
             if buildingToDelete != "":
                 self.buildingsToBuild.pop(buildingToDelete)
 
+        def checkResourceToCollect(self):
+            resToDelete = ""
+            for k in self.ressourceToCollect:
+                if self.ressourceToCollect[k]["finished"]:
+                    resToDelete= k
+                else:
+                   self.collectResources(k)
+            if resToDelete != "":
+                self.unitToMove.pop(resToDelete)
 
         def checkUnitToAttack(self):
             unitToDelete = ""
@@ -296,18 +367,29 @@ class GameManager:
                 "type": building.name,
             }
 
-        def addUnitToMoveDict(self, unit : Unity, destination : Position):
+        def addUnitToMoveDict(self, unit : Unity, destination : Position,prePath=[]):
             #self.logger("GameManager | addUnitToMoveDict--- Unit destination is : ", destination)
-            if unit.position.toTuple() not in self.world.filled_tiles.values():
-                self.world.filled_tiles[unit.position.toTuple()] = unit.position.toTuple()
             grid = self.world.convertMapToGrid()
             teamNumber = self.getTeamNumber(unit.uid)
             pathFinding  = Pathfinding(mapGrid=grid, statingPoint= unit.position.toTuple(), goal=destination.toTuple(), debug=False)
-            path = pathFinding.astar()
+            path = []
+            self.logger("GameManager | addUnitToMoveDict--- Prepath is not null")
+            prePathSet = False
+            try:
+                prePath[0]
+                prePathSet = True
+            except:
+                prePathSet = False
+            if prePathSet:
+                self.logger("GameManager | addUnitToMoveDict--- Prepath is not null")
+                path = prePath
+            else :
+                path = pathFinding.astar()
             if path.__class__ == bool:
                 raise PathfindingException(self.world.tiles_dico[destination.toTuple()])
                 #  : AJOUTER UNE EXCEPTION QUAND IL NE TROUVE VRAIMENT PAS DE CHEMIN
                 #self.logger("Found no short path")
+            self.logger("Path is !!!!" ,path)
             path = path + [pathFinding.startingPoint]
             path = path[::-1]
             self.logger("Unit ADDED TO MOVE DICT")
@@ -353,6 +435,30 @@ class GameManager:
                     }
 
 
+        def addRessourceToCollectDict(self, unit,resource : Ressource, quantity, nearDP):
+            self.addUnitToMoveDict(unit, nearDP.position)
+            grid = self.world.convertMapToGrid()
+            pathFinding  = Pathfinding(mapGrid=grid, statingPoint= nearDP.position.toTuple(), goal=resource.position.toTuple(), debug=False)
+            path = pathFinding.astar()
+            if path.__class__ == bool:
+                raise PathfindingException(self.world.tiles_dico[resource.position.toTuple()])
+                #  : AJOUTER UNE EXCEPTION QUAND IL NE TROUVE VRAIMENT PAS DE CHEMIN
+                #self.logger("Found no short path")
+            path = path + [pathFinding.startingPoint]
+            self.ressourceToCollect[unit.uid] = {
+                "unit" : unit.uid,
+                "unitTeam": self.getTeamNumber(unit.uid),
+                "resourceType" : resource.name,
+                "resourceTarget" : resource.position.toTuple(),
+                "resourceID" : resource.uid,
+                "resourceQuantity" : quantity,
+                "timeElapsed" : 0,
+                "finished" : False,
+                "full": False,
+                "nearDPPos" : nearDP.position.toTuple(),
+                "routeStarted": False,
+                "pathToDP": path
+            }
 
         def addBuildingToWorld(self, building:Building, position):
             self.world.place_element(building)
@@ -361,7 +467,6 @@ class GameManager:
             occupiedTiles = building.get_occupied_tiles()
             for a in occupiedTiles:
                 self.world.filled_tiles[a] = a
-
         def pause(self):
             self.html_generator()
 
@@ -376,7 +481,7 @@ class GameManager:
             else:
                 return True
         def checkResourceStatus(self,id):
-            if id in self.resToCollect:
+            if id in self.ressourceToCollect:
                 return False
 
         def save_world(self, path=None):

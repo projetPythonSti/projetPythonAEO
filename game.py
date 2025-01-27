@@ -136,7 +136,7 @@ class Game :
 
 
     def turn (self,term) :
-        self.clock.tick(60)
+        self.clock.tick(15)
         now = time.time()
         delta = now - self.ltick
         ig_delta = delta * self.speed
@@ -197,7 +197,7 @@ class Game :
 
         else :
             self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-3,self.world.height)) #lil minuses here to fit everything nicely
-            print(self.world.return_precise_world(self.upleft,self.downright))
+            print(self.world.return_precise_world(self.upleft,self.downright,term))
             #prevents going too much right and down
             if self.downright.getX()-self.upleft.getX()<term.width-2 and self.world.width>term.width:
                 self.upleft.setX(self.world.width-term.width+2)

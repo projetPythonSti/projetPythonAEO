@@ -66,6 +66,7 @@ class BuildingTypeENUM(Enum):
     Military = [Barracks, Stable, ArcheryRange, Keep]
     Village = [House, TownCenter]
     Farming = [Farm, Camp]
+    DropPoints = ["T", "C"]
 
 class ResourceTypeENUM(Enum):
     w = Wood
@@ -179,11 +180,12 @@ class AIPlayer:
         workingPpl  = self.team.get_pplCount() - self.getFreePplCount()
         if workingPpl < self.playStyle.minWorkers and workingPpl != self.team.get_pplCount():
             self.logger("Minworkers hit, playing now")
-            #self.setBuildingAction(self.checkBuildings())
+            self.setBuildingAction(self.checkBuildings())
             #self.setResourceAction(self.team.ressources)
             if self.playStyle.playStyleMatrix[2][2] > 5:
-                self.logger("AIPlayer | playTurn--- Aggressive AI Detected, real playstyle is", PlayStyleMatrixEnum(self.playStyle.playStyleMatrix).name)
+                #self.logger("AIPlayer | playTurn--- Aggressive AI Detected, real playstyle is", PlayStyleMatrixEnum(self.playStyle.playStyleMatrix).name)
                 self.setHumanAction()
+                pass
             self.logger(len(self.eventQueue))
             numberOfActions = 0
             for k in range(len(self.eventQueue)):
@@ -232,6 +234,7 @@ class AIPlayer:
 
     def getDirection(self, pos1, pos2):
         pass
+
     def estimateDistance(self, pos1 : tuple, pos2 : tuple):
         return abs(pos2[0] - pos1[0]), abs(pos2[1] - pos1[1])
 
@@ -245,6 +248,44 @@ class AIPlayer:
         return {
             ressourceKeyDict[nearestResourcesIndex] : resourcesPositionList[nearestResourcesIndex]
         }
+
+    def getNearestDropPoint(self, resource):
+        dpKeys1 = list(map(lambda  x : x, self.team.community["T"].keys()))
+        dpKeys2 = list(map(lambda  x : x, self.team.community["T"].keys()))
+        dropPoints1 = list(map(lambda x : self.estimateDistance(x.position.toTuple(), next(iter(resource.values()))) , self.team.community["T"].values()))
+        dropPoints2 = list(map(lambda x : self.estimateDistance(x.values().position.toTuple(), next(iter(resource.values())).position.toTuple()) , self.team.community["C"].values()))
+        self.logger("AIPlayer | getNearestDropPoint--- dropPoints1 = ", dpKeys2)
+        nearestDP = -1
+
+        nearestDP1Index = -1
+        nearestDP2Index = -1
+        try :
+            test = dropPoints1[0]
+            nearestDP1Index = dropPoints1.index(min(dropPoints1))
+        except:
+            self.logger("AIPlayer | getNearestDropPoint--- No TCS")
+        try:
+            test2 = dropPoints2[0]
+            nearestDP2Index = dropPoints2.index(min(dropPoints2))
+        except:
+            if nearestDP1Index < 0:
+                return {-1 : -1}
+            else:
+                finalDropPoint = nearestDP1Index
+
+                return self.team.community["T"][dpKeys1[finalDropPoint]]
+        finalDropPointIndex = min(dropPoints1[nearestDP1Index],dropPoints2[nearestDP2Index])
+        type = ""
+        finalList = []
+        if dropPoints1[nearestDP1Index] <dropPoints2[nearestDP2Index]:
+            finalDropPointIndex  = nearestDP1Index
+            finalList = dpKeys1
+            type = "T"
+        else:
+            finalDropPointIndex = nearestDP2Index
+            finalList = dpKeys2
+            type = "C"
+        return self.team.community[type][finalList[finalDropPointIndex]]
 
 
     def getOptimalBuildingCurve(self, BuildingType):
@@ -484,17 +525,18 @@ class AIPlayer:
             }
         }
 
-    def getResourcesActionDict(self, resourceToCollect : dict, type):
+    def getResourcesActionDict(self, resourceToCollect : dict, type, nearestDP):
         self.logger("AIPlayer | getResourcesActionDict--- restoCollectVariable : ", resourceToCollect)
-        resourceToCollectKey = next(iter(resourceToCollect.keys()))
+        resKey = next(iter(resourceToCollect.keys()))
+        resourceInstance = self.world.ressources[type][resKey]
         unitID = self.getFreePeople(1,"v")
         if len(unitID) == 0:
             errorDict = {
             "action" : "collectResource",
             "infos" :{
                 "type" : type,
-                "target" : resourceToCollect[resourceToCollectKey],
-                "targetKey" : resourceToCollectKey,
+                "target" : "ERROR",
+                "targetKey" : "ERRORR",
             }}
             #self.logger("PAS D'UNITE DE DISPONIBLE")
             raise AIPeopleException(action=errorDict)
@@ -505,8 +547,10 @@ class AIPlayer:
             "people" : unitID,
             "infos" :{
                 "type" : type,
-                "target" : resourceToCollect[resourceToCollectKey],
-                "targetKey" : resourceToCollectKey,
+                "target" : resourceInstance.position.toTuple(),
+                "targetKey" : resKey,
+                "nearestDP" : nearestDP,
+                "quantity" : resourceInstance.quantity,
             }
         }
 
@@ -531,10 +575,14 @@ class AIPlayer:
         self.logger("Ressource to get is", ResourceTypeENUM[resourceToGet].value)
         resToCollect = self.getNearestRessource(self.topVillageBorder,self.bottomVillageBorder,resourceToGet)
         self.logger("AIPlayer | setResourceAction--- resToCollectValue", resToCollect)
+        nearestDP  = self.getNearestDropPoint(resToCollect)
+        self.logger("AIPlayer | setResourceAction--- nearestDP Is", nearestDP)
         if resToCollect == -1:
             return -1
+        if nearestDP == {-1 :-1}:
+            return -1
         try :
-            resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet)
+            resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet,nearestDP)
             self.logger("Added the following resCollect event : \n Type : ", resourceCollectEvent["infos"]["type"],
                         "\t nbOfPpl : ",
                         len(resourceCollectEvent["people"]), "\t Position of the ressource :",
@@ -617,12 +665,18 @@ class AIPlayer:
         #self.logger("J'ai envoyé qqun chercher des ressources attention")
         unitList = actionDict["people"]
         unitTeam = self.gm.getTeamNumber(unitList[0])
+        unitInstance = self.team.community["v"][actionDict["people"][0]]
+        self.logger(self.world.ressources[actionDict["infos"]["type"]][actionDict["infos"]["targetKey"]])
+        self.logger(actionDict["infos"]["targetKey"])
+
+        resourceInstance = self.world.ressources[actionDict["infos"]["type"]][actionDict["infos"]["targetKey"]]
         exceptionRaised = False
         for i in unitList:
             self.world.villages[unitTeam-1].community["v"][i].target = self.world.ressources[actionDict["infos"]["type"]][(actionDict["infos"]["targetKey"])]
             targetPosition = Position(actionDict["infos"]["target"][0],actionDict["infos"]["target"][1])
             try:
-                self.gm.addUnitToMoveDict(self.world.villages[unitTeam-1].community["v"][i],targetPosition)
+                self.logger("LE TYPE DE RESOURCE INSTANCE J'EN AI MARRE", resourceInstance)
+                self.gm.addRessourceToCollectDict(unitInstance,resourceInstance ,actionDict["infos"]["quantity"],actionDict["infos"]["nearestDP"])
             except PathfindingException:
                 exceptionRaised = True
         if not exceptionRaised:

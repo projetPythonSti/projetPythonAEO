@@ -34,6 +34,9 @@ class Model:
             25/01/2025@tahakhetib - j'ai apporté des modification sur ce que @amadou_yaya_diallo a écrit
                 - Evité un bug en mettant à jour le compteur peopleCount lorsqu'on ajoute une unité
                 - Ajouté le compteur buildingCount afin de pouvoir assigner des UID au buildings
+            26/01/2025@tahakhetib - j'ai ajoutés des choses au dessus de ce que @amadou_yaya_diallo a écrit
+                - Ajouté un dictionnaire de gens du village morts lol
+                - Ajouté une fonction marquant les villageois comme mort
 
 
     """
@@ -47,6 +50,7 @@ class Model:
         self.workingPpl = 0
         self.name = name
         self.world = world
+        self.deads = defaultdict()
         self.world.add_village(self)
 
     def initialize_villages(self, archers = 0, horsmen = 0, swordsmen = 0, villages = 0, town_center = 0,
@@ -152,7 +156,12 @@ class Model:
             if not self.ressources.get(resource) or  self.ressources.get(resource) <= cost:
                 return False
         return True
-    
+
+    def markAsDead(self, unit):
+        self.world.removeUnitPos(unit.position.toTuple(), unit)
+        self.community[unit.name].pop(unit.uid)
+        self.deads[unit.uid] = unit.uid
+
     def get_community(self):
         return self.community
 

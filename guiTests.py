@@ -1,5 +1,4 @@
 import timeit
-from imaplib import Debug
 
 import pygame as pg
 import time
@@ -78,7 +77,7 @@ def jeu_terminal (world, debug=False):
         gm = GameManager(speed=1, world=world,debug=False)
         clock = pg.time.Clock()
         gm.tick = timeit.default_timer()
-        playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=False )
+        playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=False)
         game_term = Game(world,clock,gm, players=playersList)
         game_term.kickstartPG = dico["d"]
         print(game_term.playerNumber)
