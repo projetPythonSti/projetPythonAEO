@@ -253,6 +253,8 @@ class Game :
                     if data :
                         self.swap_to_load(data)
                     else : pass
+                    break
+
                 elif val2.lower() == 'p':
                     self.kickstartPG = True
 
