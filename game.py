@@ -250,6 +250,7 @@ class Game :
 
     def pause (self,term) :
         os.system('cls' if os.name == 'nt' else 'clear')
+        #self.gm.openHtmlPage()
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
         print("Appuyez sur s pour sauvegarder")
