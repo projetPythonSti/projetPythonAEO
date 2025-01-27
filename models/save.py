@@ -129,7 +129,7 @@ class Save:
 
         string1 += "\n\nVeuillez selectionner une des sauvegarde disponible :"
         chosen_save = new_input( string1 ,term)
-        string2 = "Entrer invalide! Vérifiez que vous avez écrit correctement le nom de la sauvegarde de votre choix. Il faut respect les minuscules et les majuscules.\n Entrer la lettre q pour sortir du menu de charge " + string1
+        string2 = "Entrer invalide! Vérifiez que vous avez écrit correctement le nom de la sauvegarde de votre choix. Il faut respect les minuscules et les majuscules.\nEntrer la lettre q pour sortir du menu de charge.\n" + string1
         while chosen_save not in list_save:
             chosen_save = new_input(string2 , term)
             if chosen_save == "q" :

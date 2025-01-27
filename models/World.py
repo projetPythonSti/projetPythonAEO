@@ -255,10 +255,6 @@ class World:
         return binary_array
 
     def to_json(self):
-        print("hi")
-        print(self.width)
-        print(self.height)
-        print([village.to_json() for village in self.villages])
         return {
             "width": self.width,
             "height" : self.height,
