@@ -1,9 +1,21 @@
 from blessed import Terminal
-from save import *
-import os, sys
+
+from guiTests import PyGameDebugWorldENUM
+from models.save import *
+import os
+
 
 class Menu :
+    """
+            23/01/2025@tahakhetib : J'ai apporté des modifications à ce fichier  sur ce que @etan-test-1 a écrit
+                - Ajouté le retour du dictionnaire vers la boucle de jeu afin d'extraire les informations nécessaires à la création des IA,
+            25/01/2025@tahakhetib : J'ai apporté des modifications sur ce que @etan-test-1 à écrit
+                - Ajouté un attribut debug pour lancer automatiquement une partie pré-faite avec PyGame automatiquement lancé
+                - Ajouté la prise en charge de l'input pour activer ce mode debug (start_menu(), ajout d'un if et pré-remplissages des attributs de la partie et retour du dictionnaire)
+                - Remplacé la ligne précédente par une Enum PyGameDebugWorldENUM
 
+
+        """
     def __init__(self):
         self.x = None
         self.y = None
@@ -11,6 +23,7 @@ class Menu :
         self.ressources_quantities = None
         self.nb_joueur = 0
         self.ai_behavior = []
+        self.debug = False
 
 #MENU DE DEMARRAGE
     def start_menu (self) :
@@ -21,6 +34,7 @@ class Menu :
         print("Appuyez sur q pour quitter le jeu")
         print("Appuyez sur n pour créer une nouvelle partie")
         print("Appuyez sur c charger une partie sauvegardé")
+        print("Appuyez sur k pour lancer le mode Debug PyGame")
         with term.cbreak():
             val = ''
             while val.lower() != 'n' or val.lower() != 'c':
@@ -34,8 +48,19 @@ class Menu :
 
                 if val.lower() == 'c' :
                     nsave = Save()
-                    nsave.load_term()
-                    break
+                    data = nsave.load_term(term)
+                    print(data)
+                    return tuple(data)
+                if val.lower() == 'k':
+                    self.x = PyGameDebugWorldENUM.width.value
+                    self.y = PyGameDebugWorldENUM.height.value
+                    self.type_map = PyGameDebugWorldENUM.mapType.value
+                    self.nb_joueur = PyGameDebugWorldENUM.playersNumber.value
+                    self.ai_behavior = PyGameDebugWorldENUM.aisBehavior.value
+                    self.ressources_quantities = PyGameDebugWorldENUM.ressourceQuantity.value
+                    self.debug = True
+                    return self.return_value()
+
             return self.return_value()
 
     def set_size_map (self) :
@@ -98,12 +123,12 @@ class Menu :
                 if val.lower() == 'z' :
                     self.start_menu()
                     break
-                if val.lower() == 'g': #GoldRush
+                if val.lower() == 'g':
                     self.type_map = 'g'
                     self.set_ressources_quantity()
                     break
 
-                if val.lower() == 'r': #Map random, Arabia par défaut
+                if val.lower() == 'r':
                     self.type_map = 'r'
                     self.set_ressources_quantity()
                     break
@@ -244,11 +269,11 @@ class Menu :
                     if n >= self.nb_joueur :
                         break
 
-            self.return_value()
+            #self.return_value()
 
 
     def return_value(self):
-        return {"X":self.x, "Y": self.y, "q" : self.ressources_quantities, "n" : self.nb_joueur, "b" : self.ai_behavior, "t" : self.type_map }
+        return {"X":self.x, "Y": self.y, "q" : self.ressources_quantities, "n" : self.nb_joueur, "b" : self.ai_behavior, "t" : self.type_map,"d": self.debug}
 
     def reset(self):
         self.x = None

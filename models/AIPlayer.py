@@ -1,15 +1,13 @@
-from argparse import Action
-from collections import defaultdict
+
 from enum import Enum
-from os import fdopen
-from select import select
-from tokenize import tabsize
-from typing import final
+
 from functools import partial
 import io
 import sys
+from os import remove
+from select import select
 
-from models.Exceptions import PathfindingException
+from models.Exceptions import PathfindingException, AIPeopleException
 
 output = io.StringIO()
 
@@ -29,17 +27,23 @@ from models.model import Model
 from models.ressources.ressources import Ressource, Wood, Gold, Food
 from models.unity.Villager import Villager
 
+output = io.StringIO()
 class PlayStyleMatrixEnum(Enum):
     Aggressive = [
         [2,5,0],
-        [6,3,4],
+        [6,2,4],
         [3,2,8]
     ]
     Passive = [
+        [6, 20, 0],
+        [2, 2, 1],
+        [1, 12, 2]
+    ]
+    """OLDPassive = [
         [6,1,0],
         [2,5,1],
         [1,3,10]
-    ]
+    ]"""
     Builder = [
         [9,1,0],
         [2,8,2],
@@ -62,6 +66,7 @@ class BuildingTypeENUM(Enum):
     Military = [Barracks, Stable, ArcheryRange, Keep]
     Village = [House, TownCenter]
     Farming = [Farm, Camp]
+    DropPoints = ["T", "C"]
 
 class ResourceTypeENUM(Enum):
     w = Wood
@@ -115,6 +120,12 @@ class PlayStyleEnum(Enum):
     b = PlayStyle(minWorkers=10, matrix=PlayStyleMatrixEnum["Builder"].value)
 
 class AIPlayer:
+
+
+    """
+        25/01/2025@tahakhetib : J'ai apporté des modifications sur ce que j'ai  écrit
+            - Pris en compte la fonction du gameManager pour construire les batiments
+    """
     playing = False
     def __init__(self, team : Model, world : World, playStyle : PlayStyle, level : int, gm : GameManager, debug=False, writeToDisk=False):
         self.team = team
@@ -138,6 +149,13 @@ class AIPlayer:
         self.debug = debug
         self.writeToDisk = writeToDisk
         self.logs = ""
+        tcs = list(team.community["T"].values())
+        if len(tcs) >0:
+            tcSurface = (tcs[0].position.getX() + tcs[0].surface[0] + self.playStyle.playStyleMatrix[1][2],
+                     tcs[0].position.getY() + tcs[0].surface[1] + self.playStyle.playStyleMatrix[1][2])
+            topBorder = (tcs[0].position.getX() - self.playStyle.playStyleMatrix[1][2], tcs[0].position.getY() - self.playStyle.playStyleMatrix[1][2])
+            self.setVillageBorders(topBorder, tcSurface)
+        self.logger("AIPlayer | AI Launched -> Init launched, currentEvents are :", self.currentEvents)
 
     def logger(self,*args, **kwargs):
         if self.debug:
@@ -157,11 +175,17 @@ class AIPlayer:
         self.logger("------ START OF AI TURN ------")
         #self.logger("Village border atm => ", self.topVillageBorder, self.bottomVillageBorder)
         self.playing = True
+        self.logger("AIPlayer | playTurn --- freeunits state",self.freeUnits)
+        self.logger("Voici le nombre de personnes libres",self.getFreePplCount(), "Et le nb de personnes total : ",self.team.get_pplCount())
         workingPpl  = self.team.get_pplCount() - self.getFreePplCount()
-        if workingPpl < self.playStyle.minWorkers:
+        if workingPpl < self.playStyle.minWorkers and workingPpl != self.team.get_pplCount():
             self.logger("Minworkers hit, playing now")
             self.setBuildingAction(self.checkBuildings())
-            self.setResourceAction(self.team.ressources)
+            #self.setResourceAction(self.team.ressources)
+            if self.playStyle.playStyleMatrix[2][2] > 5:
+                #self.logger("AIPlayer | playTurn--- Aggressive AI Detected, real playstyle is", PlayStyleMatrixEnum(self.playStyle.playStyleMatrix).name)
+                self.setHumanAction()
+                pass
             self.logger(len(self.eventQueue))
             numberOfActions = 0
             for k in range(len(self.eventQueue)):
@@ -210,17 +234,58 @@ class AIPlayer:
 
     def getDirection(self, pos1, pos2):
         pass
+
     def estimateDistance(self, pos1 : tuple, pos2 : tuple):
         return abs(pos2[0] - pos1[0]), abs(pos2[1] - pos1[1])
 
     def getNearestRessource(self,topLeftPos,bottomRightPos,  resourceType):
         ressourceKeyDict = list(map(lambda  x : x, self.world.ressources[resourceType].keys()))
         resourcesPositionList = list(map(lambda x : self.estimateDistance(x.position.toTuple(), topLeftPos) , self.world.ressources[resourceType].values()))
-        self.logger("AIPlayer | getNearestRessource---- resPositionList value : ", resourcesPositionList)
+        #self.logger("AIPlayer | getNearestRessource---- resPositionList value : ", ressourceKeyDict)
+        if len(resourcesPositionList) == 0:
+            return -1
         nearestResourcesIndex = resourcesPositionList.index(min(resourcesPositionList))
         return {
             ressourceKeyDict[nearestResourcesIndex] : resourcesPositionList[nearestResourcesIndex]
         }
+
+    def getNearestDropPoint(self, resource):
+        dpKeys1 = list(map(lambda  x : x, self.team.community["T"].keys()))
+        dpKeys2 = list(map(lambda  x : x, self.team.community["T"].keys()))
+        dropPoints1 = list(map(lambda x : self.estimateDistance(x.position.toTuple(), next(iter(resource.values()))) , self.team.community["T"].values()))
+        dropPoints2 = list(map(lambda x : self.estimateDistance(x.values().position.toTuple(), next(iter(resource.values())).position.toTuple()) , self.team.community["C"].values()))
+        self.logger("AIPlayer | getNearestDropPoint--- dropPoints1 = ", dpKeys2)
+        nearestDP = -1
+
+        nearestDP1Index = -1
+        nearestDP2Index = -1
+        try :
+            test = dropPoints1[0]
+            nearestDP1Index = dropPoints1.index(min(dropPoints1))
+        except:
+            self.logger("AIPlayer | getNearestDropPoint--- No TCS")
+        try:
+            test2 = dropPoints2[0]
+            nearestDP2Index = dropPoints2.index(min(dropPoints2))
+        except:
+            if nearestDP1Index < 0:
+                return {-1 : -1}
+            else:
+                finalDropPoint = nearestDP1Index
+
+                return self.team.community["T"][dpKeys1[finalDropPoint]]
+        finalDropPointIndex = min(dropPoints1[nearestDP1Index],dropPoints2[nearestDP2Index])
+        type = ""
+        finalList = []
+        if dropPoints1[nearestDP1Index] <dropPoints2[nearestDP2Index]:
+            finalDropPointIndex  = nearestDP1Index
+            finalList = dpKeys1
+            type = "T"
+        else:
+            finalDropPointIndex = nearestDP2Index
+            finalList = dpKeys2
+            type = "C"
+        return self.team.community[type][finalList[finalDropPointIndex]]
 
 
     def getOptimalBuildingCurve(self, BuildingType):
@@ -238,7 +303,7 @@ class AIPlayer:
 
     def checkIfTilesAreOccupied(self, size, position):
         for a in self.getOccupiedTiles(size,position):
-            self.logger("AIPlayer | checkIfTilesAreOccupied ----- a values is in filled_tiles ? ", self.world.filled_tiles.__contains__(a) ,"Tile value", a)
+            #self.logger("AIPlayer | checkIfTilesAreOccupied ----- a values is in filled_tiles ? ", self.world.filled_tiles.__contains__(a) ,"Tile value", a)
             if a in self.world.filled_tiles.values():
                 self.logger("AIPlayer | checkIfTilesAreOccupied---- value is indeed in filledTiles ")
                 return True
@@ -250,8 +315,29 @@ class AIPlayer:
         return [(position[0] + x, position[1] + y) for x in range(size[0]) for y in range(size[1])]
 
 
+    def find_location_contour(self, size):
+        w, h = (size[0]+1,size[1]+1)
+        candidates = set()
+        allBuildings = []
+        for a in BuildingENUM:
+            allBuildings += list(self.team.community[a.name].values())
+        #self.logger("AIPlayer | find_location_contour----- Buildings are at ", allBuildings)
+        for building in allBuildings:
+            bx, by = building.getTPosition()
+            bw, bh = (building.surface[0],building.surface[0])
+            candidates.update([
+                (bx - w, by), (bx + bw, by), (bx, by - h), (bx, by + bh)
+            ])
+
+        for x, y in candidates:
+            if not self.checkIfTilesAreOccupied(size, (x, y)):
+                #self.logger("AIPlayer | find_location_contour------ seems that this position was ok!")
+                return x, y
+        return None
+
     def getBuildTarget(self, size, tries=0):
         selectedPos = None
+        """
         #tilesOccupiedFirst = False
 
         # POSITION AU NORD - 7
@@ -383,7 +469,10 @@ class AIPlayer:
 
                         self.newTopVillageBorder = newVillageBorder if not self.isOutOfBound(newVillageBorder) else None
             if selectedPos is not None:
-                return selectedPos
+                return selectedPos"""
+        selectedPos = self.find_location_contour(size)
+        if selectedPos is not None:
+            return selectedPos
         # If no positions are found, expand the village
         self.logger("AIPlayer | getBuildTarget---- Time to expand village border")
         if self.newTopVillageBorder is not None or self.newBottomVillageBorder is not None:
@@ -393,7 +482,7 @@ class AIPlayer:
             return self.getBuildTarget(size)
         else:
             # If no positions are to be found at all, we expand the
-            self.logger("AIPlayer | getBuildTarget---- No buildings built, so expanding village naturally")
+            """self.logger("AIPlayer | getBuildTarget---- No buildings built, so expanding village naturally")
             villageBorder = [self.topVillageBorder, self.bottomVillageBorder]
             ax1 = self.world.width-self.topVillageBorder[0]
             bx1 = abs(0-self.topVillageBorder[0])
@@ -412,10 +501,8 @@ class AIPlayer:
             allDistancesTuple = (distanceTuple1,distanceTuple2)
             selectedDistanceIndex = allDistancesTuple.index(min(allDistancesTuple))
             self.topVillageBorder = (self.topVillageBorder[0]-self.playStyle.playStyleMatrix[1][2],self.topVillageBorder[1]-self.playStyle.playStyleMatrix[1][2]) if villageBorder[selectedDistanceIndex] == self.topVillageBorder else self.topVillageBorder
-            self.bottomVillageBorder = (self.bottomVillageBorder[0]+self.playStyle.playStyleMatrix[1][2],self.bottomVillageBorder[1]+self.playStyle.playStyleMatrix[1][2]) if villageBorder[selectedDistanceIndex] == self.bottomVillageBorder else self.bottomVillageBorder
-            if tries<20:
-                tries +=1
-                return self.getBuildTarget(size, tries)
+            self.bottomVillageBorder = (self.bottomVillageBorder[0]+self.playStyle.playStyleMatrix[1][2],self.bottomVillageBorder[1]+self.playStyle.playStyleMatrix[1][2]) if villageBorder[selectedDistanceIndex] == self.bottomVillageBorder else self.bottomVillageBorder"""
+
     def getBuildingActionDict(self, buildingType):
         villagerType = "v"
         idList = self.getFreePeople(self.getOptimalBuildingCurve(1), villagerType)
@@ -434,15 +521,25 @@ class AIPlayer:
             "status" : "pending",
             "infos": {
                 "type": buildingType,
-                "target": buildTarget
+                "target": buildTarget,
             }
         }
 
-    def getResourcesActionDict(self, resourceToCollect : dict, type):
-        resourceToCollectKey = next(iter(resourceToCollect.keys()))
+    def getResourcesActionDict(self, resourceToCollect : dict, type, nearestDP):
+        self.logger("AIPlayer | getResourcesActionDict--- restoCollectVariable : ", resourceToCollect)
+        resKey = next(iter(resourceToCollect.keys()))
+        resourceInstance = self.world.ressources[type][resKey]
         unitID = self.getFreePeople(1,"v")
         if len(unitID) == 0:
-            self.logger("PAS D'UNITE DE DISPONIBLE")
+            errorDict = {
+            "action" : "collectResource",
+            "infos" :{
+                "type" : type,
+                "target" : "ERROR",
+                "targetKey" : "ERRORR",
+            }}
+            #self.logger("PAS D'UNITE DE DISPONIBLE")
+            raise AIPeopleException(action=errorDict)
         for i in unitID:
             self.freeUnits["v"].remove(i)
         return {
@@ -450,23 +547,51 @@ class AIPlayer:
             "people" : unitID,
             "infos" :{
                 "type" : type,
-                "target" : resourceToCollect[resourceToCollectKey],
-                "targetKey" : resourceToCollectKey,
+                "target" : resourceInstance.position.toTuple(),
+                "targetKey" : resKey,
+                "nearestDP" : nearestDP,
+                "quantity" : resourceInstance.quantity,
             }
         }
 
+    def getHumanActionDict(self, units,type,targetUnit):
+        return {
+            "action" : "attackAction",
+            "people" : units,
+            "infos":{
+                "unitType" : type,
+                "targetType": targetUnit.name,
+                "target" : targetUnit.position.toTuple(),
+                "targetID" : targetUnit.uid,
+                "targetTeam" :self.gm.getTeamNumber(targetUnit.uid),
+            }
+        }
 
     def setResourceAction(self, concernedRes):
         resPriority = self.getResourcesPriority()
         resPriority = (resPriority[0]*self.level,resPriority[1]*self.level,resPriority[2]*self.level)
         resDistance = {"w": concernedRes["w"]-resPriority[0],"g" : concernedRes["g"]-resPriority[1], "f" :concernedRes["f"]-resPriority[2]}
         resourceToGet =  min(resDistance, key=resDistance.get)
-        #self.logger("Ressource to get is", ResourceTypeENUM[resourceToGet].value)
-        resToCollect = self.getNearestRessource((0,0),(0,4),resourceToGet)
-        resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet)
-        self.logger("Added the following resCollect event : \n Type : ", resourceCollectEvent["infos"]["type"], "\t nbOfPpl : ",
-              len(resourceCollectEvent["people"]))
-        self.eventQueue.append(resourceCollectEvent)
+        self.logger("Ressource to get is", ResourceTypeENUM[resourceToGet].value)
+        resToCollect = self.getNearestRessource(self.topVillageBorder,self.bottomVillageBorder,resourceToGet)
+        self.logger("AIPlayer | setResourceAction--- resToCollectValue", resToCollect)
+        nearestDP  = self.getNearestDropPoint(resToCollect)
+        self.logger("AIPlayer | setResourceAction--- nearestDP Is", nearestDP)
+        if resToCollect == -1:
+            return -1
+        if nearestDP == {-1 :-1}:
+            return -1
+        try :
+            resourceCollectEvent = self.getResourcesActionDict(resToCollect, resourceToGet,nearestDP)
+            self.logger("Added the following resCollect event : \n Type : ", resourceCollectEvent["infos"]["type"],
+                        "\t nbOfPpl : ",
+                        len(resourceCollectEvent["people"]), "\t Position of the ressource :",
+                        resourceCollectEvent["infos"]["target"])
+            self.logger("AIPlayer | setResourceAction--- resourceCollectEvent", resourceCollectEvent)
+            self.eventQueue.append(resourceCollectEvent)
+        except AIPeopleException as exp:
+            self.logger("AIPlayer | setResourceAction--- Not enough people to collectResource")
+
 
 
     def setBuildingAction(self, buildings):
@@ -478,84 +603,166 @@ class AIPlayer:
             builtBuildings = (
                 (buildings["A"] + buildings["K"] + buildings["S"] + buildings["B"]), (buildings["H"] + buildings["T"]),
                 (buildings["F"] + buildings["C"]))
-
+            #self.logger("AIPlayer | setBuildingAction--- buildings community : ", self.team.community)
             # permet d'obtenir la distance à laquelle nous nous trouvons des objectifs de batiments à construire
             buildingObjectiveDistance = {"Military":builtBuildings[0]-buildingPriority[0], "Village": builtBuildings[1]-buildingPriority[1], "Farming" : builtBuildings[2]-buildingPriority[2]}
             leastDeveloppedBuildingType  = min(buildingObjectiveDistance, key=buildingObjectiveDistance.get)
-
-            leastDeveloppedBuildingName = "0"
-            leastDeveloppedBuildingNumber = 0
-            for i in BuildingTypeENUM[leastDeveloppedBuildingType].value:
-                if buildings[BuildingENUM(i).name] < leastDeveloppedBuildingNumber or leastDeveloppedBuildingName == "0" :
-                    leastDeveloppedBuildingName = BuildingENUM(i).name
-                    leastDeveloppedBuildingNumber = buildings[BuildingENUM(i).name]
-            #self.logger("Least developped batiment is", BuildingENUM[leastDeveloppedBuildingName].value)
-            buildingEvent = self.getBuildingActionDict(leastDeveloppedBuildingName)
-
-            if buildingEvent == -1:
-                self.logger("No free units")
+            if buildingObjectiveDistance[leastDeveloppedBuildingType] == 0:
+                #self.logger("All buildings have been built")
                 return -1
-            self.logger("Added the following building event : \n Type : ", buildingEvent["infos"]["type"], "\t nbOfPpl : ", len(buildingEvent["people"]))
-            self.eventQueue.append(buildingEvent)
+            else:
+                #self.logger("least developped building type number according to stats", buildingObjectiveDistance[leastDeveloppedBuildingType])
+                #self.logger("least developped building type according to stats", leastDeveloppedBuildingType)
+                leastDeveloppedBuildingName ="0"
+                leastDeveloppedBuildingNumber = 0
+                for i in BuildingTypeENUM[leastDeveloppedBuildingType].value:
+                    if buildings[BuildingENUM(i).name] < leastDeveloppedBuildingNumber or leastDeveloppedBuildingName == "0" :
+                        leastDeveloppedBuildingName = BuildingENUM(i).name
+                        leastDeveloppedBuildingNumber = buildings[BuildingENUM(i).name]
+                #self.logger("Least developped batiment is", BuildingENUM[leastDeveloppedBuildingName].value)
+                buildingEvent = self.getBuildingActionDict(leastDeveloppedBuildingName)
+
+                if buildingEvent == -1:
+                    self.logger("No free units")
+                    return -1
+
+                self.logger("Added the following building event : \n Type : ", buildingEvent["infos"]["type"], "\t nbOfPpl : ", len(buildingEvent["people"]))
+                self.eventQueue.append(buildingEvent)
 
     def setHumanAction(self):
-        pass
+        nearestVillageDistance = (10000,10000)
+        nearestVillage = -1
+        for a in self.world.villages:
+            if a.name == self.team.name:
+                pass
+            else:
+                firstTargetTCKey = next(iter(a.community["T"]))
+                firstTCKey = next(iter(self.team.community["T"]))
+                firstTargetTC = a.community["T"][firstTargetTCKey]
+                firstTC = self.team.community["T"][firstTCKey]
+                villageDistance = self.estimateDistance(firstTC.position.toTuple(),firstTargetTC.position.toTuple())
+                if villageDistance[0]<nearestVillageDistance[0] and villageDistance[0]<nearestVillageDistance[1]:
+                    nearestVillageDistance = villageDistance
+                    nearestVillage = a
+        self.logger("AIPlayer | setHumanAction--- nearestVillage is", nearestVillage)
+        unitList = self.getFreePeople(1, "v")
+        if len(unitList) == 0:
+            return -1
+        for u in unitList:
+            self.freeUnits["v"].remove(u)
+
+        firstUnitKey = next(iter(nearestVillage.community["v"]))
+        firstUnit = nearestVillage.community["v"][firstUnitKey]
+        actionDict = self.getHumanActionDict(unitList,"v", firstUnit)
+        self.eventQueue.append(actionDict)
+
+
 
     def launchResourceAction(self, actionDict):
+        if actionDict["infos"]["target"] is None:
+            self.eventQueue.remove(actionDict)
+            return -1
         #self.logger("J'ai envoyé qqun chercher des ressources attention")
         unitList = actionDict["people"]
         unitTeam = self.gm.getTeamNumber(unitList[0])
+        unitInstance = self.team.community["v"][actionDict["people"][0]]
+        self.logger(self.world.ressources[actionDict["infos"]["type"]][actionDict["infos"]["targetKey"]])
+        self.logger(actionDict["infos"]["targetKey"])
+
+        resourceInstance = self.world.ressources[actionDict["infos"]["type"]][actionDict["infos"]["targetKey"]]
         exceptionRaised = False
         for i in unitList:
             self.world.villages[unitTeam-1].community["v"][i].target = self.world.ressources[actionDict["infos"]["type"]][(actionDict["infos"]["targetKey"])]
-            targetPosition = Position(actionDict["infos"]["target"][0],actionDict["infos"]["target"][0])
+            targetPosition = Position(actionDict["infos"]["target"][0],actionDict["infos"]["target"][1])
             try:
-                self.gm.addUnitToMoveDict(self.world.villages[unitTeam-1].community["v"][i],targetPosition)
+                self.logger("LE TYPE DE RESOURCE INSTANCE J'EN AI MARRE", resourceInstance)
+                self.gm.addRessourceToCollectDict(unitInstance,resourceInstance ,actionDict["infos"]["quantity"],actionDict["infos"]["nearestDP"])
             except PathfindingException:
                 exceptionRaised = True
         if not exceptionRaised:
             self.currentEvents.append(actionDict)
             self.eventQueue.remove(actionDict)
+
     def launchBuildAction(self, actionDict):
         #self.logger("J'ai lancé une construction attention")
         buildingToBuild = actionDict["infos"]["type"]
         target = actionDict["infos"]["target"]
         newBuilding = BuildingENUM[buildingToBuild].value
         newInstanciatedBuilding = newBuilding(self.team)
-        self.logger("AIPlayer | launchBuildAction----- ",target)
-        newInstanciatedBuilding.position = Position(target[0], target[1])
-        self.world.place_element(newInstanciatedBuilding)
-        self.team.community[buildingToBuild][newInstanciatedBuilding.uid] = newInstanciatedBuilding
-        for i in newInstanciatedBuilding.get_occupied_tiles():
-            self.world.filled_tiles[i] = i
-        if target not in self.world.filled_tiles:
-            self.logger("launchBuildAction----- Le batiment ne semble pas être construit")
-        if self.world.tiles_dico[target].contains is None:
-            self.logger("launchBuildAction----- Batiment absent de la map")
-        self.clearBuildAction(actionDict)
+        nearTiles = self.gm.getNearTiles((newBuilding.surface[0], newBuilding.surface[1]),
+                                         (target[0], target[1]))
+        self.logger("AIPlayer | NearTiles result --- Building surface is :",newBuilding.surface)
+        for u in actionDict["people"]:
+            self.logger("AIPlayer | launchBuildAction--- building position is, and sendingPeopleTo :", target,nearTiles)
+            unit = self.team.community["v"][u]
+            self.gm.addUnitToMoveDict(unit,Position(nearTiles[0][0],nearTiles[0][1]))
+        self.team.add_building()
+        actionDict["infos"]["uid"] = newInstanciatedBuilding.uid
+        self.gm.addBuildingToBuildDict(newInstanciatedBuilding, target, actionDict["people"], nearTiles[0])
+        self.logger("AIPlayer | launchBuildAction--- freeunits state",self.freeUnits)
+        self.eventQueue.remove(actionDict)
+        self.currentEvents.append(actionDict)
+        #self.logger("AIPlayer | launchBuildAction----- ",target)
+        #newInstanciatedBuilding.position = Position(target[0], target[1])
+        #self.world.place_element(newInstanciatedBuilding)
+        #self.team.community[buildingToBuild][newInstanciatedBuilding.uid] = newInstanciatedBuilding
+        #for i in newInstanciatedBuilding.get_occupied_tiles():
+        #    self.world.filled_tiles[i] = i
+        #if target not in self.world.filled_tiles:
+        #    self.logger("launchBuildAction----- Le batiment ne semble pas être construit")
+        #if self.world.tiles_dico[target].contains is None:
+        #    self.logger("launchBuildAction----- Batiment absent de la map")
+        #self.clearBuildAction(actionDict)
         pass
 
     def launchHumanAction(self, actionDict):
-        pass
-        #self.logger("J'ai lancé une attaque attention")
+        concernedUnits = []
+        for a in actionDict["people"]:
+            concernedUnits.append(self.team.community[actionDict["infos"]["unitType"]][a])
+        targetUnit = self.world.villages[actionDict["infos"]["targetTeam"]-1].community[actionDict["infos"]["targetType"]][actionDict["infos"]["targetID"]]
+        for u in actionDict["people"]:
+            unit = self.team.community["v"][u]
+            self.gm.addUnitToMoveDict(unit, Position(actionDict["infos"]["target"][0],actionDict["infos"]["target"][1]))
+        self.gm.addUnitToAttackDict(concernedUnits,targetUnit)
+        self.logger("J'ai lancé une attaque attention")
+
+
 
     def launchAction(self, actionDict):
         ActionEnum[actionDict["action"]].value(self,actionDict)
 
     def checkActions(self):
+        for k in self.currentEvents:
+            ActionCheckEnum[k["action"]].value(self, k)
+
+    def checkBuildingAction(self, event):
+        bldID = event["infos"]["uid"]
+        if self.gm.checkBuildingStatus(bldID):
+            event["status"] = "finished"
+            self.clearBuildAction(event)
+
+    def checkResourceAction(self,event):
+        targetRes = event["infos"]["targetKey"]
+        if self.gm.checkResourceStatus(targetRes):
+            pass
+
+    def checkAttackAction(self, event):
         pass
+
+
     def clearBuildAction(self, actionDict):
         for i in actionDict["people"]:
             self.freeUnits["v"].append(i)
         self.pastEvents.append(actionDict)
-        self.eventQueue.remove(actionDict)
+        self.currentEvents.remove(actionDict)
 
     def writeLogs(self):
-        f = open(f"AILogs{self.team.name}.txt", "a")
-        logs = output.getvalue()
-        output.flush()
-        f.write(logs)
-        self.logs = ""
+        if self.debug and self.writeToDisk:
+            f = open(f"AILogs{self.team.name}.txt", "a")
+            logs = output.getvalue()
+            output.flush()
+            f.write(logs)
+            self.logs = ""
 
 
 
@@ -565,7 +772,10 @@ class ActionEnum(Enum):
     Build = partial(AIPlayer.launchBuildAction)
     collectResource = partial(AIPlayer.launchResourceAction)
     attackAction = partial(AIPlayer.launchHumanAction)
-
+class ActionCheckEnum(Enum):
+    Build = partial(AIPlayer.checkBuildingAction)
+    collectResource = partial(AIPlayer.checkResourceAction)
+    attackAction = partial(AIPlayer.checkAttackAction)
 if __name__ == "__main__":
     monde = World(100, 100)
     village1 = Model("1", monde)
@@ -587,12 +797,12 @@ if __name__ == "__main__":
     # print(village2.population())
     #print(monde.get_ressources())
     #print(v)
-    #print(community)
+    print(community)
     gm = GameManager(speed=1, world=monde)
     print("Launched GameManager")
-    gm.addUnitToMoveDict(v, Position(40, 40))
+    #gm.addUnitToMoveDict(v, Position(40, 40))
     #print("Added unit to move dict")
-    gm.addUnitToMoveDict(community["v"]["eq1p3"],community["a"]["eq1p0"].position)
+    #gm.addUnitToMoveDict(community["v"]["eq1p3"],community["a"]["eq1p0"].position)
     #print("Added 2nd unit to move dict")
     #print(monde.filled_tiles)
 
@@ -603,16 +813,9 @@ if __name__ == "__main__":
     #print(gm.checkUnitsToMove())
     #Boucle pour tester le game manager
     n = 0
-    play_style = PlayStyle(minWorkers=10)
-    playStyleMatrix= [
-        [4,3,0],
-        [2,2,2],
-        [1,2,0]
-    ]
-    play_style.setPlayStyleMatrix(playStyleMatrix)
-    player = AIPlayer(village1, monde, play_style, level=100,gm=gm, debug=True, writeToDisk=True)
-    tcSurface = (tc.position.getX()+tc.surface[0]+playStyleMatrix[1][2], tc.position.getY()+tc.surface[1]+playStyleMatrix[1][2])
-    topBorder = (tc.position.getX()-playStyleMatrix[1][2], tc.position.getY()-playStyleMatrix[1][2])
+    play_style = PlayStyleEnum.b.value
+    player = AIPlayer(village1, monde, play_style, level=100,gm=gm, debug=True, writeToDisk=False)
+
     print("tcSurface is ", tc.position)
     print("Player is out of bound (200,-40)?", (200,-40))
     print("Player is out of bound (-200,-40)?", (player.isOutOfBound((-200,-40))))
@@ -620,7 +823,7 @@ if __name__ == "__main__":
     print("Player is out of bound (-20,101)?", (player.isOutOfBound((10,101))))
     print("Player is out of bound (-20,10)?", (player.isOutOfBound((10,101))))
 
-    player.setVillageBorders(topBorder, tcSurface)
+    #player.setVillageBorders(topBorder, tcSurface)
     for i in range(20):
         player.playTurn()
     print(monde.show_world())
