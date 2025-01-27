@@ -9,7 +9,7 @@ from collections import defaultdict
 from datetime import datetime
 import time
 import re
-from distutils.command.build import build
+
 from http.server import HTTPServer
 from typing import Tuple
 import webbrowser

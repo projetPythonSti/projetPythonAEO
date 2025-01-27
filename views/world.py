@@ -73,7 +73,7 @@ class World_GUI:
                     tile = ""
         else:
             tile = ""
-            
+
         
             
         out = {

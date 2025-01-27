@@ -143,7 +143,7 @@ class Game :
 
 
     def turn (self,term) :
-        self.clock.tick(15)
+        self.clock.tick(60)
         now = time.time()
         delta = now - self.ltick
         ig_delta = delta * self.speed
@@ -153,6 +153,7 @@ class Game :
         #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
         # self.events()
         # self.update()
+        '''
         if self.activePlayer<self.playerNumber:
             self.players[self.activePlayer].playTurn()
             self.activePlayer +=1
@@ -160,6 +161,7 @@ class Game :
             self.activePlayer = 0
             self.players[self.activePlayer].playTurn()
         self.gm.checkModifications()
+        '''
         self.gm.tick = timeit.default_timer()
 
         #self.draw_term(term)
@@ -238,14 +240,31 @@ class Game :
         for village in self.world.villages:
             infos+="Village "+village.name+" ;\n"
             infos+=" Wood:"+str(village.ressources["w"])+" Gold:"+str(village.ressources["g"])+" Food:"+str(village.ressources["f"])
-            infos+=" Population:"+str(village.peopleCount)+'/'
-            infos+="\n"
-            infos+="Playstyle: "+PlayStyleMatrixEnum(self.players[n].playStyle.playStyleMatrix).name
-            infos+="\nTopBorder: "+str(self.players[n].topVillageBorder)+"  BottomBorder: "+str(self.players[n].bottomVillageBorder)
+            infos+=" Population:"+str(village.peopleCount)+'/'+str(self.max_units(village))+" Villagers:"+str(self.nb_something(village,"v"))+" Buildings:"+str(self.nb_buildings(village))+"\n"
+            infos+="Playstyle:"+PlayStyleMatrixEnum(self.players[n].playStyle.playStyleMatrix).name
+            infos+="  TopBorder:"+str(self.players[n].topVillageBorder)+" BottomBorder:"+str(self.players[n].bottomVillageBorder)
             infos+='\n\n'
             n += 1
-        infos += '\n' * (term.height - ((len(self.world.villages)+1)*4)-2)
+        infos += '\n' * (term.height - ((len(self.world.villages)+1)*3)-2)
         print(infos)
+
+    def max_units(self,village): #function that takes a team and return the maximum number of units manageable
+        max=0
+        for _ in village.community["T"]:
+            max+=5
+        for _ in village.community["H"]:
+            max+=5
+        return max
+
+    def nb_buildings(self,village):
+        n=0
+        for b in "TABCFHKS":
+            for _ in village.community[b]:
+                n+=1
+        return n
+
+    def nb_something(self,village,letter): #takes the letter corresponding to a unit type
+        return len(village.community[letter])
 
 
     def pause (self,term) :

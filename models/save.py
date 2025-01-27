@@ -1,5 +1,5 @@
 import time
-from os import killpg
+#from os import killpg
 
 # self.path mettre
 from blessed import Terminal
