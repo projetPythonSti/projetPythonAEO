@@ -7,6 +7,7 @@ from views.game import Game as PGGame
 import sys
 import time
 import timeit
+import json
 
 #########################################
 ## Jeu
@@ -133,10 +134,16 @@ class Game :
                 elif val.name == 'KEY_F1' or val.name == 'KEY_F2' or val.name == 'KEY_F3' or val.name == 'KEY_F4':
                     self.ffff = not self.ffff
 
+                elif val.name == 'KEY_F8' :
+                    self.save.quick_save(self)
+
+                elif val.name == 'KEY_F12':
+                    self.save.quick_load(self)
+
 
 
     def turn (self,term) :
-        self.clock.tick(15)
+        self.clock.tick(60)
         now = time.time()
         delta = now - self.ltick
         ig_delta = delta * self.speed
@@ -248,7 +255,7 @@ class Game :
         print("Appuyez sur s pour sauvegarder")
         print("Appuyez sur c pour charger une partie")
         print("Appuyez sur r pour reprendre")
-        print("Appuyez sur p pour activer pygame, puis appuyez sur R")
+        print("Appuyez sur p pour activer pygame")
         print(f"IN GAME TIME : {self.game_duration}")
         print(f"SPEED : {self.speed}")
         with term.cbreak():
@@ -271,6 +278,7 @@ class Game :
 
                 elif val2.lower() == 'p':
                     self.kickstartPG = True
+                    break
 
 
 
@@ -280,6 +288,7 @@ class Game :
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
         print("Appuyez sur r pour reprendre")
+        self.make_json()
         with term.cbreak():
             val2 = ''
             while val2.lower() != 'r':
@@ -295,3 +304,10 @@ class Game :
         self.speed = 1
         self.world = dico[0]
         self.game_duration = dico[3]
+
+    def make_json(self):
+
+        with open("web/stat.json", "w") as file :
+            json.dump(self.world.to_json(),file)
+
+

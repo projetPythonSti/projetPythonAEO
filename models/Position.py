@@ -15,6 +15,8 @@ class Position:
     def getX(self): return self._x
     def getY(self): return self._y
     def toTuple(self): return (self._x, self._y)
+    def to_json(self):
+        return [self._x, self._y]
     def __repr__(self):
             return f"({self._x}, {self._y})"
     def __eq__(self, other): return self.getX() == other.getX() and self.getY() == other.getY()

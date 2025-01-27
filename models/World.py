@@ -254,6 +254,17 @@ class World:
             binary_array[key[0], key[1]] = 0 if value.contains == None else 1
         return binary_array
 
+    def to_json(self):
+        print("hi")
+        print(self.width)
+        print(self.height)
+        print([village.to_json() for village in self.villages])
+        return {
+            "width": self.width,
+            "height" : self.height,
+            "villages" : [village.to_json() for village in self.villages]
+            }
+
     # def intkey(key): #turns a float key into an int key for dict indexation
     #     return (int(key[0]),int(key[1]))
 

@@ -18,14 +18,12 @@ class Save:
             os.makedirs(self.save_path)"""
 
     def save(self, game,file_name, path=None):
-        print("début sauvegarde")
         self.generate_default_path()
         datas = [game.world,game.gm, game.players, game.game_duration]
         if path: self.save_path = path
         file = open(self.save_path + file_name, 'wb')
         pickle.dump(datas, file)
         file.close()
-        print("fin de sauvegarde")
 
     def generate_default_path(self):
         system = platform.system()
@@ -155,7 +153,7 @@ class Save:
 
     def quick_load (self,game) :
         data = self.load("quick_save", "assets/data/saves/")
-        game.swap(data)
+        game.swap_to_load(data)
 
 
 """

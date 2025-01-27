@@ -5,7 +5,6 @@ from collections import defaultdict
 from datetime import datetime
 import time
 import re
-from distutils.command.build import build
 from typing import Tuple
 
 from models.Exceptions import PathfindingException
