@@ -91,7 +91,12 @@ class World:
 
 
     def updateUnitPos(self,oldPos ,position, unit):
-        self.unitTiles[oldPos]["elements"].remove(unit)
+        print(oldPos, position)
+        try :
+            self.unitTiles[oldPos]["elements"].remove(unit)
+        except:
+            print(unit.position)
+            print("l'unité n'as pas l'air d'être à sa place")
         try:
             self.unitTiles[oldPos]["elements"][0]
         except:

@@ -10,6 +10,7 @@ class UnityHealthENUM(Enum):
     h = 45
     s = 40
     v = 25
+
 class Unity:
     population = 0
 

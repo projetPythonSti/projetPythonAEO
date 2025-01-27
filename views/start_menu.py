@@ -49,8 +49,10 @@ class Menu :
                 if val.lower() == 'c' :
                     nsave = Save()
                     data = nsave.load_term(term)
-                    print(data)
-                    return tuple(data)
+                    if data == None :
+                        return self.start_menu()
+                    else :
+                        return tuple(data)
                 if val.lower() == 'k':
                     self.x = PyGameDebugWorldENUM.width.value
                     self.y = PyGameDebugWorldENUM.height.value

@@ -7,6 +7,7 @@ from views.game import Game as PGGame
 import sys
 import time
 import timeit
+import json
 
 #########################################
 ## Jeu
@@ -133,6 +134,12 @@ class Game :
                 elif val.name == 'KEY_F1' or val.name == 'KEY_F2' or val.name == 'KEY_F3' or val.name == 'KEY_F4':
                     self.ffff = not self.ffff
 
+                elif val.name == 'KEY_F8' :
+                    self.save.quick_save(self)
+
+                elif val.name == 'KEY_F12':
+                    self.save.quick_load(self)
+
 
 
     def turn (self,term) :
@@ -243,6 +250,7 @@ class Game :
 
     def pause (self,term) :
         os.system('cls' if os.name == 'nt' else 'clear')
+        #self.gm.openHtmlPage()
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
         print("Appuyez sur s pour sauvegarder")

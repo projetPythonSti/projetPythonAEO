@@ -175,6 +175,13 @@ class AIPlayer:
         self.logger("------ START OF AI TURN ------")
         #self.logger("Village border atm => ", self.topVillageBorder, self.bottomVillageBorder)
         self.playing = True
+        for i in self.freeUnits:
+            for k in self.freeUnits[i]:
+                self.logger("AIPlayer | playTurn : valeur k -> ",k)
+                if self.gm.checkIfDead(k, team=self.team.name):
+                    print("l'unité semble être morte ")
+                    self.freeUnits[i].remove(k)
+
         self.logger("AIPlayer | playTurn --- freeunits state",self.freeUnits)
         self.logger("Voici le nombre de personnes libres",self.getFreePplCount(), "Et le nb de personnes total : ",self.team.get_pplCount())
         workingPpl  = self.team.get_pplCount() - self.getFreePplCount()
@@ -653,6 +660,7 @@ class AIPlayer:
 
         firstUnitKey = next(iter(nearestVillage.community["v"]))
         firstUnit = nearestVillage.community["v"][firstUnitKey]
+        self.logger("AIPlayer | setHumanAction--- we are going to attack", firstUnit)
         actionDict = self.getHumanActionDict(unitList,"v", firstUnit)
         self.eventQueue.append(actionDict)
 
@@ -752,7 +760,11 @@ class AIPlayer:
 
     def clearBuildAction(self, actionDict):
         for i in actionDict["people"]:
-            self.freeUnits["v"].append(i)
+            if not self.gm.checkIfDead(i, self.team):
+                self.logger("AIPlayer | clearBuildAction : L'unité n'est pas morte")
+                self.freeUnits["v"].append(i)
+            else:
+                self.logger("AIPlayer | clearBuildAction : L'unité est morte")
         self.pastEvents.append(actionDict)
         self.currentEvents.remove(actionDict)
 

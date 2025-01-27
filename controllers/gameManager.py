@@ -1,18 +1,25 @@
+import http
 import io
+import os
+import socketserver
 import sys
+import threading
 import timeit
 from collections import defaultdict
 from datetime import datetime
 import time
 import re
 from distutils.command.build import build
+from http.server import HTTPServer
 from typing import Tuple
+import webbrowser
 
 from models.Exceptions import PathfindingException
 from models.Pathfinding import Pathfinding
 from models.Position import Position
 from models.World import World
 from models.buildings.buildings import Building
+from models.httpHandler import Serv, start_http_server
 from models.ressources.ressources import Ressource
 from models.unity.Unity import Unity
 from enum import Enum
@@ -127,6 +134,9 @@ class GameManager:
             unit = self.unitToMove[uid]
             unit["timeElapsed"] += (deltaTime.real*self.gameSpeed)
             #self.logger("time elapsed : ", unit["timeElapsed"])
+            if self.checkIfDead(uid, unit["team"]):
+                self.logger("GameManager | moveUnit--- checking if dead")
+                return -1
             if unit["timeElapsed"] >= (unit["timeToTile"]):
                 unitObj = self.world.villages[(unit["team"]-1)].community[(unit["type"].lower())][uid]
                 self.world.updateUnitPos(unit["moveQueue"][0], unit["moveQueue"][1], unitObj)
@@ -147,6 +157,9 @@ class GameManager:
             building = self.buildingsToBuild[uid]
             readyToBuild = False
             buildingInstance = self.world.villages[building["team"]-1].community[building["type"]][uid]
+            if self.checkIfDead(uid, building["team"]):
+                building["error"] = True
+                return -1
             #self.logger("GameManager | buildBuilding--- Building type :",buildingInstance.name)
             for unit in building["units"]:
                 readyToBuild = self.unitNear(self.world.villages[building["team"]-1].community["v"][unit].position.toTuple(), building["nearTile"], building["type"])
@@ -173,6 +186,9 @@ class GameManager:
         def collectResources(self, uid):
             deltaTime = timeit.default_timer() - self.tick
             resToCollect = self.ressourceToCollect[uid]
+            if self.checkIfDead(uid, resToCollect["unitTeam"]):
+                self.logger("GameManager | collectResources--- checking if dead")
+                return -1
             # Line to check if the quantity to collect on said resource is still up to date
             realResQuantity = resToCollect["resourceQuantity"] if resToCollect["resourceQuantity"]<= self.world.ressources[resToCollect["resourceType"]][resToCollect["resourceID"]].quantity else self.world.ressources[resToCollect["resourceType"]][resToCollect["resourceID"]].quantity
             resToCollect["resourceQuantity"] = realResQuantity
@@ -232,13 +248,21 @@ class GameManager:
                 attackingUnit["success"] = True
                 return -1
             targetInstance = self.world.villages[attackingUnit["targetTeam"]-1].community[attackingUnit["targetType"]][attackingUnit["targetID"]]
+            self.logger("GameManager | attackUnit--- Quel type ?", targetInstance.name)
             self.logger("Game manager attackUnit--- Position unité,: ",attackingUnitInstance.position, "Position à atteindre :",targetInstance.position)
             if attackingUnit["movingTarget"]:
                 self.logger("Game manager attackUnit--- Element qui bouge")
-                if targetPosition != targetInstance.position.toTuple() or targetPosition != self.unitToMove[attackingUnit["targetID"]]["goal"] :
-                    self.logger("Game manager attackUnit--- Calcul à nouveau du chemin à suivre")
-                    targetPosition = targetInstance.position.toTuple()
-                    self.addUnitToMoveDict(attackingUnitInstance,Position(targetPosition[0],targetPosition[1]))
+                if targetPosition != targetInstance.position.toTuple() and attackingUnitInstance.estimateDistance(targetPosition,targetInstance.position.toTuple()) < (20,20):
+                    attackingUnit["targetPosition"] = targetInstance.position.toTuple()
+                    self.addUnitToMoveDict(attackingUnitInstance, Position(targetPosition[0], targetPosition[1]))
+                    """self.logger("Game manager attackUnit--- Calcul à nouveau du chemin à suivre")
+                    if attackingUnit["targetID"] in self.unitToMove and targetPosition != self.unitToMove[attackingUnit["targetID"]]["goal"] :
+                        self.logger("Game manager attackUnit--- L'unité bougeait déjà et notre position enregistrée n'est pas la même")
+                        self.addUnitToMoveDict(attackingUnitInstance, Position(self.unitToMove[attackingUnit["targetID"]]["goal"][0], self.unitToMove[attackingUnit["targetID"]]["goal"][0]))
+                        attackingUnit["targetPosition"] = self.unitToMove[attackingUnit["targetID"]]["goal"]
+                    elif not (attackingUnit["targetID"] in self.unitToMove):
+                        self.logger("Game manager attackUnit--- L'unité ne bougeait pas et s'est mise à bouger")"""
+
 
             if attackingUnitInstance.isInRange(targetPosition):
                 self.logger("GameManager | attackUnit--- Unit in Range")
@@ -250,10 +274,32 @@ class GameManager:
                     self.unitAttack[uid]["success"] = True
                     if issubclass(targetInstance.__class__, Unity):
                         self.logger("GameManager | attackUnit--- HA IL EST MORT ")
-                        self.logger(f"GameManager | En ce jour funeste nous honorons la mémoire de",attackingUnit["targetID"])
                         #targetInstance.die()
-
                         self.world.villages[attackingUnit["targetTeam"]-1].markAsDead(targetInstance)
+                        if targetInstance.uid in self.unitToMove:
+                            self.logger("GameManager | attackUnit--- should pop targetInstance in unitToMove")
+                            self.unitToMove.pop(targetInstance.uid)
+                        if targetInstance.uid in self.ressourceToCollect:
+                            self.logger("GameManager | attackUnit--- should pop targetInstance in resToCollect")
+                            self.ressourceToCollect.pop(targetInstance.uid)
+                        removeBuildAD = ""
+                        for a in self.buildingsToBuild.keys():
+                            unitToRemove = []
+                            if self.getTeamNumber(a) == attackingUnit["targetTeam"]:
+                                for k in self.buildingsToBuild[a]["units"]:
+                                    if self.checkIfDead(k,attackingUnit["targetTeam"]):
+                                        unitToRemove.append(k)
+                                for unit in unitToRemove:
+                                    self.logger("GameManager | attackUnit--- should pop targetInstance in buildingsToBuild", unit)
+                                    self.buildingsToBuild[a]["units"].remove(unit)
+                                try:
+                                    self.buildingsToBuild[a]["units"][0]
+                                except:
+
+                                    removeBuildAD = a
+                        if removeBuildAD is not "":
+                            self.buildingsToBuild.pop(removeBuildAD)
+                            self.buildingsToBuild.pop(targetInstance.uid)
                         self.pastAttacks[uid] = self.unitAttack[uid]
                     else:
                         self.logger("GameManager | attackUnit--- Seems to be a building who's been destroyed")
@@ -261,7 +307,12 @@ class GameManager:
                     self.logger(f"GameManager | attackUnit---{attackingUnitInstance.damage*gameDeltaTime} PV enlevés  ")
                     self.world.villages[attackingUnit["targetTeam"] - 1].community[attackingUnit["targetType"]][attackingUnit["targetID"]].health -= attackingUnitInstance.damage*gameDeltaTime
 
-
+        def checkIfDead(self, uid, team):
+            try :
+                self.world.villages[team - 1].deads[uid]
+            except:
+                return False
+            return True
 
         def buiding_process(self, building):
             building.begin_building()
@@ -276,7 +327,6 @@ class GameManager:
             #reshow the world here, because le buiding is finish to be built
 
 
-
         def checkUnitsToMove(self):
             if len(self.unitToMove) == 0:
                 pass
@@ -285,6 +335,7 @@ class GameManager:
                 for k in self.unitToMove:
                     if self.unitToMove[k]["moveQueue"] == []:
                         unitToDelete = k
+
                     else:
                         self.moveUnit(k)
                 if unitToDelete != "":
@@ -295,6 +346,7 @@ class GameManager:
             for k in self.buildingsToBuild:
                 if self.buildingsToBuild[k]["built"]:
                     buildingToDelete = k
+
                 else:
                     self.buildBuilding(k)
             if buildingToDelete != "":
@@ -317,6 +369,10 @@ class GameManager:
                     unitToDelete= k
                 else:
                     self.attackUnit(k)
+            if unitToDelete != "":
+                if self.unitAttack[unitToDelete]["targetID"] in self.unitAttack:
+                    self.unitAttack.pop(self.unitAttack[unitToDelete]["targetID"])
+                self.unitAttack.pop(unitToDelete)
         # idée, ajouter une représentation cassée dans le repr du building, et la faire changer lorsque celui-ci est en cours de construction
 
         def unitNear(self,unitPosition,nearTile : Tuple[int,int], type):
@@ -365,15 +421,34 @@ class GameManager:
                 "team": teamNumber,
                 "nearTile" :nearTileValue ,
                 "type": building.name,
+                "error" : False,
             }
 
         def addUnitToMoveDict(self, unit : Unity, destination : Position,prePath=[]):
             #self.logger("GameManager | addUnitToMoveDict--- Unit destination is : ", destination)
             grid = self.world.convertMapToGrid()
             teamNumber = self.getTeamNumber(unit.uid)
+            destTuple = destination.toTuple()
+            unitTuple = unit.position.toTuple()
+            if (abs(destTuple[0]-unitTuple[0]) <= 2 and abs(destTuple[1]-unitTuple[1]) <= 2):
+                self.logger("GameManager | addUnitToMoveDict--- distance is really short")
+                path = [unitTuple, destTuple]
+                self.unitToMove[unit.uid] = {
+                    "group": [],
+                    "timeToTile": 1 / (unit.speed),
+                    "timeElapsed": 0,
+                    "nextTile": path[1],
+                    "currentTile": path[0],
+                    "estimatedPos": path[0],
+                    "goal": destination.toTuple(),
+                    "team": teamNumber,
+                    "type": unit.name,
+                    "moveQueue": path,
+                    "error": False,
+                }
+                return -1
             pathFinding  = Pathfinding(mapGrid=grid, statingPoint= unit.position.toTuple(), goal=destination.toTuple(), debug=False)
             path = []
-            self.logger("GameManager | addUnitToMoveDict--- Prepath is not null")
             prePathSet = False
             try:
                 prePath[0]
@@ -389,7 +464,6 @@ class GameManager:
                 raise PathfindingException(self.world.tiles_dico[destination.toTuple()])
                 #  : AJOUTER UNE EXCEPTION QUAND IL NE TROUVE VRAIMENT PAS DE CHEMIN
                 #self.logger("Found no short path")
-            self.logger("Path is !!!!" ,path)
             path = path + [pathFinding.startingPoint]
             path = path[::-1]
             self.logger("Unit ADDED TO MOVE DICT")
@@ -405,6 +479,7 @@ class GameManager:
                 "team": teamNumber,
                 "type" : unit.name,
                 "moveQueue": path,
+                "error": False,
             }
 
         def addUnitToAttackDict(self, units, target):
@@ -428,10 +503,11 @@ class GameManager:
                         "targetInRange": False,
                         "targetPosition": targetPosition,
                         "moving" : movingUnit,
-                        "movingTarget": True if type(target) == Unity else False,
+                        "movingTarget": True if issubclass(target.__class__, Unity) else False,
                         "success" : False,
                         "team": unitTeam,
-                        "targetTeam" : targetTeam
+                        "targetTeam" : targetTeam,
+                        "error": False,
                     }
 
 
@@ -457,7 +533,8 @@ class GameManager:
                 "full": False,
                 "nearDPPos" : nearDP.position.toTuple(),
                 "routeStarted": False,
-                "pathToDP": path
+                "pathToDP": path,
+                "error" : False
             }
 
         def addBuildingToWorld(self, building:Building, position):
@@ -480,6 +557,11 @@ class GameManager:
                 return self.buildingsToBuild[id]["built"]
             else:
                 return True
+        def returnBuildingEvent(self,id):
+            if id in self.buildingsToBuild:
+                return self.buildingsToBuild[id]
+            else:
+                return None
         def checkResourceStatus(self,id):
             if id in self.ressourceToCollect:
                 return False
@@ -525,7 +607,18 @@ class GameManager:
             with open("./utils/html/gameStats.html", "w") as file:
                 file.write(body)
 
+        def openHtmlPage(self):
+            directory_to_serve = "assets/web"  # Replace with the folder you want to serve
+            port = 8000
 
+            # Start the server in a separate thread
+            server_thread = threading.Thread(target=start_http_server, args=(directory_to_serve, port), daemon=True)
+            server_thread.start()
+            # Define the handler and server
+            webbrowser.open("http://localhost:8000",new=0, autoraise=True )
+            # Start the server
+
+        print("finisshed server")
 if __name__ == "__main__":
     pass
 
