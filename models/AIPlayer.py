@@ -182,7 +182,7 @@ class AIPlayer:
                     print("l'unité semble être morte ")
                     self.freeUnits[i].remove(k)
 
-        self.logger("AIPlayer | playTurn --- freeunits state",self.freeUnits)
+        self.logger(f"AIPlayer | playTurn eq${self.team.name}--- freeunits state",self.freeUnits)
         self.logger("Voici le nombre de personnes libres",self.getFreePplCount(), "Et le nb de personnes total : ",self.team.get_pplCount())
         workingPpl  = self.team.get_pplCount() - self.getFreePplCount()
         if workingPpl < self.playStyle.minWorkers and workingPpl != self.team.get_pplCount():
@@ -703,9 +703,10 @@ class AIPlayer:
         for u in actionDict["people"]:
             self.logger("AIPlayer | launchBuildAction--- building position is, and sendingPeopleTo :", target,nearTiles)
             unit = self.team.community["v"][u]
-            self.gm.addUnitToMoveDict(unit,Position(nearTiles[0][0],nearTiles[0][1]))
+            self.gm.dumbAddUnitToMoveDict(unit,Position(nearTiles[0][0],nearTiles[0][1]))
         self.team.add_building()
         actionDict["infos"]["uid"] = newInstanciatedBuilding.uid
+        self.logger(actionDict)
         self.gm.addBuildingToBuildDict(newInstanciatedBuilding, target, actionDict["people"], nearTiles[0])
         self.logger("AIPlayer | launchBuildAction--- freeunits state",self.freeUnits)
         self.eventQueue.remove(actionDict)
@@ -731,8 +732,13 @@ class AIPlayer:
         for u in actionDict["people"]:
             unit = self.team.community["v"][u]
             self.gm.dumbAddUnitToMoveDict(unit, Position(actionDict["infos"]["target"][0],actionDict["infos"]["target"][1]))
+        self.logger("ATTAQUE INITIE !")
         self.gm.dumbAddUnitToAttackDict(concernedUnits,targetUnit)
         self.logger("J'ai lancé une attaque attention")
+        self.currentEvents.append(actionDict)
+        self.eventQueue.remove(actionDict)
+
+
 
 
 
@@ -741,6 +747,7 @@ class AIPlayer:
 
     def checkActions(self):
         for k in self.currentEvents:
+            self.logger("AIPlayer | checkAction--- Action to check is", k["action"])
             ActionCheckEnum[k["action"]].value(self, k)
 
     def checkBuildingAction(self, event):
@@ -755,10 +762,28 @@ class AIPlayer:
             pass
 
     def checkAttackAction(self, event):
-        pass
+        unitID = event["people"]
+        finishedEvent = False
+        for i in unitID:
+            finishedEvent = self.gm.checkAttackStatus(i)
+        if finishedEvent:
+            event["status"] = "finished"
+            self.clearAttackAction(event)
+
+
 
 
     def clearBuildAction(self, actionDict):
+        for i in actionDict["people"]:
+            if not self.gm.checkIfDead(i, self.team):
+                self.logger("AIPlayer | clearBuildAction : L'unité n'est pas morte")
+                self.freeUnits["v"].append(i)
+            else:
+                self.logger("AIPlayer | clearBuildAction : L'unité est morte")
+        self.pastEvents.append(actionDict)
+        self.currentEvents.remove(actionDict)
+
+    def clearAttackAction(self,actionDict):
         for i in actionDict["people"]:
             if not self.gm.checkIfDead(i, self.team):
                 self.logger("AIPlayer | clearBuildAction : L'unité n'est pas morte")

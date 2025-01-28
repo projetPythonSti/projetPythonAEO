@@ -164,6 +164,7 @@ class Model:
     def markAsDead(self, unit):
         self.world.removeUnitPos(unit.position.toTuple(), unit)
         self.community[unit.name].pop(unit.uid)
+        self.peopleCount -=1
         self.deads[unit.uid] = unit.uid
 
     def get_community(self):

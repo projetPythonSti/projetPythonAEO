@@ -162,7 +162,9 @@ class GameManager:
                 return -1
             if unit["timeElapsed"] >= (unit["timeToTile"]):
                 unitObj = self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][uid]
-                self.world.updateUnitPos(unit["currentTile"][0], unit["goal"][1], unitObj)
+                self.world.updateUnitPos(unit["currentTile"], unit["goal"], unitObj)
+                unitObj.position = Position(unit["goal"][0], unit["goal"][1])
+                unit["arrived"] = True
 
 
         def buildBuilding(self, uid):
@@ -184,17 +186,17 @@ class GameManager:
             #self.logger("GameManager | buildBuilding--- Temps pour construire le batiment :",timeToBuild)
             if timeToBuild > 0:
                 if building["timeElapsed"] > timeToBuild:
-                    #self.logger("GameManager | buildBuilding--- BATIMENT CONSTRUIT")
+                    self.logger("GameManager | buildBuilding--- BATIMENT CONSTRUIT")
                     building["built"] = True
                     buildingInstance.health = buildingHealthENUM[building["type"]].value
                 else:
-                    #self.logger("GameManager | buildBuilding--- Now building the batiment")
+                    self.logger("GameManager | buildBuilding--- Now building the batiment")
                     building["timeElapsed"] += deltaTime*self.gameSpeed
                     buildingInstance.health += deltaTime*self.gameSpeed*buildingHealthENUM[building["type"]].value / timeToBuild
-                    #self.logger("Adding building time")
+                    self.logger("Adding building time")
             else:
                 pass
-                #self.logger("GameManager | buildBuilding--- Waiting for builders")
+                self.logger("GameManager | buildBuilding--- Waiting for builders")
 
         def collectResources(self, uid):
             deltaTime = timeit.default_timer() - self.tick
@@ -384,11 +386,6 @@ class GameManager:
 
 
         def checkIfDead(self, uid, team):
-            deltaTime = (timeit.default_timer() - self.tick)
-            gameDeltaTime = deltaTime * self.gameSpeed
-            attackingUnit = self.unitAttack[uid]
-            print(attackingUnit)
-
             try :
                 self.world.villages[team - 1].deads[uid]
             except:
@@ -414,11 +411,11 @@ class GameManager:
             else:
                 unitToDelete = ""
                 for k in self.unitToMove:
-                    if self.unitToMove[k]["moveQueue"] == []:
+                    if self.unitToMove[k]["arrived"]:
                         unitToDelete = k
 
                     else:
-                        self.moveUnit(k)
+                        self.dumbMoveUnit(k)
                 if unitToDelete != "":
                     self.unitToMove.pop(unitToDelete)
 
@@ -457,10 +454,10 @@ class GameManager:
                 self.unitAttack.pop(unitToDelete)
         # idée, ajouter une représentation cassée dans le repr du building, et la faire changer lorsque celui-ci est en cours de construction
 
+
         def unitNear(self,unitPosition,nearTile : Tuple[int,int], type):
-            #self.logger("GameManager | unitNear--- List of positions : ", tiles)
-            #self.logger("GameManager | unitNear--- unitPosition : ", unitPosition)
-            #self.logger("GameManager | unitNear--- NearTilePosition : ", nearTile)
+            self.logger("GameManager | unitNear--- unitPosition : ", unitPosition)
+            self.logger("GameManager | unitNear--- NearTilePosition : ", nearTile)
             return unitPosition[0] == nearTile[0] and unitPosition[1] == nearTile[1]
 
         def getNearTiles(self, size, position):
@@ -494,6 +491,17 @@ class GameManager:
             building.position = Position(target[0],target[1])
             self.addBuildingToWorld(building, target)
             #self.logger("GameManager | addBuildingToBuildDict--- Near tile are : ", nearTileValue)
+            self.logger({
+                "units": unitsID,
+                "nominalBuildTime": building.time_building,
+                "timeElapsed": 0,
+                "position":target,
+                "built" : False,
+                "team": teamNumber,
+                "nearTile" :nearTileValue ,
+                "type": building.name,
+                "error" : False,
+            })
             self.buildingsToBuild[building.uid] = {
                 "units": unitsID,
                 "nominalBuildTime": building.time_building,
@@ -516,8 +524,9 @@ class GameManager:
             self.unitToMove[unit.uid] = {
                 "timeToTile": (1/unit.speed)*dist,
                 "timeElapsed": 0,
-                "currentTile": unit.position,
+                "currentTile": unit.position.toTuple(),
                 "goal": end,
+                "arrived": False,
                 "team" : teamNumber,
                 "type" : unit.name
             }
@@ -609,6 +618,7 @@ class GameManager:
                     }
 
         def dumbAddUnitToAttackDict(self,units,target):
+            self.logger("AJOUT D'UNITÉS A ATTAQUER KFK")
             unitTeam = self.getTeamNumber(units[0].uid)
             targetTeam = self.getTeamNumber(target.uid)
             targetPosition = target.position.toTuple()
@@ -617,6 +627,7 @@ class GameManager:
                 return 0
             else:
                 for u in units:
+
                     self.unitAttack[u.uid] = {
                         "targetID": target.uid,
                         "targetType": target.name,
@@ -629,7 +640,6 @@ class GameManager:
                         "targetTeam": targetTeam,
                         "error": False,
                     }
-                    self.logger(self.unitAttack[u.uid])
 
         def addRessourceToCollectDict(self, unit,resource : Ressource, quantity, nearDP):
             self.addUnitToMoveDict(unit, nearDP.position)
@@ -677,6 +687,10 @@ class GameManager:
                 return self.buildingsToBuild[id]["built"]
             else:
                 return True
+
+        def checkAttackStatus(self,id):
+            if id in self.unitAttack:
+                return self.unitAttack[id]["success"]
         def returnBuildingEvent(self,id):
             if id in self.buildingsToBuild:
                 return self.buildingsToBuild[id]
