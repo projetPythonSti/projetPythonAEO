@@ -27,6 +27,7 @@ class Unity:
         self.name = name
         self.cost = cost
         self.trainningTime = trainningTime
+        self.hp_max = health
         self.health = health
         self.damage = damage
         self.speed = speed
@@ -82,7 +83,7 @@ class Unity:
 
     def isInRange(self, position : tuple[int,int]):
         distance = self.estimateDistance(self.position.toTuple(), position)
-        print("isInRange ? ------ distance[0] <= self.range and distance[0]<= self.range")
+        print("isInRange ? ------,",distance[0] <= self.range and distance[0]<= self.range)
         return distance[0] <= self.range and distance[0]<= self.range
 
     def isFull(self):
@@ -91,6 +92,12 @@ class Unity:
     def spaceLeft(self):
         return 20-(self.pouch["w"]+self.pouch["g"])
 
+    def checkIfDead(self, uid, team):
+        try:
+            self.team.deads[uid]
+        except:
+            return False
+        return True
     def dropResources(self):
         self.team.ressources["w"] += self.pouch["w"]
         self.pouch["w"] = 0

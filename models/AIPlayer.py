@@ -1,4 +1,4 @@
-
+from collections import defaultdict
 from enum import Enum
 
 from functools import partial
@@ -30,13 +30,13 @@ from models.unity.Villager import Villager
 output = io.StringIO()
 class PlayStyleMatrixEnum(Enum):
     Aggressive = [
-        [2,5,0],
+        [2,0,0],
         [6,2,4],
-        [3,2,8]
+        [3,0,8]
     ]
     Passive = [
         [6, 20, 0],
-        [2, 2, 1],
+        [2, 2, 0],
         [1, 12, 2]
     ]
     """OLDPassive = [
@@ -44,8 +44,8 @@ class PlayStyleMatrixEnum(Enum):
         [2,5,1],
         [1,3,10]
     ]"""
-    Builder = [
-        [9,1,0],
+    Defensive = [
+        [9,1,9],
         [2,8,2],
         [1,4,0]
     ]
@@ -62,8 +62,17 @@ class BuildingENUM(Enum):
     K = Keep
     S = Stable
 
+class BuildingCostENUM(Enum):
+    T = {"w":350}
+    A = {"w": 175}
+    B = {"w": 175}
+    C = {"w": 100}
+    F = {"w": 60}
+    H = {"w": 25}
+    K = {"w": 35, "g": 125}
+    S = {"w": 175}
 class BuildingTypeENUM(Enum):
-    Military = [Barracks, Stable, ArcheryRange, Keep]
+    Military = [Barracks, Stable, ArcheryRange]
     Village = [House, TownCenter]
     Farming = [Farm, Camp]
     DropPoints = ["T", "C"]
@@ -117,7 +126,7 @@ class PlayStyle:
 class PlayStyleEnum(Enum):
     a = PlayStyle(minWorkers=10, matrix=PlayStyleMatrixEnum["Aggressive"].value)
     p = PlayStyle(minWorkers=10, matrix=PlayStyleMatrixEnum["Passive"].value)
-    b = PlayStyle(minWorkers=10, matrix=PlayStyleMatrixEnum["Builder"].value)
+    b = PlayStyle(minWorkers=10, matrix=PlayStyleMatrixEnum["Defensive"].value)
 
 class AIPlayer:
 
@@ -177,7 +186,6 @@ class AIPlayer:
         self.playing = True
         for i in self.freeUnits:
             for k in self.freeUnits[i]:
-                self.logger("AIPlayer | playTurn : valeur k -> ",k)
                 if self.gm.checkIfDead(k, team=self.team.name):
                     print("l'unité semble être morte ")
                     self.freeUnits[i].remove(k)
@@ -190,7 +198,7 @@ class AIPlayer:
             self.setBuildingAction(self.checkBuildings())
             #self.setResourceAction(self.team.ressources)
             if self.playStyle.playStyleMatrix[2][2] > 5:
-                #self.logger("AIPlayer | playTurn--- Aggressive AI Detected, real playstyle is", PlayStyleMatrixEnum(self.playStyle.playStyleMatrix).name)
+                self.logger("AIPlayer | playTurn--- Aggressive AI Detected, real playstyle is", PlayStyleMatrixEnum(self.playStyle.playStyleMatrix).name)
                 self.setHumanAction()
                 pass
             self.logger(len(self.eventQueue))
@@ -202,6 +210,7 @@ class AIPlayer:
         else:
             self.checkActions()
             self.logger("RAS")
+        #self.checkUnitStatus()
         self.logger("Voici le nombre de personnes libres",self.getFreePplCount(), "Et le nb de personnes total : ",self.team.get_pplCount())
         self.logger("------ END OF AI TURN ------")
 
@@ -241,6 +250,13 @@ class AIPlayer:
 
     def getDirection(self, pos1, pos2):
         pass
+
+    def isAffordable(self, costDict:dict):
+        villageResource = self.team.ressources
+        for k,value in costDict.items():
+            if villageResource[k] <= value:
+                return False
+        return True
 
     def estimateDistance(self, pos1 : tuple, pos2 : tuple):
         return abs(pos2[0] - pos1[0]), abs(pos2[1] - pos1[1])
@@ -626,6 +642,9 @@ class AIPlayer:
                     if buildings[BuildingENUM(i).name] < leastDeveloppedBuildingNumber or leastDeveloppedBuildingName == "0" :
                         leastDeveloppedBuildingName = BuildingENUM(i).name
                         leastDeveloppedBuildingNumber = buildings[BuildingENUM(i).name]
+                if not self.isAffordable(BuildingCostENUM[leastDeveloppedBuildingName].value):
+                    self.logger("Can't afford building")
+                    return -1
                 #self.logger("Least developped batiment is", BuildingENUM[leastDeveloppedBuildingName].value)
                 buildingEvent = self.getBuildingActionDict(leastDeveloppedBuildingName)
 
@@ -635,6 +654,8 @@ class AIPlayer:
 
                 self.logger("Added the following building event : \n Type : ", buildingEvent["infos"]["type"], "\t nbOfPpl : ", len(buildingEvent["people"]))
                 self.eventQueue.append(buildingEvent)
+    def prepareUnit(self):
+        pass
 
     def setHumanAction(self):
         nearestVillageDistance = (10000,10000)
@@ -651,9 +672,20 @@ class AIPlayer:
                 if villageDistance[0]<nearestVillageDistance[0] and villageDistance[0]<nearestVillageDistance[1]:
                     nearestVillageDistance = villageDistance
                     nearestVillage = a
-        self.logger("AIPlayer | setHumanAction--- nearestVillage is", nearestVillage)
-        unitList = self.getFreePeople(1, "v")
+        unitAvaibilty = self.getBestAvailbleUnits()
+        self.logger(f"AIPlayer | setHumanAction--- available unit by level :", unitAvaibilty)
+        selectedType = "v"
+        foundType = False
+        for a in unitAvaibilty:
+            if a[1] > 0:
+                self.logger(f"AIPlayer | setHumanAction--- there is {a[1]} {a[0]} ")
+                selectedType = a[0]
+                break
+        self.logger(f"AIPlayer | setHumanAction--- at the end selected type is : ",selectedType)
+
+        unitList = self.getFreePeople(1, selectedType)
         if len(unitList) == 0:
+            self.logger("AIPlayer | setHumanAction--- Not enough people to Attack")
             return -1
         for u in unitList:
             self.freeUnits["v"].remove(u)
@@ -662,6 +694,10 @@ class AIPlayer:
         firstUnit = nearestVillage.community["v"][firstUnitKey]
         self.logger("AIPlayer | setHumanAction--- we are going to attack", firstUnit)
         actionDict = self.getHumanActionDict(unitList,"v", firstUnit)
+        self.logger("Added the following attack event : \n Target : ", actionDict["infos"]["targetID"],
+                    "\t nbOfPpl : ",
+                    len(actionDict["people"]), "\t Position of the target :",
+                    actionDict["infos"]["target"])
         self.eventQueue.append(actionDict)
 
 
@@ -770,8 +806,84 @@ class AIPlayer:
             event["status"] = "finished"
             self.clearAttackAction(event)
 
+    def getBestAvailbleUnits(self):
+        unitRanking = [("h",4.8), ("a", 4), ("s", 3.6), ("v",1.6)]
+        unitAvaibility = []
+        for u in unitRanking:
+            unitAvaibility.append((u[0],len(self.team.community[u[0]].values())))
+        return unitAvaibility
+
+    def checkUnitStatus(self):
+        self.logger("AIPlayer | checkUnitStatus--- attadict", self.gm.attackDict)
+        self.logger("AIPlayer | checkUnitStatus--- attadict", self.team.name.__class__)
+
+        try:
+            self.gm.attackDict[int(self.team.name)][0]
+        except:
+            self.logger("AIPlayer | checkUnitStatus--- All safe and sound")
+            return "all safe and sound"
+        enrolledUnits = 0
+        self.logger("AIPlayer | checkUnitStatus--- playMatrix value ",self.playStyle.playStyleMatrix[0][1])
+        responseQuantity = int((self.playStyle.playStyleMatrix[0][2] / 10) * self.team.get_pplCount())
+        if responseQuantity == 0:
+            self.logger("AIPlayer | checkUnitStatus--- The AI won't respond")
+            return 0
+        unitAvailbility = []
+        sentUnit = []
+        sentUnitNumber = 0
+        self.logger("AIPlayer | checkUnitStatus--- The AI will respond, we need ", responseQuantity)
+        for unitAttacked in self.gm.attackDict[int(self.team.name)]:
+            eventEnrolledUnits = -1
+            unit = 0
+            existingUnits = self.getBestAvailbleUnits()
+            self.logger("AIPlayer | checkUnitStatus--- The unit attacked is",existingUnits)
+
+            while enrolledUnits<responseQuantity and existingUnits:
+                eventEnrolledUnits = self.resetUnits(responseQuantity,existingUnits[unit][0])
+                unitAvailbility.append((existingUnits[unit][0],eventEnrolledUnits))
+                enrolledUnits += eventEnrolledUnits if eventEnrolledUnits >= 0 else enrolledUnits
+                unit+=1
+            self.logger("AIPlayer | checkUnitStatus--- unitAvailbility", unitAvailbility)
+            for a in unitAvailbility:
+                self.logger("AIPlayer | checkUnitStatus--- freeUnits !", a[0])
+
+                if sentUnitNumber<=responseQuantity:
+                    freeUnits = self.getFreePeople(responseQuantity, a[0])
+                    sentUnitNumber += len(freeUnits)
+                    for un in freeUnits:
+                        self.freeUnits[a[0]].remove(un)
+                    actionDict = self.getHumanActionDict(freeUnits, a[0], targetUnit=unitAttacked[1])
+                    self.eventQueue.append(actionDict)
 
 
+
+
+
+    def resetUnits(self, number, type=None):
+        unitsCleared = 0
+        eventsToClear = []
+        for a in self.currentEvents:
+            peopleNumber = len(a["people"])
+            if (type is not None) and (type in ["a","h","v"]):
+                if a["action"] != "attackAction":
+                    pass
+                else:
+                    if type == a["unitType"]:
+                        if (peopleNumber >= number) and (unitsCleared <= number):
+                            unitsCleared += peopleNumber
+                            eventsToClear.append(a)
+                        elif (0 < peopleNumber <= number) and (unitsCleared <= number):
+                            unitsCleared += peopleNumber
+                            eventsToClear.append(a)
+            elif (peopleNumber >= number) and (unitsCleared <= number):
+                unitsCleared += peopleNumber
+                eventsToClear.append(a)
+            elif (0<peopleNumber<= number) and (unitsCleared<=number):
+                unitsCleared+= peopleNumber
+                eventsToClear.append(a)
+        for ev in eventsToClear:
+            clearActionEnum[ev["action"]].value(self, ev)
+        return unitsCleared
 
     def clearBuildAction(self, actionDict):
         for i in actionDict["people"]:
@@ -787,9 +899,19 @@ class AIPlayer:
         for i in actionDict["people"]:
             if not self.gm.checkIfDead(i, self.team):
                 self.logger("AIPlayer | clearBuildAction : L'unité n'est pas morte")
-                self.freeUnits["v"].append(i)
+                self.freeUnits[actionDict["infos"]["unitType"]].append(i)
             else:
                 self.logger("AIPlayer | clearBuildAction : L'unité est morte")
+        self.pastEvents.append(actionDict)
+        self.currentEvents.remove(actionDict)
+
+    def clearResourceAction(self,actionDict):
+        for units in actionDict["people"]:
+            if not self.gm.checkIfDead(units,self.team):
+                self.logger("AIPlayer | clearBuildAction : L'unité n'est pas morte")
+                self.freeUnits["v"].append(units)
+            else:
+                self.logger("AIPlayer | clearResAction : l'unité est morte ")
         self.pastEvents.append(actionDict)
         self.currentEvents.remove(actionDict)
 
@@ -813,6 +935,11 @@ class ActionEnum(Enum):
 class ActionCheckEnum(Enum):
     Build = partial(AIPlayer.checkBuildingAction)
     collectResource = partial(AIPlayer.checkResourceAction)
+    attackAction = partial(AIPlayer.checkAttackAction)
+
+class clearActionEnum(Enum):
+    Build = partial(AIPlayer.clearBuildAction)
+    collectResource = partial(AIPlayer.clearResourceAction)
     attackAction = partial(AIPlayer.checkAttackAction)
 if __name__ == "__main__":
     monde = World(100, 100)

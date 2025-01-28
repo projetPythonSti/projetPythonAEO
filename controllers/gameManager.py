@@ -53,6 +53,8 @@ class GameManager:
                 - Ajouté une fonction pour vérifier l'avancement de la construction d'un batiment
                 - Ajouté les fonctions pour initier un combat
                 - Ajouté les fonctions pour initer une collecte de ressources
+            27/01/2025@tahakhetib : J'ai apporté des modifications sur ce que j'ai écrit
+                - Crée des fonctions basiques de mouvements afin d'avoir une version stable
 
         """
         tick = timeit.default_timer()
@@ -256,7 +258,8 @@ class GameManager:
             deltaTime = (timeit.default_timer() - self.tick)
             gameDeltaTime = deltaTime*self.gameSpeed
             attackingUnit = self.unitAttack[uid]
-
+            if uid in self.world.villages[attackingUnit["team"]-1].deads:
+                return -1
             attackingUnitInstance = self.world.villages[attackingUnit["team"]-1].community[attackingUnit["type"]][uid]
             targetPosition = attackingUnit["targetPosition"]
             if attackingUnit["targetID"] in self.world.villages[attackingUnit["targetTeam"]-1].deads:
@@ -287,7 +290,7 @@ class GameManager:
                 self.logger("GameManager | attackUnit--- Unit in Range")
                 if not(attackingUnit["targetInRange"]):
                     self.logger("GameManager | attackUnit--- Adding unit to attackedUnitList")
-                    self.attackDict[attackingUnit["targetTeam"]] += [(attackingUnit["targetType"], uid,attackingUnitInstance.team.name)]
+                    self.attackDict[attackingUnit["targetTeam"]] += [(attackingUnit["targetType"], attackingUnitInstance,attackingUnitInstance.team.name)]
                 attackingUnit["targetInRange"] = True
                 if targetInstance.health < 0:
                     self.unitAttack[uid]["success"] = True
@@ -342,7 +345,8 @@ class GameManager:
             targetUnitInstance = self.world.villages[attackingUnitDict["targetTeam"] - 1].community[attackingUnitDict["targetType"]][attackingUnitDict["targetID"]]
             if attackingUnitInstance.isInRange(targetUnitInstance.position.toTuple()):
                 if not(attackingUnitDict["targetInRange"]):
-                    self.attackDict[attackingUnitDict["targetTeam"]] += [(attackingUnitDict["targetType"], uid,attackingUnitInstance.team.name)]
+                    self.attackDict[int(attackingUnitDict["targetTeam"])] += [(attackingUnitDict["targetID"],attackingUnitInstance)]
+                    self.logger("GameManager | collectResources--- Waiting to arrive to Resource")
                 attackingUnitDict["targetInRange"] = True
                 if attackingUnitDict["targetID"] in self.world.villages[attackingUnitDict["targetTeam"] - 1].deads:
                     attackingUnitDict["success"] = True

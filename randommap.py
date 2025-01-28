@@ -28,12 +28,14 @@ def cluster(world,resource,key,repl=50,fade=16): #key is a tuple please
     newResource = None
     if resource.name == "w":
         newResource = Wood(world)
+        newResource.position = Position(key[0],key[1])
         if len(resKeys)==0:
             pass
         else:
             newResource.uid = f"{int(resKeys[-1])+1}"
     elif resource.name == "g":
         newResource = Gold(world)
+        newResource.position = Position(key[0],key[1])
         if len(resKeys) == 0:
             pass
         else:

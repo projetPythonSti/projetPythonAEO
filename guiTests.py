@@ -37,7 +37,7 @@ import randommap
 class PyGameDebugWorldENUM(Enum):
     width = 120
     height = 120
-    ressourceQuantity = 'g'
+    ressourceQuantity = 'p'
     playersNumber = 2
     aisBehavior = ["a","a"]
     mapType = 'g'
@@ -74,10 +74,10 @@ def jeu_terminal (world, debug=False):
         world = random_world(dico)
         make_teams(dico,world)
         place_tcs(dico,world)
-        gm = GameManager(speed=1, world=world,debug=False)
+        gm = GameManager(speed=1, world=world,debug=True)
         clock = pg.time.Clock()
         gm.tick = timeit.default_timer()
-        playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=False)
+        playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=True)
         game_term = Game(world,clock,gm, players=playersList)
         game_term.kickstartPG = dico["d"]
         print(game_term.playerNumber)
@@ -177,4 +177,3 @@ if __name__ == "__main__":
         tick = datetime.now()
         n += 1
 """
-
