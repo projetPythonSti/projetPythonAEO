@@ -179,7 +179,7 @@ class Game :
             pass
         if self.term_on:
             pass
-            #self.draw_term(term)
+            self.draw_term(term)
 
 
 ### Fonction intermédiaire

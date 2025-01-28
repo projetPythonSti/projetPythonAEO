@@ -317,7 +317,6 @@ class GameManager:
                                     removeBuildAD = a
                         if removeBuildAD is not "":
                             self.buildingsToBuild.pop(removeBuildAD)
-                            self.buildingsToBuild.pop(targetInstance.uid)
                         self.pastAttacks[uid] = self.unitAttack[uid]
                     else:
                         self.logger("GameManager | attackUnit--- Seems to be a building who's been destroyed")

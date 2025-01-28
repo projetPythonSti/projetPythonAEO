@@ -804,6 +804,7 @@ class AIPlayer:
 
 
 
+
 class ActionEnum(Enum):
     test = House
     Build = partial(AIPlayer.launchBuildAction)
