@@ -58,7 +58,7 @@ class Building:
     def deduct_resources(self, player_resources):
         for resource, amount_needed in self.cost.items():
             player_resources[resource] -= amount_needed
-        print(f"Ressources déduites pour {self.name}: {self.cost}")    
+        #print(f"Ressources déduites pour {self.name}: {self.cost}")
 
     # def build(self, player_resources):
     #     if not self.can_afford(player_resources):
@@ -82,7 +82,7 @@ class Building:
             time.sleep(1)
             
         self.is_built = True
-        print(f"Construction de {self.name} terminée.")
+        #print(f"Construction de {self.name} terminée.")
         return True
     
     def is_destroyed(self) -> bool:

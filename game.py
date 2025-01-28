@@ -1,3 +1,5 @@
+import threading
+
 import pygame as pg
 from blessed import Terminal
 from models.Position import Position
@@ -283,6 +285,7 @@ class Game :
     def stat (self,term):
         #generate html
         self.make_json()
+        self.gm.openHtmlPage()
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
@@ -295,6 +298,7 @@ class Game :
                     quit()
 
 
+
     def swap_to_load (self,dico) :
         self.ltick = time.time()
         self.gm = dico[1]
@@ -305,7 +309,7 @@ class Game :
 
     def make_json(self):
 
-        with open("web/stat.json", "w") as file :
+        with open("web/assets/assets/stat.json", "w") as file :
             json.dump(self.world.to_json(),file)
 
 

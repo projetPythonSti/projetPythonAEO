@@ -180,6 +180,21 @@ class Model:
         return self.peopleCount
     def get_bldCount(self):
         return self.buildingCount
+        pass
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "resources":{
+                    key: value
+                    for key, value in self.ressources.items()},
+            "community": {
+                key: [self.community[key][item].to_json() for item in value]
+                for key, value in self.community.items()
+            },
+            "deads": [dead.to_json() for dead in self.deads],
+            "peopleCount": self.get_pplCount()
+        }
 
 if __name__ == "__main__":
     model = Model("Mine")

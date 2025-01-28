@@ -200,7 +200,7 @@ class GameManager:
                 pass
                 self.logger("GameManager | buildBuilding--- Waiting for builders")
 
-        def collectResources(self, uid):
+        def dumbCollectResources(self, uid):
             deltaTime = timeit.default_timer() - self.tick
             resToCollect = self.ressourceToCollect[uid]
             if self.checkIfDead(uid, resToCollect["unitTeam"]):
@@ -215,7 +215,7 @@ class GameManager:
             if not resToCollect["routeStarted"]:
                 if dpDistance< (1,1):
                     resToCollect["routeStarted"] = True
-                    self.addUnitToMoveDict(unitInstance, Position(resToCollect["resourceTarget"][0],resToCollect["resourceTarget"][1]), prePath=resToCollect["pathToDP"][-1::])
+                    self.dumbAddUnitToMoveDict(unitInstance, Position(resToCollect["resourceTarget"][0],resToCollect["resourceTarget"][1]))
                 else:
                     self.logger("GameManager | collectResources--- Still not been to the nearestDP")
                     return -1
@@ -234,7 +234,7 @@ class GameManager:
                     resToCollect["full"] = unitInstance.isFull()
                 elif resToCollect["full"]:
                     self.logger("GameManager | collectResources--- Pouch is filled")
-                    self.addUnitToMoveDict(unitInstance,resToCollect["nearDPPos"], prePath=resToCollect["pathToDP"])
+                    self.dumbAddUnitToMoveDict(unitInstance,resToCollect["nearDPPos"])
 
             else:
                 if resToCollect["full"]:
@@ -247,7 +247,7 @@ class GameManager:
                         if resToCollect["finished"]:
                             pass
                         else:
-                            self.addUnitToMoveDict(unitInstance, resToCollect["nearDPPos"],prePath=resToCollect["pathToDP"][-1::])
+                            self.dumbAddUnitToMoveDict(unitInstance, resToCollect["nearDPPos"])
                     else:
                         self.logger("GameManager | collectResources--- Waiting to arrive to DP")
                 else:
@@ -439,7 +439,7 @@ class GameManager:
                 if self.ressourceToCollect[k]["finished"]:
                     resToDelete= k
                 else:
-                   self.collectResources(k)
+                   self.dumbCollectResources(k)
             if resToDelete != "":
                 self.unitToMove.pop(resToDelete)
 
@@ -669,6 +669,22 @@ class GameManager:
                 "pathToDP": path,
                 "error" : False
             }
+        def dumbAddResourceToCollectDict(self,unit,resource:Ressource, quantity, nearDP):
+            self.dumbAddUnitToMoveDict(unit, nearDP.position)
+            self.ressourceToCollect[unit.uid] = {
+                "unit": unit.uid,
+                "unitTeam": self.getTeamNumber(unit.uid),
+                "resourceType": resource.name,
+                "resourceTarget": resource.position.toTuple(),
+                "resourceID": resource.uid,
+                "resourceQuantity": quantity,
+                "timeElapsed": 0,
+                "finished": False,
+                "full": False,
+                "nearDPPos": nearDP.position.toTuple(),
+                "routeStarted": False,
+                "error": False
+            }
 
         def addBuildingToWorld(self, building:Building, position):
             self.world.place_element(building)
@@ -745,17 +761,19 @@ class GameManager:
                 file.write(body)
 
         def openHtmlPage(self):
-            directory_to_serve = "assets/web"  # Replace with the folder you want to serve
+            directory_to_serve = "web"  # Replace with the folder you want to serve
             port = 8000
 
             # Start the server in a separate thread
-            server_thread = threading.Thread(target=start_http_server, args=(directory_to_serve, port), daemon=True)
+            stop = False
+
+            server_thread = threading.Thread(target=start_http_server, args=(directory_to_serve, port), daemon=True,name="htmlPage")
             server_thread.start()
             # Define the handler and server
             webbrowser.open("http://localhost:8000",new=0, autoraise=True )
             # Start the server
 
-        print("finisshed server")
+        #print("finisshed server")
 if __name__ == "__main__":
     pass
 

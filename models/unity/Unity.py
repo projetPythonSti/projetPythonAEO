@@ -103,6 +103,17 @@ class Unity:
         self.pouch["w"] = 0
         self.team.ressources["g"] += self.pouch["g"]
         self.pouch["g"] = 0
+
+    def to_json(self):
+        return {
+            "id": self.uid,
+            "name": self.name,
+            "health": self.health,
+            "teamID": self.team.name, #int(x) if its not an integer please
+            "position": self.position.to_json(),
+            "pouch": self.pouch
+        }
+
     def __repr__(self): return f"{self.name}"
     def personalizedStr(self,term): return f"{term.red if self.health<UnityHealthENUM[self.name].value else term.normal}{self.name}{term.normal}"
     def __eq__(self, other): return self.__class__ == other.__class__

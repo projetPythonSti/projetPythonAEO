@@ -91,12 +91,12 @@ class World:
 
 
     def updateUnitPos(self,oldPos ,position, unit):
-        print(oldPos, position)
+        #print(oldPos, position)
         try :
             self.unitTiles[oldPos]["elements"].remove(unit)
         except:
-            print(unit.position)
-            print("l'unité n'as pas l'air d'être à sa place")
+            #print(unit.position)
+            #print("l'unité n'as pas l'air d'être à sa place")
         try:
             self.unitTiles[oldPos]["elements"][0]
         except:
@@ -174,9 +174,9 @@ class World:
         #print("World : place_element -- In place element")
         place = (element.position.getX(), element.position.getY())
         if place not in self.filled_tiles and place[0] <= self.width and place[1] <= self.height:
-            print("World : place_element ------- Element n'étant pas dans une tuile déjà prise")
+            #print("World : place_element ------- Element n'étant pas dans une tuile déjà prise")
             if issubclass(element.__class__, Building) and all(tile not in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
-                print("World : place_element ------- Elt est un batiment, voici le batiment -> " ,element.name)
+                #print("World : place_element ------- Elt est un batiment, voici le batiment -> " ,element.name)
                 #check if the building can be placed
                 if element.surface[0] + place[0] <= self.width and element.surface[1] + place[1] <= self.height:
                     for x in range(element.surface[0]):
@@ -258,6 +258,13 @@ class World:
         for i, (key, value) in enumerate(self.tiles_dico.items()):
             binary_array[key[0], key[1]] = 0 if value.contains == None else 1
         return binary_array
+
+    def to_json(self):
+        return {
+            "width": self.width,
+            "height" : self.height,
+            "villages" : [village.to_json() for village in self.villages]
+            }
 
     # def intkey(key): #turns a float key into an int key for dict indexation
     #     return (int(key[0]),int(key[1]))
