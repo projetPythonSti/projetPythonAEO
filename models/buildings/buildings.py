@@ -29,6 +29,7 @@ class Building:
         self.cost = cost
         self.time_building = time_building
         self.health = health
+        self.hp_max=int(health)
         self.is_built = False
         self.spawn = spawn
         self.dropPoint = dropPoint
@@ -84,12 +85,34 @@ class Building:
         #print(f"Construction de {self.name} terminée.")
         return True
     
-    def get_position(self):
+    def is_destroyed(self) -> bool:
+        return self.health <= 0
+
+    def get_position(self) -> Position:
         return self.position
+
+    def set_position(self, x: float, y: float):
+        self.position.setX(x)
+        self.position.setY(y)
 
     def getTPosition(self):
         return self.position.toTuple()
 
+    def destroy(self):
+        """
+        Handles the destruction of the building.
+        """
+        self.is_built = False
+        self.health = 0
+        # Additional logic for destruction can be added here, such as removing the building from the game world
+        self.team.world.remove_element(self)
+
+    def checkIfDead(self, uid, team):
+        try:
+            self.team.deads[uid]
+        except:
+            return False
+        return True
     def personalizedStr(self,term): return f"{term.red if self.health<BuildingHealthENUM[self.name].value else term.normal}{self.name}{term.normal}"
 
     def to_json(self):

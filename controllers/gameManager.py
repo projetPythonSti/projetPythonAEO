@@ -1,5 +1,6 @@
 import http
 import io
+import math
 import os
 import socketserver
 import sys
@@ -51,6 +52,8 @@ class GameManager:
                 - Ajouté une fonction pour vérifier l'avancement de la construction d'un batiment
                 - Ajouté les fonctions pour initier un combat
                 - Ajouté les fonctions pour initer une collecte de ressources
+            27/01/2025@tahakhetib : J'ai apporté des modifications sur ce que j'ai écrit
+                - Crée des fonctions basiques de mouvements afin d'avoir une version stable
 
         """
         tick = timeit.default_timer()
@@ -153,6 +156,20 @@ class GameManager:
                 else:
                     unit["nextTile"] = unit["moveQueue"][1]
 
+        def dumbMoveUnit(self, uid):
+            deltaTime = timeit.default_timer() - self.tick
+            unit = self.unitToMove[uid]
+            unit["timeElapsed"] += (deltaTime.real * self.gameSpeed)
+            if self.checkIfDead(uid, unit["team"]):
+                self.logger("GameManager | moveUnit--- checking if dead")
+                return -1
+            if unit["timeElapsed"] >= (unit["timeToTile"]):
+                unitObj = self.world.villages[(unit["team"] - 1)].community[(unit["type"].lower())][uid]
+                self.world.updateUnitPos(unit["currentTile"], unit["goal"], unitObj)
+                unitObj.position = Position(unit["goal"][0], unit["goal"][1])
+                unit["arrived"] = True
+
+
         def buildBuilding(self, uid):
             deltaTime = timeit.default_timer() - self.tick
             building = self.buildingsToBuild[uid]
@@ -172,17 +189,17 @@ class GameManager:
             #self.logger("GameManager | buildBuilding--- Temps pour construire le batiment :",timeToBuild)
             if timeToBuild > 0:
                 if building["timeElapsed"] > timeToBuild:
-                    #self.logger("GameManager | buildBuilding--- BATIMENT CONSTRUIT")
+                    self.logger("GameManager | buildBuilding--- BATIMENT CONSTRUIT")
                     building["built"] = True
                     buildingInstance.health = buildingHealthENUM[building["type"]].value
                 else:
-                    #self.logger("GameManager | buildBuilding--- Now building the batiment")
+                    self.logger("GameManager | buildBuilding--- Now building the batiment")
                     building["timeElapsed"] += deltaTime*self.gameSpeed
                     buildingInstance.health += deltaTime*self.gameSpeed*buildingHealthENUM[building["type"]].value / timeToBuild
-                    #self.logger("Adding building time")
+                    self.logger("Adding building time")
             else:
                 pass
-                #self.logger("GameManager | buildBuilding--- Waiting for builders")
+                self.logger("GameManager | buildBuilding--- Waiting for builders")
 
         def dumb_collectRessources(self, uid):
 
@@ -270,7 +287,8 @@ class GameManager:
             deltaTime = (timeit.default_timer() - self.tick)
             gameDeltaTime = deltaTime*self.gameSpeed
             attackingUnit = self.unitAttack[uid]
-
+            if uid in self.world.villages[attackingUnit["team"]-1].deads:
+                return -1
             attackingUnitInstance = self.world.villages[attackingUnit["team"]-1].community[attackingUnit["type"]][uid]
             targetPosition = attackingUnit["targetPosition"]
             if attackingUnit["targetID"] in self.world.villages[attackingUnit["targetTeam"]-1].deads:
@@ -281,9 +299,13 @@ class GameManager:
             self.logger("Game manager attackUnit--- Position unité,: ",attackingUnitInstance.position, "Position à atteindre :",targetInstance.position)
             if attackingUnit["movingTarget"]:
                 self.logger("Game manager attackUnit--- Element qui bouge")
-                if targetPosition != targetInstance.position.toTuple() and attackingUnitInstance.estimateDistance(targetPosition,targetInstance.position.toTuple()) < (20,20):
-                    attackingUnit["targetPosition"] = targetInstance.position.toTuple()
-                    self.addUnitToMoveDict(attackingUnitInstance, Position(targetPosition[0], targetPosition[1]))
+                if targetPosition != targetInstance.position.toTuple() and attackingUnitInstance.estimateDistance(targetPosition,targetInstance.position.toTuple()) < (10,10):
+                    pass
+                    """
+                    self.unitToMove[uid]["currentTile"] = self.unitToMove[attackingUnit["targetID"]]["currentTile"] if attackingUnit["targetID"] in self.unitToMove else targetPosition
+                    self.unitToMove[uid]["nextTile"] = self.unitToMove[attackingUnit["targetID"]]["nextTile"] if attackingUnit["targetID"] in self.unitToMove else targetInstance.position.toTuple()
+                    self.unitToMove[uid]["moveQueue"] = self.unitToMove[attackingUnit["targetID"]]["moveQueue"] if attackingUnit["targetID"] in self.unitToMove else Pathfinding(mapGrid=self.world.convertMapToGrid(),statingPoint=attackingUnitInstance.position, goal=targetInstance.position)
+                    attackingUnit["targetPosition"] = targetInstance.position.toTuple()"""
                     """self.logger("Game manager attackUnit--- Calcul à nouveau du chemin à suivre")
                     if attackingUnit["targetID"] in self.unitToMove and targetPosition != self.unitToMove[attackingUnit["targetID"]]["goal"] :
                         self.logger("Game manager attackUnit--- L'unité bougeait déjà et notre position enregistrée n'est pas la même")
@@ -297,12 +319,11 @@ class GameManager:
                 self.logger("GameManager | attackUnit--- Unit in Range")
                 if not(attackingUnit["targetInRange"]):
                     self.logger("GameManager | attackUnit--- Adding unit to attackedUnitList")
-                    self.attackDict[attackingUnit["targetTeam"]] += [(attackingUnit["targetType"], uid,attackingUnitInstance.team.name)]
+                    self.attackDict[attackingUnit["targetTeam"]] += [(attackingUnit["targetType"], attackingUnitInstance,attackingUnitInstance.team.name)]
                 attackingUnit["targetInRange"] = True
                 if targetInstance.health < 0:
                     self.unitAttack[uid]["success"] = True
                     if issubclass(targetInstance.__class__, Unity):
-                        self.logger("GameManager | attackUnit--- HA IL EST MORT ")
                         #targetInstance.die()
                         self.world.villages[attackingUnit["targetTeam"]-1].markAsDead(targetInstance)
                         if targetInstance.uid in self.unitToMove:
@@ -328,13 +349,73 @@ class GameManager:
                                     removeBuildAD = a
                         if removeBuildAD is not "":
                             self.buildingsToBuild.pop(removeBuildAD)
-                            self.buildingsToBuild.pop(targetInstance.uid)
                         self.pastAttacks[uid] = self.unitAttack[uid]
                     else:
                         self.logger("GameManager | attackUnit--- Seems to be a building who's been destroyed")
                 else:
                     self.logger(f"GameManager | attackUnit---{attackingUnitInstance.damage*gameDeltaTime} PV enlevés  ")
                     self.world.villages[attackingUnit["targetTeam"] - 1].community[attackingUnit["targetType"]][attackingUnit["targetID"]].health -= attackingUnitInstance.damage*gameDeltaTime
+            else:
+                if uid in self.unitToMove:
+                    self.unitToMove.pop(uid)
+                self.world.updateUnitPos(attackingUnitInstance.position.toTuple(), targetInstance.position.toTuple(),
+                                         attackingUnitInstance)
+                attackingUnitInstance.position = targetInstance.position
+                attackingUnit["targetPosition"] = targetInstance.position.toTuple()
+
+        def dumbAttackUnit(self,uid):
+            deltaTime = (timeit.default_timer() - self.tick)
+            gameDeltaTime = deltaTime * self.gameSpeed
+            attackingUnitDict = self.unitAttack[uid]
+            attackingUnitTeam = attackingUnitDict["team"]
+            attackingUnitType = attackingUnitDict["type"]
+            attackingUnitInstance = self.world.villages[attackingUnitTeam-1].community[attackingUnitType][uid]
+            targetUnitID = attackingUnitDict["targetID"]
+            targetUnitInstance = self.world.villages[attackingUnitDict["targetTeam"] - 1].community[attackingUnitDict["targetType"]][attackingUnitDict["targetID"]]
+            if attackingUnitInstance.isInRange(targetUnitInstance.position.toTuple()):
+                if not(attackingUnitDict["targetInRange"]):
+                    self.attackDict[int(attackingUnitDict["targetTeam"])] += [(attackingUnitDict["targetID"],attackingUnitInstance)]
+                    self.logger("GameManager | collectResources--- Waiting to arrive to Resource")
+                attackingUnitDict["targetInRange"] = True
+                if attackingUnitDict["targetID"] in self.world.villages[attackingUnitDict["targetTeam"] - 1].deads:
+                    attackingUnitDict["success"] = True
+                    return -1
+                if targetUnitInstance.health <= 0:
+                    if issubclass(targetUnitInstance.__class__, Unity):
+                        #targetInstance.die()
+                        self.world.villages[attackingUnitDict["targetTeam"]-1].markAsDead(targetUnitInstance)
+                        if targetUnitInstance.uid in self.unitToMove:
+                            self.logger("GameManager | attackUnit--- should pop targetInstance in unitToMove")
+                            self.unitToMove.pop(targetUnitInstance.uid)
+                        if targetUnitInstance.uid in self.ressourceToCollect:
+                            self.logger("GameManager | attackUnit--- should pop targetInstance in resToCollect")
+                            self.ressourceToCollect.pop(targetUnitInstance.uid)
+                        removeBuildAD = ""
+                        for a in self.buildingsToBuild.keys():
+                            unitToRemove = []
+                            if self.getTeamNumber(a) == attackingUnitDict["targetTeam"]:
+                                for k in self.buildingsToBuild[a]["units"]:
+                                    if self.checkIfDead(k,attackingUnitDict["targetTeam"]):
+                                        unitToRemove.append(k)
+                                for unit in unitToRemove:
+                                    self.logger("GameManager | attackUnit--- should pop targetInstance in buildingsToBuild", unit)
+                                    self.buildingsToBuild[a]["units"].remove(unit)
+                                try:
+                                    self.buildingsToBuild[a]["units"][0]
+                                except:
+
+                                    removeBuildAD = a
+                        if removeBuildAD is not "":
+                            self.buildingsToBuild.pop(removeBuildAD)
+                            self.buildingsToBuild.pop(targetUnitInstance.uid)
+                        self.pastAttacks[uid] = self.unitAttack[uid]
+                else:
+                    self.world.villages[attackingUnitDict["targetTeam"] - 1].community[attackingUnitDict["targetType"]][attackingUnitDict["targetID"]].health -= attackingUnitInstance.damage*gameDeltaTime
+
+            else:
+                self.addUnitToAttackDict(attackingUnitInstance,targetUnitInstance.position)
+
+
 
         def checkIfDead(self, uid, team):
             try :
@@ -362,11 +443,11 @@ class GameManager:
             else:
                 unitToDelete = ""
                 for k in self.unitToMove:
-                    if self.unitToMove[k]["moveQueue"] == []:
+                    if self.unitToMove[k]["arrived"]:
                         unitToDelete = k
 
                     else:
-                        self.moveUnit(k)
+                        self.dumbMoveUnit(k)
                 if unitToDelete != "":
                     self.unitToMove.pop(unitToDelete)
 
@@ -393,6 +474,7 @@ class GameManager:
 
         def checkUnitToAttack(self):
             unitToDelete = ""
+            self.logger("Unit attack is ---", self.unitAttack)
             for k in self.unitAttack:
                 if self.unitAttack[k]["success"]:
                     unitToDelete= k
@@ -404,10 +486,10 @@ class GameManager:
                 self.unitAttack.pop(unitToDelete)
         # idée, ajouter une représentation cassée dans le repr du building, et la faire changer lorsque celui-ci est en cours de construction
 
+
         def unitNear(self,unitPosition,nearTile : Tuple[int,int], type):
-            #self.logger("GameManager | unitNear--- List of positions : ", tiles)
-            #self.logger("GameManager | unitNear--- unitPosition : ", unitPosition)
-            #self.logger("GameManager | unitNear--- NearTilePosition : ", nearTile)
+            self.logger("GameManager | unitNear--- unitPosition : ", unitPosition)
+            self.logger("GameManager | unitNear--- NearTilePosition : ", nearTile)
             return unitPosition[0] == nearTile[0] and unitPosition[1] == nearTile[1]
 
         def getNearTiles(self, size, position):
@@ -441,6 +523,17 @@ class GameManager:
             building.position = Position(target[0],target[1])
             self.addBuildingToWorld(building, target)
             #self.logger("GameManager | addBuildingToBuildDict--- Near tile are : ", nearTileValue)
+            self.logger({
+                "units": unitsID,
+                "nominalBuildTime": building.time_building,
+                "timeElapsed": 0,
+                "position":target,
+                "built" : False,
+                "team": teamNumber,
+                "nearTile" :nearTileValue ,
+                "type": building.name,
+                "error" : False,
+            })
             self.buildingsToBuild[building.uid] = {
                 "units": unitsID,
                 "nominalBuildTime": building.time_building,
@@ -451,6 +544,23 @@ class GameManager:
                 "nearTile" :nearTileValue ,
                 "type": building.name,
                 "error" : False,
+            }
+
+        def dumbAddUnitToMoveDict(self, unit : Unity, destination : Position):
+            start = unit.position.toTuple()
+            end = destination.toTuple()
+            distXY = (abs(end[0]- start[0]), abs(end[1]-start[1]))
+            dist = math.sqrt(distXY[0]**2+distXY[1]**2)
+            teamNumber = self.getTeamNumber(unit.uid)
+            self.logger("hello")
+            self.unitToMove[unit.uid] = {
+                "timeToTile": (1/unit.speed)*dist,
+                "timeElapsed": 0,
+                "currentTile": unit.position.toTuple(),
+                "goal": end,
+                "arrived": False,
+                "team" : teamNumber,
+                "type" : unit.name
             }
 
         def addUnitToMoveDict(self, unit : Unity, destination : Position,prePath=[]):
@@ -539,6 +649,29 @@ class GameManager:
                         "error": False,
                     }
 
+        def dumbAddUnitToAttackDict(self,units,target):
+            self.logger("AJOUT D'UNITÉS A ATTAQUER KFK")
+            unitTeam = self.getTeamNumber(units[0].uid)
+            targetTeam = self.getTeamNumber(target.uid)
+            targetPosition = target.position.toTuple()
+            if unitTeam == targetTeam:
+                self.logger("GameManager | addUnitToAttackDict--- Friendly fire is not allowed")
+                return 0
+            else:
+                for u in units:
+
+                    self.unitAttack[u.uid] = {
+                        "targetID": target.uid,
+                        "targetType": target.name,
+                        "type": u.name,
+                        "targetInRange": False,
+                        "targetPosition": targetPosition,
+                        "movingTarget": True if issubclass(target.__class__, Unity) else False,
+                        "success": False,
+                        "team": unitTeam,
+                        "targetTeam": targetTeam,
+                        "error": False,
+                    }
 
         def addRessourceToCollectDict(self, unit,resource : Ressource, quantity, nearDP):
             self.addUnitToMoveDict(unit, nearDP.position)
@@ -586,6 +719,10 @@ class GameManager:
                 return self.buildingsToBuild[id]["built"]
             else:
                 return True
+
+        def checkAttackStatus(self,id):
+            if id in self.unitAttack:
+                return self.unitAttack[id]["success"]
         def returnBuildingEvent(self,id):
             if id in self.buildingsToBuild:
                 return self.buildingsToBuild[id]

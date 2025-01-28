@@ -1,4 +1,7 @@
 from models.buildings.buildings import Building
+import logging
+logger = logging.getLogger(__name__)
+from .projectile import  ProjectilePool  # Ensure Projectile and ProjectilePool are imported
 
 class Keep(Building) :
   """
@@ -19,4 +22,22 @@ class Keep(Building) :
       team=team
     )
     self.damage = 5
-    self.visibility = 8
+    self.visibility = 80
+    self.projectile_speed = 0.5
+    self.projectile_pool=ProjectilePool(6, cooldown=4.0)
+
+  def attack(self, target):
+    """Activate a projectile towards the target."""
+    logger.debug(f"Keep {self.uid} at position {self.position} attacking target {target}")
+    projectile = self.projectile_pool.get_projectile()
+    if projectile and not projectile.active:
+        projectile.activate(
+            start_pos=self.position,  # Use Position instance
+            target_entity=target,
+            damage=self.damage,
+            speed=self.projectile_speed,
+            team=self.team
+        )
+        logger.debug(f"Projectile activated with start_pos={self.position} towards target={target}")
+    else:
+        logger.warning("No available projectile to activate or pool is in cooldown.")

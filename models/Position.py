@@ -22,3 +22,6 @@ class Position:
     def __eq__(self, other): return self.getX() == other.getX() and self.getY() == other.getY()
     
     def __ne__(self, other): return self.getX() != other.getX() or self.getY() != other.getY()
+
+    def distance_to(self, other: 'Position') -> float:
+        return ((self._x - other._x) ** 2 + (self._y - other._y) ** 2) ** 0.5
