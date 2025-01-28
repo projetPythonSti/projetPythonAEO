@@ -730,8 +730,8 @@ class AIPlayer:
         targetUnit = self.world.villages[actionDict["infos"]["targetTeam"]-1].community[actionDict["infos"]["targetType"]][actionDict["infos"]["targetID"]]
         for u in actionDict["people"]:
             unit = self.team.community["v"][u]
-            self.gm.addUnitToMoveDict(unit, Position(actionDict["infos"]["target"][0],actionDict["infos"]["target"][1]))
-        self.gm.addUnitToAttackDict(concernedUnits,targetUnit)
+            self.gm.dumbAddUnitToMoveDict(unit, Position(actionDict["infos"]["target"][0],actionDict["infos"]["target"][1]))
+        self.gm.dumbAddUnitToAttackDict(concernedUnits,targetUnit)
         self.logger("J'ai lancé une attaque attention")
 
 

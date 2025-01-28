@@ -74,7 +74,7 @@ def jeu_terminal (world, debug=False):
         world = random_world(dico)
         make_teams(dico,world)
         place_tcs(dico,world)
-        gm = GameManager(speed=1, world=world,debug=False)
+        gm = GameManager(speed=1, world=world,debug=True)
         clock = pg.time.Clock()
         gm.tick = timeit.default_timer()
         playersList = fillAIPlaystyle(world, gm=gm, gameLevel=100, aiBehavior=dico["b"],debug=False)
