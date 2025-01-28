@@ -95,9 +95,9 @@ class World:
         try :
             self.unitTiles[oldPos]["elements"].remove(unit)
         except:
-            (unit.position)
-            #print("l'unité n'as pas l'air d'être à sa place")
             pass
+            #print(unit.position)
+            #print("l'unité n'as pas l'air d'être à sa place")
         try:
             self.unitTiles[oldPos]["elements"][0]
         except:

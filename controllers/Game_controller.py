@@ -63,6 +63,6 @@ class Game_controller:
             self.model.add_building(village, building)  # Ajouter le bâtiment au modèle
             self.view.update_building(village, building)  # Afficher le bâtiment dans la vue
         else:
-            #print("Pas assez de ressources pour construire ce bâtiment.")
             pass
+            #print("Pas assez de ressources pour construire ce bâtiment.")
 

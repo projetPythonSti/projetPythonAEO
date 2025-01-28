@@ -167,7 +167,6 @@ class AIPlayer:
         self.logger("AIPlayer | AI Launched -> Init launched, currentEvents are :", self.currentEvents)
 
     def logger(self,*args, **kwargs):
-        """
         if self.debug:
             if self.writeToDisk:
                 sys.stdout = output
@@ -175,7 +174,6 @@ class AIPlayer:
                 sys.stdout = sys.__stdout__
             else:
                 print(*args, **kwargs)
-         """
 
     def setVillageBorders(self, topLeftPos, bottomRightPos):
         self.topVillageBorder = topLeftPos
@@ -189,7 +187,7 @@ class AIPlayer:
         for i in self.freeUnits:
             for k in self.freeUnits[i]:
                 if self.gm.checkIfDead(k, team=self.team.name):
-                    #print("l'unité semble être morte ")
+                    self.logger("l'unité semble être morte ")
                     self.freeUnits[i].remove(k)
 
         self.logger(f"AIPlayer | playTurn eq${self.team.name}--- freeunits state",self.freeUnits)
@@ -722,7 +720,7 @@ class AIPlayer:
             targetPosition = Position(actionDict["infos"]["target"][0],actionDict["infos"]["target"][1])
             try:
                 self.logger("LE TYPE DE RESOURCE INSTANCE J'EN AI MARRE", resourceInstance)
-                self.gm.addRessourceToCollectDict(unitInstance,resourceInstance ,actionDict["infos"]["quantity"],actionDict["infos"]["nearestDP"])
+                self.gm.dumbAddResourceToCollectDict(unitInstance,resourceInstance ,actionDict["infos"]["quantity"],actionDict["infos"]["nearestDP"])
             except PathfindingException:
                 exceptionRaised = True
         if not exceptionRaised:
