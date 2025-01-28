@@ -153,7 +153,7 @@ class Save:
 
     def quick_load (self,game) :
         data = self.load("quick_save", "assets/data/saves/")
-        game.swap(data)
+        game.swap_to_load(data)
 
 
 """

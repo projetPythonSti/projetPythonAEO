@@ -282,6 +282,7 @@ class Game :
 
     def stat (self,term):
         #generate html
+        self.make_json()
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
@@ -301,3 +302,10 @@ class Game :
         self.speed = 1
         self.world = dico[0]
         self.game_duration = dico[3]
+
+    def make_json(self):
+
+        with open("web/stat.json", "w") as file :
+            json.dump(self.world.to_json(),file)
+
+
