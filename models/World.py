@@ -91,12 +91,13 @@ class World:
 
 
     def updateUnitPos(self,oldPos ,position, unit):
-        print(oldPos, position)
+        #print(oldPos, position)
         try :
             self.unitTiles[oldPos]["elements"].remove(unit)
         except:
-            print(unit.position)
-            print("l'unité n'as pas l'air d'être à sa place")
+            (unit.position)
+            #print("l'unité n'as pas l'air d'être à sa place")
+            pass
         try:
             self.unitTiles[oldPos]["elements"][0]
         except:
@@ -174,9 +175,9 @@ class World:
         #print("World : place_element -- In place element")
         place = (element.position.getX(), element.position.getY())
         if place not in self.filled_tiles and place[0] <= self.width and place[1] <= self.height:
-            print("World : place_element ------- Element n'étant pas dans une tuile déjà prise")
+            #print("World : place_element ------- Element n'étant pas dans une tuile déjà prise")
             if issubclass(element.__class__, Building) and all(tile not in set(self.filled_tiles) for tile in element.get_occupied_tiles()):
-                print("World : place_element ------- Elt est un batiment, voici le batiment -> " ,element.name)
+                #print("World : place_element ------- Elt est un batiment, voici le batiment -> " ,element.name)
                 #check if the building can be placed
                 if element.surface[0] + place[0] <= self.width and element.surface[1] + place[1] <= self.height:
                     for x in range(element.surface[0]):

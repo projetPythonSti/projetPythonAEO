@@ -179,7 +179,7 @@ class AIPlayer:
             for k in self.freeUnits[i]:
                 self.logger("AIPlayer | playTurn : valeur k -> ",k)
                 if self.gm.checkIfDead(k, team=self.team.name):
-                    print("l'unité semble être morte ")
+                    #print("l'unité semble être morte ")
                     self.freeUnits[i].remove(k)
 
         self.logger("AIPlayer | playTurn --- freeunits state",self.freeUnits)

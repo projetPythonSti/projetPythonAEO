@@ -74,8 +74,6 @@ class World_GUI:
         else:
             tile = ""
             
-        
-            
         out = {
             "grid": [grid_x, grid_y],
             "cart_rect": rect,

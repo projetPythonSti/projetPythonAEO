@@ -91,8 +91,9 @@ class GameManager:
 
         ressourceToCollect = defaultdict(dict)
 
-        def __init__(self, speed, world: World,debug=False, writeToDisk=False ):
+        def __init__(self, speed , game_duration , world: World,debug=False, writeToDisk=False ):
             self.gameSpeed = speed
+            self.game_duration =game_duration
             self.world = world
             self.debug = debug
             self.writeToDisk = writeToDisk
@@ -103,10 +104,11 @@ class GameManager:
             if self.debug:
                 if self.writeToDisk:
                     sys.stdout = gmOutput
-                    print(*args, **kwargs)
+                    #print(*args, **kwargs)
                     sys.stdout = sys.__stdout__
                 else:
-                    print(*args, **kwargs)
+                    #print(*args, **kwargs)
+                    pass
 
 
         def checkModifications(self):
@@ -181,6 +183,34 @@ class GameManager:
             else:
                 pass
                 #self.logger("GameManager | buildBuilding--- Waiting for builders")
+
+        def dumb_collectRessources(self, uid):
+
+            """
+            Se déclanche quand, cible unité = position ressource et position unité == position resource + ou - 1 (x,y)
+            nouvel attribut a villagois -> début collect = timer début collect
+            à chaque tour lancé dumb collect si condition rempli
+
+            1er etape :
+            if villageois.collect == None :
+                villageois.collect = game.duration
+                ressource.hp = ressource.hp -1
+                villageois.pounch += 1
+                if ressource.hp == 0 :
+                    supprimer ressource du monde
+                    villageois.collect = None
+                    villageois.cible = None
+
+            else if game.duration - villageois.collect >= 2.4 :
+                if ressource.hp == 0 :
+                    supprimer ressource du monde
+                    villageois.collect = None
+                    villageois.cible = None
+                else :
+                    villageois.collect += 2.4
+                    ressource.hp = ressource.hp -1
+                    villageois.pounch += 1
+            """
 
         def collectResources(self, uid):
             deltaTime = timeit.default_timer() - self.tick
