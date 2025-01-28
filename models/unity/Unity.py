@@ -89,7 +89,7 @@ class Unity:
 
     def estimateDistance(self, pos1: tuple, pos2: tuple):
         distance = math.hypot(pos2[0] - pos1[0], pos2[1] - pos1[1])
-        logging.debug(f"Estimated distance between {pos1} and {pos2}: {distance}")
+        #logging.debug(f"Estimated distance between {pos1} and {pos2}: {distance}")
         return distance
 
     def isInRange(self, position : tuple[int,int]):

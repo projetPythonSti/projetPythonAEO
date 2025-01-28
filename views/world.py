@@ -64,20 +64,21 @@ class World_GUI:
         r = random.randint(1, 100)
         perlin = 100 * noise.pnoise2(grid_x / self.perlin_scale, grid_y / self.perlin_scale)
 
-        if "w" in self.world_model.ressources and "g" in self.world_model.ressources:
-            if (perlin >= 15) or (perlin <= -35):
-                tile = "w"
-            else:
-                if r == 1:
-                    tile = "F"
-                elif r == 2:
-                    tile = "eau"
-                elif r == 3:
-                    tile = "g"
-                else:
-                    tile = ""
-        else:
-            tile = ""
+        # if "w" in self.world_model.ressources and "g" in self.world_model.ressources:
+        #     if (perlin >= 15) or (perlin <= -35):
+        #         tile = "w"
+        #     else:
+        #         if r == 1:
+        #             tile = "F"
+        #         elif r == 2:
+        #             tile = "eau"
+        #         elif r == 3:
+        #             tile = "g"
+        #         else:
+        #             tile = ""
+        # else:
+        #     t
+        tile = ""
             
         
             
@@ -358,7 +359,7 @@ class World_GUI:
                 if ressource:
                     image_key= ressource.get_name()
                     image = self.tile_images[image_key]
-                    #print(f"Drawing ressource {image_key} at position: {ressource.getTPosition()}")  # Added debug statement
+                    print(f"Drawing ressource {image_key} at position: {ressource.getTPosition()}")  # Added debug statement
                     self.draw_on_map(screen, ressource.getTPosition(), image, camera)
         for k, h in units1.items():
             surface = 1 if k in "ah" else (2,2)

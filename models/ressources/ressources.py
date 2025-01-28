@@ -10,7 +10,7 @@ class Ressource:
         self.name = name
         self.quantity = quantity
         self.world = world
-        self.position = Position(rd.randint(0, self.world.width - 1), rd.randint(0, self.world.height - 1))
+        self.position = Position(0,0)
         self.uid = uid
         self.image = f"./assets/images/ressources/{self.name}.png"
        # self.images = pg.image.load(f"./assets/images/ressources/{self.name}.png").convert_alpha()

@@ -139,7 +139,7 @@ class Game :
 
 
     def turn (self,term) :
-        self.clock.tick(15)
+        self.clock.tick(60)
         now = time.time()
         delta = now - self.ltick
         ig_delta = delta * self.speed
