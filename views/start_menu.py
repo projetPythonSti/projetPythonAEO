@@ -33,8 +33,8 @@ class Menu :
         print("Menu de démarrage : ")
         print("Appuyez sur q pour quitter le jeu")
         print("Appuyez sur n pour créer une nouvelle partie")
-        print("Appuyez sur c charger une partie sauvegardé")
-        print("Appuyez sur k pour lancer le mode Debug PyGame")
+        print("Appuyez sur c charger une partie sauvegardée")
+        print("Appuyez sur r pour lancer une partie rapide")
         with term.cbreak():
             val = ''
             while val.lower() != 'n' or val.lower() != 'c':
@@ -53,7 +53,7 @@ class Menu :
                         return self.start_menu()
                     else :
                         return tuple(data)
-                if val.lower() == 'k':
+                if val.lower() == 'r':
                     self.x = PyGameDebugWorldENUM.width.value
                     self.y = PyGameDebugWorldENUM.height.value
                     self.type_map = PyGameDebugWorldENUM.mapType.value
@@ -73,9 +73,9 @@ class Menu :
         print("Appuyez sur z à tout moment pour revenir à l'étape précédente \n ")
 
         print("Veuillez choisir la taille de la carte")
-        print("Appuyez sur p pour revenir une petite carte")
-        print("Appuyez sur m pour revenir une carte de taille moyenne")
-        print("Appuyez sur g pour revenir une grande carte \n")
+        print("Appuyez sur p pour créer une petite carte")
+        print("Appuyez sur m pour créer une carte de taille moyenne")
+        print("Appuyez sur g pour créer une grande carte \n")
         with term.cbreak():
             val = ''
             while val.lower() != 's' or val.lower() != 'm' or val.lower() != 'l':
@@ -113,7 +113,7 @@ class Menu :
 
         print("Veuillez choisir le type de carte")
         print("Appuyez sur g pour une map de type Gold Rush (or au centre de la carte)")
-        print("Appuyez sur r pour une map random")
+        print("Appuyez sur a pour une map de type Arabia (centre de la carte dégagé)")
 
         with term.cbreak():
             val = ''
@@ -130,8 +130,8 @@ class Menu :
                     self.set_ressources_quantity()
                     break
 
-                if val.lower() == 'r':
-                    self.type_map = 'r'
+                if val.lower() == 'a':
+                    self.type_map = 'a'
                     self.set_ressources_quantity()
                     break
 
@@ -240,12 +240,12 @@ class Menu :
         print("Veuillez le comportement des IA ")
         print("Appuyez sur a pour une IA agressive")
         print("Appuyez sur p pour une IA passive")
-        print("Appuyez sur b pour une IA bâtisseuse")
+        print("Appuyez sur d pour une IA défensive")
 
         with term.cbreak():
             n = 0
             val = ''
-            while val.lower() != 'a' or val.lower() != 'p' or val.lower() != 'b' :
+            while val.lower() != 'a' or val.lower() != 'p' or val.lower() != 'd' :
                 print(f"Veuillez choisir le comportement de l'ia du joueur {n+1}")
                 val = term.inkey()
                 if val.lower() == 'q':
@@ -265,7 +265,7 @@ class Menu :
                     n = n + 1
                     if n >= self.nb_joueur :
                         break
-                if val.lower() == 'b':
+                if val.lower() == 'd':
                     self.ai_behavior.append('b')
                     n = n + 1
                     if n >= self.nb_joueur :

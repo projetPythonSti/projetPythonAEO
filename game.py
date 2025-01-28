@@ -245,7 +245,7 @@ class Game :
             infos+="  TopBorder:"+str(self.players[n].topVillageBorder)+" BottomBorder:"+str(self.players[n].bottomVillageBorder)
             infos+='\n\n'
             n += 1
-        infos += '\n' * (term.height - ((len(self.world.villages)+1)*3)-2)
+        infos += '\n' * (term.height - ((len(self.world.villages)+1)*4)-2)
         print(infos)
 
     def max_units(self,village): #function that takes a team and return the maximum number of units manageable

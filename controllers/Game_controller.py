@@ -27,27 +27,28 @@ class Game_controller:
     def attack(self, attacker, defender):
         """ Managing attack between two units """
         if attacker not in self.units or defender not in self.units:
-            print("Une des unités n'existe pas.")
+            #print("Une des unités n'existe pas.")
             return
 
-        print(f"{attacker.name} attaque {defender.name}")
+        #print(f"{attacker.name} attaque {defender.name}")
         # Déterminer si l'attaque est réussie (en fonction des caractéristiques, ici simplifié)
         if attacker.position == defender.position:  # Si elles sont au même endroit
             damage = attacker.damage
             defender.health -= damage  # Appliquer les dégâts
-            print(f"{defender.name} a subi {damage} dégâts. Santé restante: {defender.health}")
+            #print(f"{defender.name} a subi {damage} dégâts. Santé restante: {defender.health}")
             if defender.health <= 0:
-                print(f"{defender.name} a été éliminé.")
+                #print(f"{defender.name} a été éliminé.")
                 self.model.remove_unit(defender)  # Retirer l'unité morte du modèle
                 self.units.remove(defender)  # Retirer de la liste des unités
                 self.view.remove_unit(defender)  # Mettre à jour la vue (enlever l'unité)
         else:
-            print(f"{defender.name} est hors de portée pour l'attaque.")
+            #print(f"{defender.name} est hors de portée pour l'attaque.")
+            ()
 
     def collect_resources(self, worker, resource):
         """ Gérer la collecte de ressources """
         if worker not in self.units:
-            print("L'unité de travailleur n'existe pas.")
+            #print("L'unité de travailleur n'existe pas.")
             return
         
         if worker.can_collect(resource):  # Vérifier si l'unité peut collecter la ressource
@@ -62,5 +63,6 @@ class Game_controller:
             self.model.add_building(village, building)  # Ajouter le bâtiment au modèle
             self.view.update_building(village, building)  # Afficher le bâtiment dans la vue
         else:
-            print("Pas assez de ressources pour construire ce bâtiment.")
+            #print("Pas assez de ressources pour construire ce bâtiment.")
+            ()
 
