@@ -94,15 +94,15 @@ class GameManager:
 
         ressourceToCollect = defaultdict(dict)
 
-        def __init__(self, speed , game_duration , world: World,debug=False, writeToDisk=False ):
+        def __init__(self, speed , world: World,debug=False, writeToDisk=False ):
             self.gameSpeed = speed
-            self.game_duration =game_duration
             self.world = world
             self.debug = debug
             self.writeToDisk = writeToDisk
             self.save = False
             self.attackDict = defaultdict(list)
             self.pastAttacks = defaultdict(dict)
+
         def logger(self, *args, **kwargs):
             if self.debug:
                 if self.writeToDisk:
@@ -228,6 +228,7 @@ class GameManager:
                     ressource.hp = ressource.hp -1
                     villageois.pounch += 1
             """
+            pass
 
         def collectResources(self, uid):
             deltaTime = timeit.default_timer() - self.tick

@@ -167,6 +167,7 @@ class AIPlayer:
         self.logger("AIPlayer | AI Launched -> Init launched, currentEvents are :", self.currentEvents)
 
     def logger(self,*args, **kwargs):
+        """
         if self.debug:
             if self.writeToDisk:
                 sys.stdout = output
@@ -174,6 +175,7 @@ class AIPlayer:
                 sys.stdout = sys.__stdout__
             else:
                 print(*args, **kwargs)
+         """
 
     def setVillageBorders(self, topLeftPos, bottomRightPos):
         self.topVillageBorder = topLeftPos

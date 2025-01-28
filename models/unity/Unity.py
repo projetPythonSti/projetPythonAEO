@@ -83,7 +83,7 @@ class Unity:
 
     def isInRange(self, position : tuple[int,int]):
         distance = self.estimateDistance(self.position.toTuple(), position)
-        print("isInRange ? ------,",distance[0] <= self.range and distance[0]<= self.range)
+        #print("isInRange ? ------,",distance[0] <= self.range and distance[0]<= self.range)
         return distance[0] <= self.range and distance[0]<= self.range
 
     def isFull(self):
