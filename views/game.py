@@ -59,16 +59,8 @@ class Game:
 
     def draw(self):
         self.screen.fill((0, 0, 0))
-        #self.world.draw(self.screen, self.camera)
         self.world.draw(self.screen, self.camera)
-        # self.draw_entities(self.screen , self.camera)
-            
-        # self.world.draw_buildings(self.screen, self.camera)
-        #     # self.draw_large_image(self.screen, self.(0,0), pg.image.load("assets/images/buildings/T.png").convert_alpha(), camera)
-        #     # self.draw_buildings(self.screen  , self.camera)
-        # self.world.draw_hp_score(self.screen , self.camera)
-        # self.world.draw_projectiles(self.screen  , self.camera)
-        # # self.world.draw_grass_tiles(self.screen, self.camera)
+        # self.world.draw_grass_tiles(self.screen, self.camera)
         # self.world.draw_on_map(self.screen, (0, 0), pg.image.load("assets/images/buildings/K.png"), self.camera, (0.8,0.8))
         # self.world.draw_on_map(self.screen, 0, 1, pg.image.load("assets/images/sable.png"), self.camera)
         # self.world.draw_on_map(self.screen, (1, 119), pg.image.load("assets/images/sable.png"), self.camera)

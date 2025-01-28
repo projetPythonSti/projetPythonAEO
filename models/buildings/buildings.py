@@ -1,31 +1,47 @@
 import time
+from enum import Enum
+
+import pygame as pg
 from models.Position import Position
 import random as rd
 
+class BuildingHealthENUM(Enum):
+    T = 1000
+    A = 500
+    B = 500
+    C = 200
+    F = 100
+    H = 200
+    K = 800
+    S = 500
 class Building:
     """
-                06/12/2024@tahakhetib - J'ai ajouté les modifications au dessus de ce que @amadou_yaya_diallo à écrit
+                06/01/2025@tahakhetib - J'ai ajouté les modifications au dessus de ce que @amadou_yaya_diallo à écrit
                     - Passé l'attribut surface en statique afin de pouvoir y accéder sans avoir à créer un Building
+                25/01/2025@tahahkhetib - J'ai ajouté des modifications au dessus de ce que @amadou_yaya_diallo à écrit
+                    - Changé la définition de l'UID au niveau de toutes les classes filles de Building
+                26/01/2025@tahahkhetib - J'ai ajouté des modifications au dessus de ce que @amadou_yaya_diallo à écrit
+                    - Supprimé la ligne self.time_building = 3*ksjfl afin de garder le calcul du temps pour construire au niveau du GameManager
     """
     surface = (1,1)
-    def __init__(self, uid, name, cost, time_building, health, spawn="", population=0, dropPoint=False, position = None, team=None):
+    def __init__(self, uid, name, cost, time_building, health, spawn="", population=0, dropPoint=False, position=None, team=None):
         self.uid = uid
         self.name = name
         self.cost = cost
         self.time_building = time_building
         self.health = health
-        self.hp_max=int(health)
+        self.hp_max = health
         self.is_built = False
         self.spawn = spawn
         self.dropPoint = dropPoint
         self.population = population
         self.builders = 1
-        self.time_building = 3 * time_building / (self.builders + 2)
+        #self.time_building = 3 * time_building / (self.builders + 2)
         self.team = team
-
         self.position = position if position else Position(rd.randint(0, self.team.world.width - 1), rd.randint(0, self.team.world.height - 1))
-
         self.image = f"./assets/images/buildings/{self.name}.png"
+        # self.images = pg.image.load(f"./assets/images/buildings/{self.name}.png").convert_alpha()
+
 
     def get_cost(self):
         return self.cost
@@ -72,18 +88,18 @@ class Building:
         print(f"Construction de {self.name} terminée.")
         return True
     
-    def is_destroyed(self) -> bool:
-        return self.health <= 0
-
-    def get_position(self) -> Position:
+    
+    def get_position(self):
         return self.position
-
-    def set_position(self, x: float, y: float):
-        self.position.setX(x)
-        self.position.setY(y)
 
     def getTPosition(self):
         return self.position.toTuple()
+
+    def personalizedStr(self,term): return f"{term.red if self.health<BuildingHealthENUM[self.name].value else term.normal}{self.name}{term.normal}"
+
+    def __repr__(self):
+        return self.name
+    
 
     def destroy(self):
         """
@@ -96,5 +112,5 @@ class Building:
 
         print(f"{self.name} has been destroyed.")
 
-    def __repr__(self):
-        return self.name
+    def is_destroyed(self):
+        return self.health <= 0

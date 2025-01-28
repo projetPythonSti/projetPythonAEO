@@ -33,10 +33,8 @@ class luncher:
         print(world.ressources)
         village1 = Model("1", world)
         village2 = Model("2", world)
-        #50,2,30, 10, gold=200, wood=10, food=300, 
-        village1.initialize_villages(50,2,30, 10, gold=200, wood=10, food=300,keeps=10, houses=5)
-        village2.initialize_villages( 4, 2, 30 , 10, food=100, camps=2, barracks=2, archery_ranger=2)
-        #4,50,6, 20, gold=2, wood=1, stables=3, 
+        village1.initialize_villages(50,2,30, 10, gold=200, wood=10, food=300, keeps=2, houses=5, camps=3)
+        village2.initialize_villages(4,50,6, 20, gold=2, wood=1, food=3, barracks=1, archery_ranger=3, stables=3, farms=2)
         # village1.initialize_villages(houses=1)
         # village2.initialize_villages(houses=1)
         world.fill_world()

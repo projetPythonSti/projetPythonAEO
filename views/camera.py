@@ -68,13 +68,6 @@ class Camera:
 
         # logger.info(f"Camera displacement: {self.deplacement}, zoom: {self.zoom}")
 
-    def getX(self):
-        return self.deplacement.x
-    
-    def getY(self):
-        return self.deplacement.y
-
-
     def zoom_me(self):
         """
         Zoom in/out with arrow keys. Clamp zoom between 0.1 and 3.0.
@@ -120,7 +113,6 @@ class Camera:
         return (screen_x, screen_y)
 
     def screen_to_iso(self, screen_pos: tuple) -> pg.Vector2:
-
         """
         Inverse of iso_to_screen. 
         """

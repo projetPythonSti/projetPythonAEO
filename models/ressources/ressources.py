@@ -1,16 +1,19 @@
 # This file contains the ressources classes, which are the objects that the player can collect in the game.
 from models.Position import Position
 import random as rd
+import pygame as pg
 
 
 class Ressource:
     def __init__(self, uid, name, quantity, world):
+                
         self.name = name
         self.quantity = quantity
         self.world = world
         self.position = Position(rd.randint(0, self.world.width - 1), rd.randint(0, self.world.height - 1))
         self.uid = uid
         self.image = f"./assets/images/ressources/{self.name}.png"
+       # self.images = pg.image.load(f"./assets/images/ressources/{self.name}.png").convert_alpha()
 
 
     def get_quantity(self):
@@ -44,7 +47,7 @@ class Ressource:
             self.position = None
 
     def __repr__(self): return self.name
-    
+    def personalizedStr(self,term): return f"{self.name}"
     def __eq__(self, other): return self.__class__ == other.__class__ # it could be useful
 
 class Wood(Ressource):

@@ -1,5 +1,5 @@
 import time
-from os import killpg
+#from os import killpg
 
 # self.path mettre
 from blessed import Terminal
@@ -10,18 +10,22 @@ import os
 
 class Save:
     def __init__(self):
+        pass
+        """
         self.generate_default_path()
 
         if not os.path.exists(self.save_path):
-            os.makedirs(self.save_path)
+            os.makedirs(self.save_path)"""
 
     def save(self, game,file_name, path=None):
+        print("début sauvegarde")
         self.generate_default_path()
-        datas = [game.gm, game.players,game.world, game.game_duration]
+        datas = [game.world,game.gm, game.players, game.game_duration]
         if path: self.save_path = path
         file = open(self.save_path + file_name, 'wb')
         pickle.dump(datas, file)
         file.close()
+        print("fin de sauvegarde")
 
     def generate_default_path(self):
         system = platform.system()
@@ -64,6 +68,7 @@ class Save:
         file = open(self.save_path + file_name, 'rb')
         datas = pickle.load(file)
         file.close()
+        print(datas)
         return datas
 
 
@@ -92,6 +97,7 @@ class Save:
                     time.sleep(2)
                     return None
             else:
+                print("bizarre")
                 self.save(game, file_name, "assets/data/saves/")
 
     def list_files_in_directory(self, directory):
@@ -105,16 +111,37 @@ class Save:
                 print(entry)
         return liste_fichier
 
-    def load_term (self):
-        print("Voici la liste des fichiers de sauvegardes :")
-        list_save = self.list_files_in_directory("assets/data/saves/")
-        chosen_save = input("Entrer un nom de sauvegarde pour charger une partie :")
+    def list_files_in_directory_printless(self, directory):
+        """Affiche les fichiers dans le répertoire spécifié."""
+        liste_fichier = []
+        # Liste tout le contenu du dossier
+        for entry in os.listdir(directory):
+            # Vérifie si c'est un fichier
+            if os.path.isfile(os.path.join(directory, entry)):
+                liste_fichier.append(entry)
+                #print(entry)
+        return liste_fichier
+
+    def load_term (self,term):
+        q = False
+        list_save = self.list_files_in_directory_printless("assets/data/saves/")
+        string1 = "Voici la liste des fichiers de sauvegarde :"
+        for i in range(0,len(list_save)):
+            string1 += "\n" + list_save[i]
+
+        string1 += "\n\nVeuillez selectionner une des sauvegarde disponible :"
+        chosen_save = new_input( string1 ,term)
+        string2 = "Entrer invalide! Vérifiez que vous avez écrit correctement le nom de la sauvegarde de votre choix. Il faut respect les minuscules et les majuscules.\n Entrer la lettre q pour sortir du menu de charge " + string1
         while chosen_save not in list_save:
-            print(
-                "Entrer invalide! Vérifiez que vous avez écrit correctement le nom de la sauvegarde de votre choix. Il faut respect les minuscules et les majuscules ainsi que les extensions.")
-            chosen_save = input("Entrer un nom de sauvegarde pour charger une partie :")
-        data = self.load(chosen_save, "assets/data/saves/")
-        return data
+            chosen_save = new_input(string2 , term)
+            if chosen_save == "q" :
+                q = True
+                break
+        if q :
+            return None 
+        else :
+            data = self.load(chosen_save, "assets/data/saves/")
+            return data
 
 
 
@@ -124,10 +151,10 @@ class Save:
     """
 
     def quick_save (self,game) :
-        self.save(game,"quick_save", "../assets/data/saves/")
+        self.save(game,"quick_save", "assets/data/saves/")
 
     def quick_load (self,game) :
-        data = self.load("quick_save", "../assets/data/saves/")
+        data = self.load("quick_save", "assets/data/saves/")
         game.swap(data)
 
 
@@ -180,6 +207,5 @@ def confirmation(term):
 if __name__ == "__main__":
 
     save = Save()
-    game = 1
-    term = Terminal()
-    save.save_term(game,term)
+    liste = save.list_files_in_directory("../assets/data/saves")
+    print (liste)

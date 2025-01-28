@@ -21,21 +21,29 @@ class Game :
                     - Ajouté un attribut kickstartPg
                     - Ajouté la prise en charge du démarrage de pygame (touché à turn())
                     - Créé une fonction initPygame, et draw_pygame()
-                    - ajouté l'attribut term_on pour s'assurer que le terminal est bien allumé
+                    - Ajouté l'attribut term_on pour s'assurer que le terminal est bien allumé
+                25/01/2025@tahakhetib : J'ai ajouté des choses sur ce que @etan-test1 a écrit
+                    - Ajouté un attribut optionnel à l'init() de la classe pour spécifier le temps du jeu, nécessaire lors du chargement de la sauvegarde
+                    - Ajouté un attribut dérivé playerNumber représentant le nombre de joueurs dans le jeu, et ajouté l'attribut activePlayer pour faire jouer une IA par Frame au lieu de toutes les IA par frame
+                    - Modifié la fonction checkUnitToMove() par checkModifications() afin d'exécuter toutes les actions du gameManager en une seule fonction
+                26/01/2025@tahkhetib
+                    - synchronisé le Speed du jeu avec celle du GameManager
             """
 
-    def __init__(self, world, clock, gm, players: list[AIPlayer]):
+    def __init__(self, world, clock, gm, players: list[AIPlayer], gameDuration=0):
 
         self.ltick = time.time()
         self.gm = gm
         self.players = players
+        self.playerNumber = len(players)
+        self.activePlayer = 0
         self.clock = clock
         self.speed = 1
         self.world = world
         self.upleft = Position(0,0) #changes by player arrow keys, should always start upper left of the map (0,0)
         self.downright = Position(0, 0) #changes by itself to fit the screen
         self.playing = False
-        self.game_duration = 0
+        self.game_duration = gameDuration
         self.save = Save()
         self.ffff = False
         self.pygame_on = False
@@ -54,6 +62,9 @@ class Game :
 
         while self.playing :
             self.my_inputs_turn (term)
+            
+        
+
 
 
 
@@ -68,15 +79,18 @@ class Game :
                     self.pause(term)
                 elif val.name == 'KEY_TAB':
                     self.stat(term)
-
+                #for debugging purposes only - To be removed after testing
+                elif val.lower() == 'k' :
+                    assert False
                 #a changer
                 elif val.lower() == '+':
                     if self.speed < 10:
                         self.speed += 1
+                        self.gm.gameSpeed += 1
                 elif val.lower() == '-':
                     if self.speed >= 1 :
                         self.speed -= 1
-
+                        self.gm.gameSpeed -= 1
 
                 elif val == 'z':
                     if self.upleft.getY()>0:
@@ -125,7 +139,7 @@ class Game :
 
 
     def turn (self,term) :
-        self.clock.tick(60)
+        self.clock.tick(15)
         now = time.time()
         delta = now - self.ltick
         ig_delta = delta * self.speed
@@ -135,12 +149,16 @@ class Game :
         #self.world.units[0].position = (self.world.units[0].position[0] + 1, self.world.units[0].position[1])
         # self.events()
         # self.update()
-        for a in self.players:
-            a.playTurn()
-        self.gm.checkUnitsToMove()
+        if self.activePlayer<self.playerNumber:
+            self.players[self.activePlayer].playTurn()
+            self.activePlayer +=1
+        else:
+            self.activePlayer = 0
+            self.players[self.activePlayer].playTurn()
+        self.gm.checkModifications()
         self.gm.tick = timeit.default_timer()
 
-        self.draw_term(term)
+        #self.draw_term(term)
         """
         Peut changer si besoin 
         """
@@ -149,13 +167,15 @@ class Game :
             self.initPygame()
             self.kickstartPG = False
             self.pygame_on = self.pgGame is not None
+            self.term_on = self.pgGame is None
             pass
         if self.pygame_on :
             self.draw_pygame()
         if self.gm.save:
             pass
         if self.term_on:
-            self.draw_term
+            pass
+            self.draw_term(term)
 
 
 ### Fonction intermédiaire
@@ -165,6 +185,7 @@ class Game :
         screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
         clock = pg.time.Clock()
         self.pgGame = PGGame(screen,clock,self.gm)
+
 
     def init_term(self):
         term = Terminal()
@@ -180,7 +201,7 @@ class Game :
 
         else :
             self.downright=Position(min(self.upleft.getX()+term.width-2,self.world.width),min(self.upleft.getY()+term.height-3,self.world.height)) #lil minuses here to fit everything nicely
-            print(self.world.return_precise_world(self.upleft,self.downright))
+            print(self.world.return_precise_world(self.upleft,self.downright,term))
             #prevents going too much right and down
             if self.downright.getX()-self.upleft.getX()<term.width-2 and self.world.width>term.width:
                 self.upleft.setX(self.world.width-term.width+2)
@@ -198,6 +219,7 @@ class Game :
             self.pgGame.events()
             self.pgGame.update(dt)  # Pass delta time to update
             self.pgGame.draw()
+            # self.pgGame.update(self.pgGame, dt)  # Pass both camera and dt
         pass
         ### A REMPLIR
 
@@ -229,6 +251,7 @@ class Game :
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
         print("Appuyez sur s pour sauvegarder")
+        print("Appuyez sur c pour charger une partie")
         print("Appuyez sur r pour reprendre")
         print("Appuyez sur p pour activer pygame, puis appuyez sur R")
         print(f"IN GAME TIME : {self.game_duration}")
@@ -244,10 +267,13 @@ class Game :
                     break
 
                 elif val2.lower() =='c':
-                    data = self.save.load_term()
+                    data = self.save.load_term(term)
+
                     if data :
                         self.swap_to_load(data)
                     else : pass
+                elif val2.lower() == 'p':
+                    self.kickstartPG = True
 
 
 
@@ -265,10 +291,10 @@ class Game :
                     quit()
 
 
-    def swap_to_load (self,other_game) :
+    def swap_to_load (self,dico) :
         self.ltick = time.time()
-        self.gm = other_game.gm
-        self.players = other_game.players
+        self.gm = dico[1]
+        self.players = dico[2]
         self.speed = 1
-        self.world = other_game.world
-        self.game_duration = other_game.game_duration
+        self.world = dico[0]
+        self.game_duration = dico[3]
