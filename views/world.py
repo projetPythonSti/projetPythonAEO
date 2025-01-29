@@ -381,7 +381,8 @@ class World_GUI:
     def draw_on_map(self, screen, position, image, camera, surface=1, p=0):
         # ...existing code...
         # print(f"Rendering entity at position: {position}")  # Added debug statement
-
+        if position==None:
+            return
         # Scale grid positions by TILE_SIZE to convert to pixel coordinates
         cart_x = position[0] * TILE_SIZE  # Added scaling
         cart_y = position[1] * TILE_SIZE  # Added scaling

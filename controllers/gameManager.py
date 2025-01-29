@@ -20,7 +20,6 @@ from models.Pathfinding import Pathfinding
 from models.Position import Position
 from models.World import World
 from models.buildings.buildings import Building
-from models.httpHandler import Serv, start_http_server
 from models.ressources.ressources import Ressource
 from models.unity import Horseman, Archer, Villager, Swordsman
 from models.unity.Unity import Unity
@@ -858,13 +857,15 @@ class GameManager:
             file.write(body)
 
     def openHtmlPage(self):
-        directory_to_serve = "web"
-        port = 8000
-        stop = False
-        server_thread = threading.Thread(target=start_http_server, args=(directory_to_serve, port), daemon=True,
-                                         name="htmlPage")
-        server_thread.start()
-        webbrowser.open(f"http://localhost:8000", new=0, autoraise=True)
+        #directory_to_serve = "web"
+        #port = 8000
+        #stop = False
+        #server_thread = threading.Thread(target=start_http_server, args=(directory_to_serve, port), daemon=True,
+        #                                name="htmlPage")
+        #server_thread.start()
+        file_path = f"{os.getcwd()}/utils/html/gameStats.html"
+        self.html_generator()
+        webbrowser.open(f"file://{file_path}")
         # Start the server
 
     # print("finisshed server")

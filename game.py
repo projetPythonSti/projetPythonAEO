@@ -325,8 +325,8 @@ class Game :
         self.game_duration = dico[3]
 
     def make_json(self):
-
-        with open("web/assets/assets/stat.json", "w") as file :
-            json.dump(self.world.to_json(),file)
+        pass
+        #with open("web/assets/assets/stat.json", "w") as file :
+        #    json.dump(self.world.to_json(),file)
 
 
