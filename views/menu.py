@@ -22,7 +22,9 @@ class PlayPauseMenu:
         self.play_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 - 150), "Play", button_width, button_height)
         self.save_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 - 50), "Sauvegarder", button_width, button_height)
         self.load_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 + 50), "Charger", button_width, button_height)
-        self.quit_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 + 150), "Quitter", button_width, button_height)
+        self.stats_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 + 150), "Stats", button_width, button_height)
+        self.quit_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 + 250), "Quitter", button_width, button_height)
+        
 
     def run(self):
         if not self.running:
@@ -46,6 +48,8 @@ class PlayPauseMenu:
                     self.error()
                 if self.quit_button.is_over(pg.mouse.get_pos()):
                     self.quit_game()
+                if self.stats_button.is_over(pg.mouse.get_pos()):
+                    self.show_stats()
 
     def update(self):
         # Si un message est affiché, décrémente le timer
@@ -59,12 +63,13 @@ class PlayPauseMenu:
         self.play_button.draw(self.screen)
         self.save_button.draw(self.screen)
         self.load_button.draw(self.screen)
+        self.stats_button.draw(self.screen)
         self.quit_button.draw(self.screen)
         
         if self.message:
             font = pg.font.Font(None, 36)
             text = font.render(self.message, True, (255, 0, 0))
-            self.screen.blit(text, (self.screen.get_width() // 2 - text.get_width() // 2, self.screen.get_height() // 2 + 250))
+            self.screen.blit(text, (self.screen.get_width() // 2 - text.get_width() // 2, self.screen.get_height() // 2 + 300))
             
         pg.display.flip()
 
@@ -87,10 +92,12 @@ class PlayPauseMenu:
         self.game.playing = True
         
     def error(self):
-        self.message = "This function has been changed, but you can do it by the terminal !"
-        self.message_timer = 180
+        self.message = "This functionnality is no longer available in the GUI mode, please use the terminal mode !"
+        self.message_timer = 240
         # self.play()
-
+    def show_stats(self):
+        self.game.game_manager.openHtmlPage()
+        
     def load(self):
         print("Im charging...")
         file_selector = FileSelector()

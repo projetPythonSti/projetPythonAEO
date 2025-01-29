@@ -2,12 +2,7 @@ from models.buildings.buildings import Building
 from collections import defaultdict
 from utils.setup import TILE_SIZE
 from models.World import World
-from models.Position import Position
-from views.camera import Camera
 import pygame as pg
-import random
-import noise
-# from buildings import Building, TownCentre, House, Camp, Farm, Barracks, Stable, ArcheryRange, Keep, ProjectilePool, Projectile
 import logging
 
 logging.basicConfig(level=logging.DEBUG)  # Changed from INFO to DEBUG
@@ -65,23 +60,6 @@ class World_GUI:
         minx = min(x for x, _ in iso_poly)
         miny = min(y for _, y in iso_poly)
 
-        r = random.randint(1, 100)
-        perlin = 100 * noise.pnoise2(grid_x / self.perlin_scale, grid_y / self.perlin_scale)
-
-        # if "w" in self.world_model.ressources and "g" in self.world_model.ressources:
-        #     if (perlin >= 15) or (perlin <= -35):
-        #         tile = "w"
-        #     else:
-        #         if r == 1:
-        #             tile = "F"
-        #         elif r == 2:
-        #             tile = "eau"
-        #         elif r == 3:
-        #             tile = "g"
-        #         else:
-        #             tile = ""
-        # else:
-        #     t
         tile = ""
 
         out = {
@@ -114,10 +92,6 @@ class World_GUI:
         self.tile_images["C"] = pg.image.load("assets/images/buildings/C.png")  # Added default image
         self.tile_images["B"] = pg.image.load("assets/images/buildings/B.png")
         # self.tile_images["default"] = pg.image.load("assets/images/default.png").convert_alpha()  # Added default image
-        # self.tile_images["sable"] = pg.image.load("assets/images/sable.png").convert_alpha()
-        # self.tile_images["block"] = pg.image.load("assets/images/block.png").convert_alpha()
-        # self.tile_images["tree"] = pg.image.load("assets/images/graphics/tree.png").convert_alpha()
-        # self.tile_images["rock"] = pg.image.load("assets/images/graphics/rock.png").convert_alpha()
 
     def load_image(self, key, value):
         if key not in self.tile_images:
@@ -163,38 +137,9 @@ class World_GUI:
                                 return True
         return False
 
-    # def can_place_building(self, grid_x, grid_y, size):
-    #     """Check if a building of given size can be placed at the grid position."""
-    #     size_x, size_y = size
-    #     if grid_x + size_x > self.grid_width or grid_y + size_y > self.grid_height:
-    #         return False
-
-    #     for dx in range(size_x):
-    #         for dy in range(size_y):
-    #             if not self.is_tile_available(grid_x + dx, grid_y + dy):
-    #                 return False  # Tile is not available
-
-    #     if self.is_entity_collision(grid_x, grid_y, size):
-    #         return False  # Collision with existing entity
-
-    #     return True
     def can_place_building(self, occupied_tiles, position, surface):
         return all(tile not in set(self.world_model.filled_tiles.values()) for tile in occupied_tiles) and surface[0] + \
             position[0] <= self.grid_width and surface[1] + position[1] <= self.grid_height
-
-    # def is_tile_available(self, x, y):
-    #     if (x, y) not in self.world:
-    #         return False
-
-    #     # Check if there's already a building here
-    #     if (x, y) in self.buildings:
-    #         return False
-
-    #     # Check if the tile is marked as a collision in the world (e.g., tree, rock)
-    #     if self.world[(x, y)]["collision"]:
-    #         return False
-
-    #     return True
 
     def is_tile_available(self, position):
         if position not in self.world or position in self.world_model.filled_tiles:
@@ -277,57 +222,16 @@ class World_GUI:
             scaled_grass_tiles,
             (camera.scroll.x * camera.zoom, camera.scroll.y * camera.zoom)
         )
-
-    # def draw_world_tiles(self, screen, camera):
-    #     for x in range(self.grid_width):
-    #         for y in range(self.grid_height):
-    #             render_pos = self.world[x, y]["render_pos"]
-    #             self.draw_world_tile(screen, render_pos, x, y, camera)
-
-    # def draw_element(self, screen, camera, element):
-    #     position = element.get_position()
-    #     self.draw_world_tile(screen, self.world[position]["render_pos"], position, camera)
-
-    # def draw_world_tile(self, screen, render_pos, position, camera):
-    #     """Draw a single world tile at the specified position."""
-    #     tile = self.world[position]["tile"]
-    #     if tile != "":
-    #         # Scale the tile image
-    #         try:
-    #             scaled_tile = pg.transform.scale(
-    #                 self.tile_images[tile],
-    #                 (
-    #                     int(self.tile_images[tile].get_width() * camera.zoom),
-    #                     int(self.tile_images[tile].get_height() * camera.zoom)
-    #                 )
-    #             )
-    #             # Adjust position according to zoom and scroll
-    #             screen.blit(
-    #                 scaled_tile,
-    #                 (
-    #                     (render_pos[0] + self.grass_tiles.get_width() / 2) * camera.zoom + camera.scroll.x * camera.zoom,
-    #                     (render_pos[1] - (self.tile_images[tile].get_height() - TILE_SIZE)) * camera.zoom + camera.scroll.y * camera.zoom
-    #                 )
-    #             )
-    #         except KeyError:
-    #             print("Clé non trouvé !")
-
     def draw(self, screen, camera):
         """Render the world, including buildings."""
         self.draw_grass_tiles(screen, camera)
         self.draw_entities(screen, camera)
         self.draw_buildings(screen, camera)
-        # self.draw_large_image(screen, (0,0), pg.image.load("assets/images/buildings/T.png").convert_alpha(), camera)
-        # self.draw_buildings(screen, camera)
         self.draw_hp_score(screen, camera)
-        #self.draw_projectiles(screen, camera)
-        # for k in self.world_model.filled_tiles.keys():
-        #     self.draw_on_map(screen, k, pg.image.load("assets/images/sable.png").convert_alpha(), camera)
-
+        
     def draw_building(self, screen, building, camera, surf=None):
         """Single entry point to render buildings."""
         image = self.tile_images[building.get_name()]
-        # logger.debug(f"Drawing building {building.get_name()} at position: {building.getTPosition()}")
         self.draw_on_map(screen, building.getTPosition(), image, camera, surf)
 
     def draw_buildings(self, screen, camera):
@@ -467,11 +371,7 @@ class World_GUI:
         """Update the world and its entities."""
         # self.draw(screen, camera)
         self.update_projectiles(dt=dt)
-        #self.update_projectiles(dt=dt)
-        # first_key, first_value = next(iter(self.world_model.filled_tiles.items()))
-        # print(f"Key: {first_key}, Value: {first_value}")
-        # print(f"type_key: {type(first_key)} , type_value: {type(first_value)}")
-
+        
     def iso_to_grid(self, iso_x, iso_y):
         """Helper to convert iso coords back to grid coords."""
         cart_y = (2 * iso_y - iso_x) / 2
@@ -516,26 +416,6 @@ class World_GUI:
                     self.draw_on_map_p(screen, projectile.position.toTuple(), projectile.image, camera,
                                        surface=(0.25, 0.25))
                     logger.debug(f"Draw projectile at position: {projectile.position.toTuple()}")
-                    # # Check if projectile is within grid boundaries
-                    # if (0 <= projectile.position.getX() < self.grid_width * TILE_SIZE and
-                    #     0 <= projectile.position.getY() < self.grid_height * TILE_SIZE):
-                    #     # Convert projectile's grid/world position to screen coords
-                    #     screen_pos = self.compute_screen_position(
-                    #         projectile.position.getX(),
-                    #         projectile.position.getY()
-                    #     )
-
-                    #     # Adjust for camera zoom & scroll
-                    #     adjusted_x = (screen_pos[0] + camera.scroll.x) * camera.zoom
-                    #     adjusted_y = (screen_pos[1] + camera.scroll.y) * camera.zoom
-
-                    #     # Center the projectile image
-                    #     projectile_rect = projectile.image.get_rect(center=(int(adjusted_x), int(adjusted_y)))
-
-                    #     screen.blit(projectile.image, projectile_rect)
-                    #     logger.debug(f"Draw projectile at ({adjusted_x}, {adjusted_y})")
-                    # else:
-                    #    logger.debug(f"Projectile out of bounds: position={projectile.position}")
 
     def update_projectiles(self, dt: float):
         """Update all active projectiles and activate new ones towards closest targets."""

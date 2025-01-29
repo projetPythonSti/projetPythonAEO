@@ -220,9 +220,9 @@ class Game :
 
     def draw_pygame (self):
         if self.pgGame is not None:
-            dt = self.pgGame.clock.tick(60) / 1000.0  # Calculate delta time in seconds
+            # dt = self.pgGame.clock.tick(60) / 1000.0  # Calculate delta time in seconds
             self.pgGame.events()
-            self.pgGame.update(dt)  # Pass delta time to update
+            self.pgGame.update()  # Pass delta time to update
             self.pgGame.draw()
         pass
         ### A REMPLIR

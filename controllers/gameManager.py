@@ -1,17 +1,10 @@
-import http
 import io
 import math
-import os
-import socketserver
 import sys
 import threading
 import timeit
 from collections import defaultdict
-from datetime import datetime
-import time
 import re
-from distutils.command.build import build
-from http.server import HTTPServer
 from typing import Tuple
 import webbrowser
 
@@ -20,7 +13,7 @@ from models.Pathfinding import Pathfinding
 from models.Position import Position
 from models.World import World
 from models.buildings.buildings import Building
-from models.httpHandler import Serv, start_http_server
+from models.httpHandler import start_http_server
 from models.ressources.ressources import Ressource
 from models.unity.Unity import Unity
 from enum import Enum
