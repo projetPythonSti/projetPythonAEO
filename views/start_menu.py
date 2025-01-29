@@ -73,12 +73,13 @@ class Menu :
         print("Appuyez sur z à tout moment pour revenir à l'étape précédente \n ")
 
         print("Veuillez choisir la taille de la carte")
-        print("Appuyez sur p pour revenir une petite carte")
-        print("Appuyez sur m pour revenir une carte de taille moyenne")
-        print("Appuyez sur g pour revenir une grande carte \n")
+        print("Appuyez sur p pour générer une petite carte (120*120)")
+        print("Appuyez sur m pour générer une carte de taille moyenne (240*240)")
+        print("Appuyez sur g pour générer une grande carte (360*360)")
+        print("Appuyez sur r pour générer une carte rectangle (180*120)\n")
         with term.cbreak():
             val = ''
-            while val.lower() != 's' or val.lower() != 'm' or val.lower() != 'l':
+            while val.lower() != 's' or val.lower() != 'm' or val.lower() != 'l' or val.lower() != 'r' :
                 val = term.inkey()
                 if val.lower() == 'q' :
                     self.start_menu()
@@ -101,6 +102,12 @@ class Menu :
                 if val.lower() == 'g':
                     self.x = 360
                     self.y = 360
+                    self.set_type_map()
+                    break
+
+                if val.lower() == 'r':
+                    self.x = 180
+                    self.y = 120
                     self.set_type_map()
                     break
 

@@ -157,7 +157,10 @@ class World:
                 world_chunk+='<'
             for x in range(upleft.getX(), downright.getX(), 1):
                 if (x,y) in self.unitTiles and self.unitTiles[(x,y)]["elements"] is not []:
-                    world_chunk += self.unitTiles[(x, y)]["elements"][0].personalizedStr(term)
+                    try :
+                        world_chunk += self.unitTiles[(x, y)]["elements"][0].personalizedStr(term)
+                    except :
+                        pass
                 elif(self.tiles_dico[(x, y)].contains!=None):
                         world_chunk+=self.tiles_dico[(x, y)].contains.personalizedStr(term)
                 else:
