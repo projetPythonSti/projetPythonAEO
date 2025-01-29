@@ -1,4 +1,6 @@
+from enum import Enum
 
+from models.Position import Position
 from models.unity.Archer import  Archer
 from models.unity.Horseman import Horseman
 from models.unity.Swordsman import Swordsman
@@ -19,7 +21,15 @@ from models.ressources.ressources import Ressource, Gold, Wood, Food
 # from unity import Unity
 from collections import defaultdict
 
+class BuildingPopulationEnum(Enum):
+    T= 5
+    H= 5
 
+class UnitENUM(Enum):
+    a = Archer
+    h = Horseman
+    v = Villager
+    s = Swordsman
 
 class Model:
     """
@@ -50,6 +60,7 @@ class Model:
         self.workingPpl = 0
         self.name = name
         self.world = world
+        self.maxPplCount = 0
         self.deads = defaultdict()
         self.world.add_village(self)
 
@@ -127,13 +138,25 @@ class Model:
         unit: Unity
         cost_dict : dict
     """
-    def add_unit(self, unit):    
-        if(self.has_enough_resources(unit.get_cost())):
+
+    def add_unit(self, unitType,position,futureID):
+            newUnit = UnitENUM[unitType].value(self)
+            newUnit.uid = futureID
+            print("AAAAAAANEW UNIT", newUnit.uid)
+            newUnit.position = Position(position[0],position[1])
             # if issubclass(unit.__class__, Building):
             #     unit.build()
-            self.peopleCount += 1
-            self.community[unit.name][str(unit.uid)] = unit
-            for ressource, cost in unit.get_cost().items():
+            self.community[newUnit.name][str(newUnit.uid)] = newUnit
+            if position in self.world.unitTiles:
+                self.world.unitTiles[position]["elements"].append(newUnit)
+            else:
+                self.world.unitTiles[position] = {
+                    "filled": False,
+                    "elements" : [],
+                }
+                self.world.unitTiles[position]["elements"].append(newUnit)
+                self.world.unitTiles[position]["filled"] = True
+            for ressource, cost in newUnit.get_cost().items():
                 self.ressources[ressource] -= cost
     """
         takes ressources to add, and update the village ressources
@@ -167,6 +190,9 @@ class Model:
         self.peopleCount -=1
         self.deads[unit.uid] = unit.uid
 
+    def calculateMaxPplLimit(self):
+        popLimit = min(len(self.community["T"].keys())*BuildingPopulationEnum["T"].value + len(self.community["H"].keys())*BuildingPopulationEnum["H"].value, 200)
+        return popLimit
     def get_community(self):
         return self.community
 

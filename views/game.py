@@ -45,13 +45,13 @@ class Game:
                 pg.quit()
                 sys.exit()
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
+                if event.key == pg.K_TAB:
                     self.playing = False
                     self.game_manager.html_generator()
                     self.playPauseMenu.run()
                 
 
-    def update(self, dt: float):
+    def update(self):
         self.camera.update()
         
         # self.hud.update()

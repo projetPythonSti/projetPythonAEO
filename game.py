@@ -220,9 +220,9 @@ class Game :
 
     def draw_pygame (self):
         if self.pgGame is not None:
-            dt = self.pgGame.clock.tick(60) / 1000.0  # Calculate delta time in seconds
+            # dt = self.pgGame.clock.tick(60) / 1000.0  # Calculate delta time in seconds
             self.pgGame.events()
-            self.pgGame.update(dt)  # Pass delta time to update
+            self.pgGame.update()  # Pass delta time to update
             self.pgGame.draw()
         pass
         ### A REMPLIR
@@ -240,14 +240,31 @@ class Game :
         for village in self.world.villages:
             infos+="Village "+village.name+" ;\n"
             infos+=" Wood:"+str(village.ressources["w"])+" Gold:"+str(village.ressources["g"])+" Food:"+str(village.ressources["f"])
-            infos+=" Population:"+str(village.peopleCount)+'/'
-            infos+="\n"
-            infos+="Playstyle: "+PlayStyleMatrixEnum(self.players[n].playStyle.playStyleMatrix).name
-            infos+="\nTopBorder: "+str(self.players[n].topVillageBorder)+"  BottomBorder: "+str(self.players[n].bottomVillageBorder)
+            infos+=" Population:"+str(village.peopleCount)+'/'+str(self.max_units(village))+" Villagers:"+str(self.nb_something(village,"v"))+" Buildings:"+str(self.nb_buildings(village))+"\n"
+            infos+="Playstyle:"+PlayStyleMatrixEnum(self.players[n].playStyle.playStyleMatrix).name
+            infos+="  TopBorder:"+str(self.players[n].topVillageBorder)+" BottomBorder:"+str(self.players[n].bottomVillageBorder)
             infos+='\n\n'
             n += 1
         infos += '\n' * (term.height - ((len(self.world.villages)+1)*4)-2)
         print(infos)
+
+    def max_units(self,village): #function that takes a team and return the maximum number of units manageable
+        max=0
+        for _ in village.community["T"]:
+            max+=5
+        for _ in village.community["H"]:
+            max+=5
+        return max
+
+    def nb_buildings(self,village):
+        n=0
+        for b in "TABCFHKS":
+            for _ in village.community[b]:
+                n+=1
+        return n
+
+    def nb_something(self,village,letter): #takes the letter corresponding to a unit type
+        return len(village.community[letter])
 
 
     def pause (self,term) :

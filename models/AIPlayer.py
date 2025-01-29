@@ -8,6 +8,7 @@ from os import remove
 from select import select
 
 from models.Exceptions import PathfindingException, AIPeopleException
+from models.unity import Archer, Swordsman, Horseman
 
 output = io.StringIO()
 
@@ -30,9 +31,9 @@ from models.unity.Villager import Villager
 output = io.StringIO()
 class PlayStyleMatrixEnum(Enum):
     Aggressive = [
-        [2,0,0],
-        [6,2,4],
-        [3,0,8]
+        [2,2,0],
+        [6,10,4],
+        [3,4,8]
     ]
     Passive = [
         [6, 20, 0],
@@ -62,6 +63,12 @@ class BuildingENUM(Enum):
     K = Keep
     S = Stable
 
+class UnitENUM(Enum):
+    a = Archer
+    h = Horseman
+    v = Villager
+    s = Swordsman
+
 class BuildingCostENUM(Enum):
     T = {"w":350}
     A = {"w": 175}
@@ -81,9 +88,35 @@ class ResourceTypeENUM(Enum):
     w = Wood
     g = Gold
     f = Food
+class unitTimeENUM(Enum):
+    a = 35
+    h = 30
+    s = 20
+    v = 25
 
 class DirectionsENUM(Enum):
     f = "East"
+class UnitTypeENUM(Enum):
+    Military = [Archer,Swordsman,Horseman]
+    Village = [Villager]
+    Farming = [Villager]
+
+class UnitCostENUM(Enum):
+    a = {
+        "w" : 25,
+        "g" : 45
+    }
+    h = {
+        "f" : 80,
+        "g" : 20,
+    }
+    s = {
+        "f" : 50,
+        "20" : 20
+    }
+    v = {
+        "f" : 50,
+    }
 
 class PlayStyle:
 
@@ -197,6 +230,7 @@ class AIPlayer:
             self.logger("Minworkers hit, playing now")
             self.setBuildingAction(self.checkBuildings())
             self.setResourceAction(self.team.ressources)
+            self.setSpawnAction(self.checkUnits())
             if self.playStyle.playStyleMatrix[2][2] > 5:
                 self.logger("AIPlayer | playTurn--- Aggressive AI Detected, real playstyle is", PlayStyleMatrixEnum(self.playStyle.playStyleMatrix).name)
                 self.setHumanAction()
@@ -240,7 +274,18 @@ class AIPlayer:
             "S" : nbSt,
             "T" : nbTc
         }
+    def checkUnits(self):
+        nba = len(self.team.community["a"])
+        nbh = len(self.team.community["h"])
+        nbs = len(self.team.community["s"])
+        nbv = len(self.team.community["v"])
 
+        return {
+            'a' : nba,
+            "h" : nbh,
+            "s" : nbs,
+            "v" : nbv,
+        }
     def getBuildingsPriority(self):
         return self.playStyle.playStyleMatrix[0][1],self.playStyle.playStyleMatrix[1][1],self.playStyle.playStyleMatrix[2][1]
 
@@ -597,7 +642,20 @@ class AIPlayer:
                 "targetTeam" :self.gm.getTeamNumber(targetUnit.uid),
             }
         }
-
+    def getSpawnActionDict(self, type,):
+        pplCount = sum(self.checkUnits().values())
+        futureID = f"eq{self.team.name}p{pplCount + 1}"
+        tcID = next(iter(self.team.community["T"]))
+        tcPos = self.team.community["T"][tcID].position.toTuple()
+        return{
+            "action": "spawnAction",
+            "infos": {
+                "futureID" : futureID,
+                "unitType": type,
+                "unitSpawnPosition": (tcPos[0]+1,tcPos[1]+1),
+                "team": self.team.name,
+            }
+        }
     def setResourceAction(self, concernedRes):
         resPriority = self.getResourcesPriority()
         resPriority = (resPriority[0]*self.level,resPriority[1]*self.level,resPriority[2]*self.level)
@@ -708,7 +766,66 @@ class AIPlayer:
                     actionDict["infos"]["target"])
         self.eventQueue.append(actionDict)
 
+    def setSpawnAction(self,units):
+        if self.team.peopleCount == self.team.calculateMaxPplLimit():
+            self.logger("AIPlayer | setHumanAction--- Impossible to add another unit")
+        else:
+            unitPriority = self.getBuildingsPriority()
+            self.logger()
+            unitPriority = (unitPriority[0]*self.level,unitPriority[1]*self.level,unitPriority[2]*self.level)
+            self.logger("AIPlayer--- checkingunitprio", self.level)
+            total = sum(unitPriority)  # Calcule la somme totale des valeurs
+            scaling_factor = 200 / max(unitPriority)  # Trouve le facteur d'échelle pour que max(values) devienne threshold
+            unitPriority = [v * scaling_factor for v in unitPriority]
+            spawnedUnits = (
+                (units["a"] + units["s"] + units["h"]), (units["v"]),
+                (units["v"]))
+            unitObjectiveDistance = {"Military": spawnedUnits[0] - unitPriority[0], "Village": spawnedUnits[1] - unitPriority[1], "Farming" : spawnedUnits[2] - unitPriority[2]}
+            leastDeveloppedBuildingType  = min(unitObjectiveDistance, key=unitObjectiveDistance.get)
+            if unitObjectiveDistance[leastDeveloppedBuildingType] == 0:
+                #self.logger("All buildings have been built")
+                return -1
+            else:
+                #self.logger("least developped building type number according to stats", buildingObjectiveDistance[leastDeveloppedBuildingType])
+                #self.logger("least developped building type according to stats", leastDeveloppedBuildingType)
+                leastDeveloppedBuildingName ="0"
+                leastDeveloppedBuildingNumber = 0
+                print("least")
+                for i in UnitTypeENUM[leastDeveloppedBuildingType].value:
+                    if units[UnitENUM(i).name] < leastDeveloppedBuildingNumber or leastDeveloppedBuildingName == "0" :
+                        leastDeveloppedBuildingName = UnitENUM(i).name
+                if not self.isAffordable(UnitCostENUM[leastDeveloppedBuildingName].value):
+                    self.logger("AIPlayer | setBuildingAction--- Can't afford building")
+                    return -1
+                #self.logger("Least developped batiment is", BuildingENUM[leastDeveloppedBuildingName].value)
+                spawnEvent = self.getSpawnActionDict(leastDeveloppedBuildingName)
 
+                if spawnEvent == -1:
+                    self.logger("No free units")
+                    return -1
+
+                self.logger("Added the following building event : \n Type : ", spawnEvent["infos"]["unitType"])
+                self.eventQueue.append(spawnEvent)
+
+    def launchSpawnAction(self, actionDict):
+        self.logger(actionDict["infos"]["futureID"])
+        self.logger("ENTREE FONCtiO ")
+        try:
+
+            self.gm.unitToSpawn[actionDict["infos"]["futureID"]] = {
+                "unit": actionDict["infos"]["futureID"],
+                "unitTeam": self.team.name,
+                "unitType": actionDict["infos"]["unitType"],
+                "unitPos": actionDict["infos"]["unitSpawnPosition"],
+                "timeElapsed": 0,
+                "timeToTrain": unitTimeENUM[actionDict["infos"]["unitType"]].value,
+                "finished": False,
+                "error": False
+            }
+        except:
+            self.logger("Exception en tentant")
+
+        self.currentEvents.append(actionDict)
 
     def launchResourceAction(self, actionDict):
         if actionDict["infos"]["target"] is None:
@@ -750,7 +867,6 @@ class AIPlayer:
 
         self.currentEvents.append(actionDict)
         self.eventQueue.remove(actionDict)
-
 
 
     def launchBuildAction(self, actionDict):
@@ -849,6 +965,11 @@ class AIPlayer:
         if finishedEvent:
             event["status"] = "finished"
             self.clearAttackAction(event)
+    def checkUnitSpawnAction(self,event):
+        unitID = event["infos"]["futureID"]
+        if unitID not in self.gm.unitToSpawn:
+            event["status"] = "finished"
+            self.currentEvents.remove(event)
 
     def getBestAvailbleUnits(self):
         unitRanking = [("h",4.8), ("a", 4), ("s", 3.6), ("v",1.6)]
@@ -898,7 +1019,6 @@ class AIPlayer:
                         self.freeUnits[a[0]].remove(un)
                     actionDict = self.getHumanActionDict(freeUnits, a[0], targetUnit=unitAttacked[1])
                     self.eventQueue.append(actionDict)
-
 
 
 
@@ -976,10 +1096,12 @@ class ActionEnum(Enum):
     Build = partial(AIPlayer.launchBuildAction)
     collectResource = partial(AIPlayer.launchResourceAction)
     attackAction = partial(AIPlayer.launchHumanAction)
+    spawnAction = partial(AIPlayer.launchSpawnAction)
 class ActionCheckEnum(Enum):
     Build = partial(AIPlayer.checkBuildingAction)
     collectResource = partial(AIPlayer.checkResourceAction)
     attackAction = partial(AIPlayer.checkAttackAction)
+    spawnAction = partial(AIPlayer.checkUnitSpawnAction)
 
 class clearActionEnum(Enum):
     Build = partial(AIPlayer.clearBuildAction)

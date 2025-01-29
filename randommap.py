@@ -31,14 +31,14 @@ def cluster(world,resource,key,repl=50,fade=16): #key is a tuple please
     newResource = None
     if resource.name == "w":
         newResource = Wood(world)
-        newResource.position = Position(key[0],key[1])
+        newResource.position=Position(key[0],key[1])
         if len(resKeys)==0:
             pass
         else:
             newResource.uid = f"{int(resKeys[-1])+1}"
     elif resource.name == "g":
         newResource = Gold(world)
-        newResource.position = Position(key[0],key[1])
+        newResource.position = Position(key[0], key[1])
         if len(resKeys) == 0:
             pass
         else:
@@ -132,8 +132,8 @@ def place_tcs(dict,world):
         y=world.height-y
     '''
     #clears space
-    for j in range(y-2, y + 14):
-        for i in range(x-2, x + 14):
+    for j in range(y-8, y + 20):
+        for i in range(x-8, x + 20):
             world.tiles_dico[(i,j)].contains=None
             world.tiles_dico[(world.width-i,world.height-j)].contains=None
             if dict["n"]>=3:
@@ -154,346 +154,418 @@ def place_tcs(dict,world):
     tc1.position=Position(x+4,y+4)
     world.place_element(tc1)
     world.villages[0].community["T"][tc1.uid] = tc1
+    world.villages[0].buildingCount+=1
     tc2 = TownCenter(team=world.villages[1])
     tc2.position = Position(world.width-x-6,world.height-y-6)
     world.place_element(tc2)
-    world.villages[1].community["T"][tc1.uid] = tc2
+    world.villages[1].community["T"][tc2.uid] = tc2
+    world.villages[1].buildingCount += 1
     if dict["n"]>=3:
         tc3 = TownCenter(team=world.villages[2])
         tc3.position = Position(x+4,world.height-y-6)
         world.place_element(tc3)
         world.villages[2].community["T"][tc3.uid] = tc3
+        world.villages[2].buildingCount += 1
     if dict["n"]>=4:
         tc4 = TownCenter(team=world.villages[3])
         tc4.position = Position(world.width-x-6,y+4)
         world.place_element(tc4)
         world.villages[3].community["T"][tc4.uid] = tc4
+        world.villages[3].buildingCount += 1
     if dict["n"]>=5:
         tc5 = TownCenter(team=world.villages[4])
         tc5.position = Position(world.width//2, y+4)
         world.place_element(tc5)
         world.villages[4].community["T"][tc5.uid] = tc5
+        world.villages[4].buildingCount += 1
     if dict["n"]>=6:
         tc6 = TownCenter(team=world.villages[5])
         tc6.position = Position(world.width//2, world.height - y - 6)
         world.place_element(tc6)
         world.villages[5].community["T"][tc6.uid] = tc6
+        world.villages[5].buildingCount += 1
     if dict["n"]>=7:
         tc7 = TownCenter(team=world.villages[6])
         tc7.position = Position(x+4, world.height//2)
         world.place_element(tc7)
         world.villages[6].community["T"][tc7.uid] = tc7
+        world.villages[6].buildingCount += 1
     if dict["n"]>=8:
         tc8 = TownCenter(team=world.villages[7])
         tc8.position = Position(world.width-x-6, world.height//2)
         world.place_element(tc8)
         world.villages[7].community["T"][tc8.uid] = tc8
+        world.villages[7].buildingCount += 1
     #MARINES YEAHH
     if dict["q"]=="g":
         tc1 = TownCenter(team=world.villages[0])
         tc1.position = Position(x + 4+5, y + 4)
         world.place_element(tc1)
         world.villages[0].community["T"][tc1.uid] = tc1
+        world.villages[0].buildingCount += 1
         tc2 = TownCenter(team=world.villages[1])
         tc2.position = Position(world.width - x - 6+5, world.height - y - 6)
         world.place_element(tc2)
         world.villages[1].community["T"][tc2.uid] = tc2
+        world.villages[1].buildingCount += 1
         if dict["n"] >= 3:
             tc3 = TownCenter(team=world.villages[2])
             tc3.position = Position(x + 4+5, world.height - y - 6)
             world.place_element(tc3)
             world.villages[2].community["T"][tc3.uid] = tc3
+            world.villages[2].buildingCount += 1
         if dict["n"] >= 4:
             tc4 = TownCenter(team=world.villages[3])
             tc4.position = Position(world.width - x - 6+5, y + 4)
             world.place_element(tc4)
             world.villages[3].community["T"][tc4.uid] = tc4
+            world.villages[3].buildingCount += 1
         if dict["n"] >= 5:
             tc5 = TownCenter(team=world.villages[4])
             tc5.position = Position(world.width // 2+5, y + 4)
             world.place_element(tc5)
             world.villages[4].community["T"][tc5.uid] = tc5
+            world.villages[4].buildingCount += 1
         if dict["n"] >= 6:
             tc6 = TownCenter(team=world.villages[5])
             tc6.position = Position(world.width // 2+5, world.height - y - 6)
             world.place_element(tc6)
             world.villages[5].community["T"][tc6.uid] = tc6
+            world.villages[5].buildingCount += 1
         if dict["n"] >= 7:
             tc7 = TownCenter(team=world.villages[6])
             tc7.position = Position(x + 4+5, world.height // 2)
             world.place_element(tc7)
             world.villages[6].community["T"][tc7.uid] = tc7
+            world.villages[6].buildingCount += 1
         if dict["n"] >= 8:
             tc8 = TownCenter(team=world.villages[7])
             tc8.position = Position(world.width - x - 6+5, world.height // 2)
             world.place_element(tc8)
             world.villages[7].community["T"][tc8.uid] = tc8
+            world.villages[7].buildingCount += 1
         tc1 = TownCenter(team=world.villages[0])
         tc1.position = Position(x + 4, y + 4+5)
         world.place_element(tc1)
         world.villages[0].community["T"][tc1.uid] = tc1
+        world.villages[0].buildingCount += 1
         tc2 = TownCenter(team=world.villages[1])
         tc2.position = Position(world.width - x - 6, world.height - y - 6+5)
         world.place_element(tc2)
         world.villages[1].community["T"][tc2.uid] = tc2
+        world.villages[1].buildingCount += 1
         if dict["n"] >= 3:
             tc3 = TownCenter(team=world.villages[2])
             tc3.position = Position(x + 4, world.height - y - 6+5)
             world.place_element(tc3)
             world.villages[2].community["T"][tc3.uid] = tc3
+            world.villages[2].buildingCount += 1
         if dict["n"] >= 4:
             tc4 = TownCenter(team=world.villages[3])
             tc4.position = Position(world.width - x - 6, y + 4+5)
             world.place_element(tc4)
             world.villages[3].community["T"][tc4.uid] = tc4
+            world.villages[3].buildingCount += 1
         if dict["n"] >= 5:
             tc5 = TownCenter(team=world.villages[4])
             tc5.position = Position(world.width // 2, y + 4+5)
             world.place_element(tc5)
             world.villages[4].community["T"][tc5.uid] = tc5
+            world.villages[4].buildingCount += 1
         if dict["n"] >= 6:
             tc6 = TownCenter(team=world.villages[5])
             tc6.position = Position(world.width // 2, world.height - y - 6+5)
             world.place_element(tc6)
             world.villages[5].community["T"][tc6.uid] = tc6
+            world.villages[5].buildingCount += 1
         if dict["n"] >= 7:
             tc7 = TownCenter(team=world.villages[6])
             tc7.position = Position(x + 4, world.height // 2+5)
             world.place_element(tc7)
             world.villages[6].community["T"][tc7.uid] = tc7
+            world.villages[6].buildingCount += 1
         if dict["n"] >= 8:
             tc8 = TownCenter(team=world.villages[7])
             tc8.position = Position(world.width - x - 6, world.height // 2+5)
             world.place_element(tc8)
             world.villages[7].community["T"][tc8.uid] = tc8
+            world.villages[7].buildingCount += 1
         tc1 = Barracks(team=world.villages[0])
         tc1.position = Position(x + 4 + 7, y + 4+ 5)
         world.place_element(tc1)
-        world.villages[0].community["T"][tc1.uid] = tc1
+        world.villages[0].community["B"][tc1.uid] = tc1
+        world.villages[0].buildingCount += 1
         tc2 = Barracks(team=world.villages[1])
         tc2.position = Position(world.width - x - 6 + 7, world.height - y - 6+ 5)
         world.place_element(tc2)
-        world.villages[1].community["T"][tc2.uid] = tc2
+        world.villages[1].community["B"][tc2.uid] = tc2
+        world.villages[1].buildingCount += 1
         if dict["n"] >= 3:
             tc3 = Barracks(team=world.villages[2])
             tc3.position = Position(x + 4 + 7, world.height - y - 6+ 5)
             world.place_element(tc3)
-            world.villages[2].community["T"][tc3.uid] = tc3
+            world.villages[2].community["B"][tc3.uid] = tc3
+            world.villages[2].buildingCount += 1
         if dict["n"] >= 4:
             tc4 = Barracks(team=world.villages[3])
             tc4.position = Position(world.width - x - 6 + 7, y + 4+ 5)
             world.place_element(tc4)
-            world.villages[3].community["T"][tc4.uid] = tc4
+            world.villages[3].community["B"][tc4.uid] = tc4
+            world.villages[3].buildingCount += 1
         if dict["n"] >= 5:
             tc5 = Barracks(team=world.villages[4])
             tc5.position = Position(world.width // 2 + 7, y + 4+ 5)
             world.place_element(tc5)
-            world.villages[4].community["T"][tc5.uid] = tc5
+            world.villages[4].community["B"][tc5.uid] = tc5
+            world.villages[4].buildingCount += 1
         if dict["n"] >= 6:
             tc6 = Barracks(team=world.villages[5])
             tc6.position = Position(world.width // 2 + 7, world.height - y - 6+ 5)
             world.place_element(tc6)
-            world.villages[5].community["T"][tc6.uid] = tc6
+            world.villages[5].community["B"][tc6.uid] = tc6
+            world.villages[5].buildingCount += 1
         if dict["n"] >= 7:
             tc7 = Barracks(team=world.villages[6])
             tc7.position = Position(x + 4 + 7, world.height // 2)
             world.place_element(tc7)
-            world.villages[6].community["T"][tc7.uid] = tc7
+            world.villages[6].community["B"][tc7.uid] = tc7
+            world.villages[6].buildingCount += 1
         if dict["n"] >= 8:
             tc8 = Barracks(team=world.villages[7])
             tc8.position = Position(world.width - x - 6 + 7, world.height // 2+ 5)
             world.place_element(tc8)
-            world.villages[7].community["T"][tc8.uid] = tc8
+            world.villages[7].community["B"][tc8.uid] = tc8
+            world.villages[7].buildingCount += 1
         tc1 = Barracks(team=world.villages[0])
         tc1.position = Position(x + 4 + 5, y + 4 + 9)
         world.place_element(tc1)
-        world.villages[0].community["T"][tc1.uid] = tc1
+        world.villages[0].community["B"][tc1.uid] = tc1
+        world.villages[0].buildingCount += 1
         tc2 = Barracks(team=world.villages[1])
         tc2.position = Position(world.width - x - 6 + 5, world.height - y - 6 + 9)
         world.place_element(tc2)
-        world.villages[1].community["T"][tc2.uid] = tc2
+        world.villages[1].community["B"][tc2.uid] = tc2
+        world.villages[1].buildingCount += 1
         if dict["n"] >= 3:
             tc3 = Barracks(team=world.villages[2])
             tc3.position = Position(x + 4 + 5, world.height - y - 6 + 9)
             world.place_element(tc3)
-            world.villages[2].community["T"][tc3.uid] = tc3
+            world.villages[2].community["B"][tc3.uid] = tc3
+            world.villages[2].buildingCount += 1
         if dict["n"] >= 4:
             tc4 = Barracks(team=world.villages[3])
             tc4.position = Position(world.width - x - 6 + 5, y + 4 + 9)
             world.place_element(tc4)
-            world.villages[3].community["T"][tc4.uid] = tc4
+            world.villages[3].community["B"][tc4.uid] = tc4
+            world.villages[3].buildingCount += 1
         if dict["n"] >= 5:
             tc5 = Barracks(team=world.villages[4])
             tc5.position = Position(world.width // 2 + 5, y + 4 + 9)
             world.place_element(tc5)
-            world.villages[4].community["T"][tc5.uid] = tc5
+            world.villages[4].community["B"][tc5.uid] = tc5
+            world.villages[4].buildingCount += 1
         if dict["n"] >= 6:
             tc6 = Barracks(team=world.villages[5])
             tc6.position = Position(world.width // 2 + 5, world.height - y - 6 + 9)
             world.place_element(tc6)
-            world.villages[5].community["T"][tc6.uid] = tc6
+            world.villages[5].community["B"][tc6.uid] = tc6
+            world.villages[5].buildingCount += 1
         if dict["n"] >= 7:
             tc7 = Barracks(team=world.villages[6])
             tc7.position = Position(x + 4 + 5, world.height // 2)
             world.place_element(tc7)
-            world.villages[6].community["T"][tc7.uid] = tc7
+            world.villages[6].community["B"][tc7.uid] = tc7
+            world.villages[6].buildingCount += 1
         if dict["n"] >= 8:
             tc8 = Barracks(team=world.villages[7])
             tc8.position = Position(world.width - x - 6 + 5, world.height // 2 + 9)
             world.place_element(tc8)
-            world.villages[7].community["T"][tc8.uid] = tc8
+            world.villages[7].community["B"][tc8.uid] = tc8
+            world.villages[7].buildingCount += 1
         tc1 = Stable(team=world.villages[0])
         tc1.position = Position(x + 4 -4, y + 4 + 9)
         world.place_element(tc1)
-        world.villages[0].community["T"][tc1.uid] = tc1
+        world.villages[0].community["S"][tc1.uid] = tc1
+        world.villages[0].buildingCount += 1
         tc2 = Stable(team=world.villages[1])
         tc2.position = Position(world.width - x - 6 -4, world.height - y - 6 + 9)
         world.place_element(tc2)
-        world.villages[1].community["T"][tc2.uid] = tc2
+        world.villages[1].community["S"][tc2.uid] = tc2
+        world.villages[1].buildingCount += 1
         if dict["n"] >= 3:
             tc3 = Stable(team=world.villages[2])
             tc3.position = Position(x + 4 -4, world.height - y - 6 + 9)
             world.place_element(tc3)
-            world.villages[2].community["T"][tc3.uid] = tc3
+            world.villages[2].community["S"][tc3.uid] = tc3
+            world.villages[2].buildingCount += 1
         if dict["n"] >= 4:
             tc4 = Stable(team=world.villages[3])
             tc4.position = Position(world.width - x - 6 -4, y + 4 + 9)
             world.place_element(tc4)
-            world.villages[3].community["T"][tc4.uid] = tc4
+            world.villages[3].community["S"][tc4.uid] = tc4
+            world.villages[3].buildingCount += 1
         if dict["n"] >= 5:
             tc5 = Stable(team=world.villages[4])
             tc5.position = Position(world.width // 2 -4, y + 4 + 9)
             world.place_element(tc5)
-            world.villages[4].community["T"][tc5.uid] = tc5
+            world.villages[4].community["S"][tc5.uid] = tc5
+            world.villages[4].buildingCount += 1
         if dict["n"] >= 6:
             tc6 = Stable(team=world.villages[5])
             tc6.position = Position(world.width // 2 -4, world.height - y - 6 + 9)
             world.place_element(tc6)
-            world.villages[5].community["T"][tc6.uid] = tc6
+            world.villages[5].community["S"][tc6.uid] = tc6
+            world.villages[5].buildingCount += 1
         if dict["n"] >= 7:
             tc7 = Stable(team=world.villages[6])
             tc7.position = Position(x + 4 -4, world.height // 2 + 9)
             world.place_element(tc7)
-            world.villages[6].community["T"][tc7.uid] = tc7
+            world.villages[6].community["S"][tc7.uid] = tc7
+            world.villages[6].buildingCount += 1
         if dict["n"] >= 8:
             tc8 = Stable(team=world.villages[7])
             tc8.position = Position(world.width - x - 6 -4, world.height // 2 + 9)
             world.place_element(tc8)
-            world.villages[7].community["T"][tc8.uid] = tc8
+            world.villages[7].community["S"][tc8.uid] = tc8
+            world.villages[7].buildingCount += 1
         tc1 = Stable(team=world.villages[0])
         tc1.position = Position(x + 4 - 4, y + 4 + 6)
         world.place_element(tc1)
-        world.villages[0].community["T"][tc1.uid] = tc1
+        world.villages[0].community["S"][tc1.uid] = tc1
+        world.villages[0].buildingCount += 1
         tc2 = Stable(team=world.villages[1])
         tc2.position = Position(world.width - x - 6 - 4, world.height - y - 6 + 6)
         world.place_element(tc2)
-        world.villages[1].community["T"][tc2.uid] = tc2
+        world.villages[1].community["S"][tc2.uid] = tc2
+        world.villages[1].buildingCount += 1
         if dict["n"] >= 3:
             tc3 = Stable(team=world.villages[2])
             tc3.position = Position(x + 4 - 4, world.height - y - 6 + 6)
             world.place_element(tc3)
-            world.villages[2].community["T"][tc3.uid] = tc3
+            world.villages[2].community["S"][tc3.uid] = tc3
+            world.villages[2].buildingCount += 1
         if dict["n"] >= 4:
             tc4 = Stable(team=world.villages[3])
             tc4.position = Position(world.width - x - 6 - 4, y + 4 + 6)
             world.place_element(tc4)
-            world.villages[3].community["T"][tc4.uid] = tc4
+            world.villages[3].community["S"][tc4.uid] = tc4
+            world.villages[3].buildingCount += 1
         if dict["n"] >= 5:
             tc5 = Stable(team=world.villages[4])
             tc5.position = Position(world.width // 2 - 4, y + 4 + 6)
             world.place_element(tc5)
-            world.villages[4].community["T"][tc5.uid] = tc5
+            world.villages[4].community["S"][tc5.uid] = tc5
+            world.villages[4].buildingCount += 1
         if dict["n"] >= 6:
             tc6 = Stable(team=world.villages[5])
             tc6.position = Position(world.width // 2 - 4, world.height - y - 6 + 6)
             world.place_element(tc6)
-            world.villages[5].community["T"][tc6.uid] = tc6
+            world.villages[5].community["S"][tc6.uid] = tc6
+            world.villages[5].buildingCount += 1
         if dict["n"] >= 7:
             tc7 = Stable(team=world.villages[6])
             tc7.position = Position(x + 4 - 4, world.height // 2 + 6)
             world.place_element(tc7)
-            world.villages[6].community["T"][tc7.uid] = tc7
+            world.villages[6].community["S"][tc7.uid] = tc7
+            world.villages[6].buildingCount += 1
         if dict["n"] >= 8:
             tc8 = Stable(team=world.villages[7])
             tc8.position = Position(world.width - x - 6 - 4, world.height // 2 + 6)
             world.place_element(tc8)
-            world.villages[7].community["T"][tc8.uid] = tc8
+            world.villages[7].community["S"][tc8.uid] = tc8
+            world.villages[7].buildingCount += 1
         tc1 = ArcheryRange(team=world.villages[0])
         tc1.position = Position(x + 4 - 6, y + 4 + 2)
         world.place_element(tc1)
-        world.villages[0].community["T"][tc1.uid] = tc1
+        world.villages[0].community["A"][tc1.uid] = tc1
+        world.villages[0].buildingCount += 1
         tc2 = ArcheryRange(team=world.villages[1])
         tc2.position = Position(world.width - x - 6 - 6, world.height - y - 6 + 2)
         world.place_element(tc2)
-        world.villages[1].community["T"][tc2.uid] = tc2
+        world.villages[1].community["A"][tc2.uid] = tc2
+        world.villages[1].buildingCount += 1
         if dict["n"] >= 3:
             tc3 = ArcheryRange(team=world.villages[2])
             tc3.position = Position(x + 4 - 6, world.height - y - 6 + 2)
             world.place_element(tc3)
-            world.villages[2].community["T"][tc3.uid] = tc3
+            world.villages[2].community["A"][tc3.uid] = tc3
+            world.villages[2].buildingCount += 1
         if dict["n"] >= 4:
             tc4 = ArcheryRange(team=world.villages[3])
             tc4.position = Position(world.width - x - 6 - 6, y + 4 + 2)
             world.place_element(tc4)
-            world.villages[3].community["T"][tc4.uid] = tc4
+            world.villages[3].community["A"][tc4.uid] = tc4
+            world.villages[3].buildingCount += 1
         if dict["n"] >= 5:
             tc5 = ArcheryRange(team=world.villages[4])
             tc5.position = Position(world.width // 2 - 6, y + 4 + 2)
             world.place_element(tc5)
-            world.villages[4].community["T"][tc5.uid] = tc5
+            world.villages[4].community["A"][tc5.uid] = tc5
+            world.villages[4].buildingCount += 1
         if dict["n"] >= 6:
             tc6 = ArcheryRange(team=world.villages[5])
             tc6.position = Position(world.width // 2 - 6, world.height - y - 6 + 2)
             world.place_element(tc6)
-            world.villages[5].community["T"][tc6.uid] = tc6
+            world.villages[5].community["A"][tc6.uid] = tc6
+            world.villages[5].buildingCount += 1
         if dict["n"] >= 7:
             tc7 = ArcheryRange(team=world.villages[6])
             tc7.position = Position(x + 4 - 6, world.height // 2 + 2)
             world.place_element(tc7)
-            world.villages[6].community["T"][tc7.uid] = tc7
+            world.villages[6].community["A"][tc7.uid] = tc7
+            world.villages[6].buildingCount += 1
         if dict["n"] >= 8:
             tc8 = ArcheryRange(team=world.villages[7])
             tc8.position = Position(world.width - x - 6 - 6, world.height // 2 + 2)
             world.place_element(tc8)
-            world.villages[7].community["T"][tc8.uid] = tc8
+            world.villages[7].community["A"][tc8.uid] = tc8
+            world.villages[7].buildingCount += 1
         tc1 = ArcheryRange(team=world.villages[0])
-        tc1.position = Position(x + 4 - 6, y + 4 + 2)
+        tc1.position = Position(x + 4 - 6, y + 4 -1)
         world.place_element(tc1)
-        world.villages[0].community["T"][tc1.uid] = tc1
+        world.villages[0].community["A"][tc1.uid] = tc1
+        world.villages[0].buildingCount += 1
         tc2 = ArcheryRange(team=world.villages[1])
-        tc2.position = Position(world.width - x - 6 - 6, world.height - y - 6 + 2)
+        tc2.position = Position(world.width - x - 6 - 6, world.height - y - 6 -1)
         world.place_element(tc2)
-        world.villages[1].community["T"][tc2.uid] = tc2
+        world.villages[1].community["A"][tc2.uid] = tc2
+        world.villages[1].buildingCount += 1
         if dict["n"] >= 3:
             tc3 = ArcheryRange(team=world.villages[2])
             tc3.position = Position(x + 4 - 6, world.height - y - 6 - 1)
             world.place_element(tc3)
-            world.villages[2].community["T"][tc3.uid] = tc3
+            world.villages[2].community["A"][tc3.uid] = tc3
+            world.villages[2].buildingCount += 1
         if dict["n"] >= 4:
             tc4 = ArcheryRange(team=world.villages[3])
             tc4.position = Position(world.width - x - 6 - 6, y + 4 - 1)
             world.place_element(tc4)
-            world.villages[3].community["T"][tc4.uid] = tc4
+            world.villages[3].community["A"][tc4.uid] = tc4
+            world.villages[3].buildingCount += 1
         if dict["n"] >= 5:
             tc5 = ArcheryRange(team=world.villages[4])
             tc5.position = Position(world.width // 2 - 6, y + 4 - 1)
             world.place_element(tc5)
-            world.villages[4].community["T"][tc5.uid] = tc5
+            world.villages[4].community["A"][tc5.uid] = tc5
+            world.villages[4].buildingCount += 1
         if dict["n"] >= 6:
             tc6 = ArcheryRange(team=world.villages[5])
             tc6.position = Position(world.width // 2 - 6, world.height - y - 6 - 1)
             world.place_element(tc6)
-            world.villages[5].community["T"][tc6.uid] = tc6
+            world.villages[5].community["A"][tc6.uid] = tc6
+            world.villages[5].buildingCount += 1
         if dict["n"] >= 7:
             tc7 = ArcheryRange(team=world.villages[6])
             tc7.position = Position(x + 4 - 6, world.height // 2 - 1)
             world.place_element(tc7)
-            world.villages[6].community["T"][tc7.uid] = tc7
+            world.villages[6].community["A"][tc7.uid] = tc7
+            world.villages[6].buildingCount += 1
         if dict["n"] >= 8:
             tc8 = ArcheryRange(team=world.villages[7])
             tc8.position = Position(world.width - x - 6 - 6, world.height // 2 - 1)
             world.place_element(tc8)
-            world.villages[7].community["T"][tc8.uid] = tc8
+            world.villages[7].community["A"][tc8.uid] = tc8
+            world.villages[7].buildingCount += 1
     #re-places villagers (they got summoned by initialize villages but weren't assigned proper positions)
     j=y+1
     for id in world.villages[0].community["v"]:

@@ -14,14 +14,17 @@ class PlayPauseMenu:
         self.clock = pg.time.Clock()
         self.running = True
         self.game = game
-
+        self.message = ""
+        self.message_timer = 0
         screen_width, screen_height = self.screen.get_size()
         button_width, button_height = 100, 50
 
         self.play_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 - 150), "Play", button_width, button_height)
         self.save_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 - 50), "Sauvegarder", button_width, button_height)
         self.load_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 + 50), "Charger", button_width, button_height)
-        self.quit_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 + 150), "Quitter", button_width, button_height)
+        self.stats_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 + 150), "Stats", button_width, button_height)
+        self.quit_button = Button((screen_width // 2 - button_width // 2, screen_height // 2 + 250), "Quitter", button_width, button_height)
+
 
     def run(self):
         if not self.running:
@@ -40,21 +43,34 @@ class PlayPauseMenu:
                 if self.play_button.is_over(pg.mouse.get_pos()):
                     self.play()
                 if self.save_button.is_over(pg.mouse.get_pos()):
-                    self.save()
+                    self.error()
                 if self.load_button.is_over(pg.mouse.get_pos()):
-                    self.load()
+                    self.error()
                 if self.quit_button.is_over(pg.mouse.get_pos()):
                     self.quit_game()
+                if self.stats_button.is_over(pg.mouse.get_pos()):
+                    self.show_stats()
 
     def update(self):
-        pass
+        # Si un message est affiché, décrémente le timer
+        if self.message_timer > 0:
+            self.message_timer -= 1
+        else:
+            self.message = ""
 
     def draw(self):
         self.screen.fill((255, 255, 255))
         self.play_button.draw(self.screen)
         self.save_button.draw(self.screen)
         self.load_button.draw(self.screen)
+        self.stats_button.draw(self.screen)
         self.quit_button.draw(self.screen)
+
+        if self.message:
+            font = pg.font.Font(None, 36)
+            text = font.render(self.message, True, (255, 0, 0))
+            self.screen.blit(text, (self.screen.get_width() // 2 - text.get_width() // 2, self.screen.get_height() // 2 + 300))
+
         pg.display.flip()
 
     def play(self):
@@ -75,32 +91,39 @@ class PlayPauseMenu:
         self.running = False  # Ensure the menu keeps running after saving
         self.game.playing = True
 
+    def error(self):
+        self.message = "This functionnality is no longer available in the GUI mode, please use the terminal mode !"
+        self.message_timer = 240
+        # self.play()
+    def show_stats(self):
+        self.game.game_manager.openHtmlPage()
+
     def load(self):
         print("Im charging...")
-        # file_selector = FileSelector()
-        # file_selector.master.mainloop()
-        # path = file_selector.file_path
+        file_selector = FileSelector()
+        file_selector.master.mainloop()
+        path = file_selector.file_path
         
-        # if path:
-        #     try:
-        #         with open(path, 'rb') as file:
-        #             header = file.read(4)
-        #             if header.startswith(b'\x89PNG') or header.startswith(b'\xFF\xD8\xFF'):
-        #                 print("Selected file is an image.")
-        #             elif header.startswith(b'%PDF'):
-        #                 print("Selected file is a PDF document.")
-        #             elif header.startswith(b'ID3'):
-        #                 print("Selected file is an MP3 audio.")
-        #             else:
-        #                 print("Selected file is a binary file.")
-        #                 # print("Before : ", self.game.game_manager.world.villages[0].population(), self.game.game_manager.world.villages[1].population(), sep="\n")
-        #                 if self.game:
-        #                     self.game.game_manager.load_from_file(path)
-        #                     path=""
-        #                 # print("After : ", self.game.game_manager.world.villages[0].population(), self.game.game_manager.world.villages[1].population(), sep="\n")
-        #                 self.game.world.draw(self.game.screen, self.game.camera)
-        #     except Exception as e:
-        #         print(f"Error reading file: {e}")
+        if path:
+            try:
+                with open(path, 'rb') as file:
+                    header = file.read(4)
+                    if header.startswith(b'\x89PNG') or header.startswith(b'\xFF\xD8\xFF'):
+                        print("Selected file is an image.")
+                    elif header.startswith(b'%PDF'):
+                        print("Selected file is a PDF document.")
+                    elif header.startswith(b'ID3'):
+                        print("Selected file is an MP3 audio.")
+                    else:
+                        print("Selected file is a binary file.")
+                        # print("Before : ", self.game.game_manager.world.villages[0].population(), self.game.game_manager.world.villages[1].population(), sep="\n")
+                        if self.game:
+                            self.game.game_manager.load_from_file(path)
+                            path=""
+                        # print("After : ", self.game.game_manager.world.villages[0].population(), self.game.game_manager.world.villages[1].population(), sep="\n")
+                        self.game.world.draw(self.game.screen, self.game.camera)
+            except Exception as e:
+                print(f"Error reading file: {e}")
         self.game.game_manager.load()
         self.running = False
         self.game.playing = True
