@@ -183,6 +183,7 @@ class Model:
         pass
 
     def to_json(self):
+        print(self.deads)
         return {
             "name": self.name,
             "resources":{
@@ -192,7 +193,7 @@ class Model:
                 key: [self.community[key][item].to_json() for item in value]
                 for key, value in self.community.items()
             },
-            "deads": [dead.to_json() for dead in self.deads],
+            "deads": [dead for dead in self.deads.values()],
             "peopleCount": self.get_pplCount()
         }
 

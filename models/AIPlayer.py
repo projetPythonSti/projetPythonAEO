@@ -196,7 +196,7 @@ class AIPlayer:
         if workingPpl < self.playStyle.minWorkers and workingPpl != self.team.get_pplCount():
             self.logger("Minworkers hit, playing now")
             self.setBuildingAction(self.checkBuildings())
-            #self.setResourceAction(self.team.ressources)
+            self.setResourceAction(self.team.ressources)
             if self.playStyle.playStyleMatrix[2][2] > 5:
                 self.logger("AIPlayer | playTurn--- Aggressive AI Detected, real playstyle is", PlayStyleMatrixEnum(self.playStyle.playStyleMatrix).name)
                 self.setHumanAction()
@@ -205,8 +205,10 @@ class AIPlayer:
             numberOfActions = 0
             for k in range(len(self.eventQueue)):
                 numberOfActions += 1
-                self.logger(self.eventQueue[k-1]["action"])
-                self.launchAction(self.eventQueue[k-1])
+                try:
+                    self.launchAction(self.eventQueue[k-1])
+                except:
+                    self.logger("AIPlayer | playTurn--- Il semble que il n'y a rien dans la eventQueue, la voici",self.eventQueue)
         else:
             self.checkActions()
             self.logger("RAS")
@@ -276,7 +278,13 @@ class AIPlayer:
         dpKeys1 = list(map(lambda  x : x, self.team.community["T"].keys()))
         dpKeys2 = list(map(lambda  x : x, self.team.community["T"].keys()))
         dropPoints1 = list(map(lambda x : self.estimateDistance(x.position.toTuple(), next(iter(resource.values()))) , self.team.community["T"].values()))
-        dropPoints2 = list(map(lambda x : self.estimateDistance(x.values().position.toTuple(), next(iter(resource.values())).position.toTuple()) , self.team.community["C"].values()))
+        self.logger("JIUAJHOFUIAHFIUAHFIUAHFZIUF",self.team.community["C"])
+        dropPoints2 = []
+        for community in self.team.community["C"]:
+            self.logger("AIPlayer | getNearestDropPoint-- valeur du camp", community)
+            community_position = self.team.community["C"][community]
+            distance = self.estimateDistance(community_position, next(iter(resource.values())))
+            dropPoints2.append(distance)
         self.logger("AIPlayer | getNearestDropPoint--- dropPoints1 = ", dpKeys2)
         nearestDP = -1
 
@@ -709,23 +717,41 @@ class AIPlayer:
         #self.logger("J'ai envoyé qqun chercher des ressources attention")
         unitList = actionDict["people"]
         unitTeam = self.gm.getTeamNumber(unitList[0])
-        unitInstance = self.team.community["v"][actionDict["people"][0]]
+        deadUnits = []
+        unitInstance = None
+        for i in unitList:
+            try:
+                unitInstance = self.team.community["v"][i]
+            except:
+                deadUnits.append(i)
+        for deads in deadUnits:
+            actionDict["people"].remove(deads)
+        if unitInstance == None:
+            self.clearResourceAction(actionDict)
+            return -1
         self.logger(self.world.ressources[actionDict["infos"]["type"]][actionDict["infos"]["targetKey"]])
         self.logger(actionDict["infos"]["targetKey"])
 
         resourceInstance = self.world.ressources[actionDict["infos"]["type"]][actionDict["infos"]["targetKey"]]
         exceptionRaised = False
         for i in unitList:
-            self.world.villages[unitTeam-1].community["v"][i].target = self.world.ressources[actionDict["infos"]["type"]][(actionDict["infos"]["targetKey"])]
             targetPosition = Position(actionDict["infos"]["target"][0],actionDict["infos"]["target"][1])
             try:
+                self.world.villages[unitTeam - 1].community["v"][i].target = \
+                self.world.ressources[actionDict["infos"]["type"]][(actionDict["infos"]["targetKey"])]
                 self.logger("LE TYPE DE RESOURCE INSTANCE J'EN AI MARRE", resourceInstance)
-                self.gm.dumbAddResourceToCollectDict(unitInstance,resourceInstance ,actionDict["infos"]["quantity"],actionDict["infos"]["nearestDP"])
-            except PathfindingException:
-                exceptionRaised = True
-        if not exceptionRaised:
-            self.currentEvents.append(actionDict)
-            self.eventQueue.remove(actionDict)
+                self.gm.dumbAddResourceToCollectDict(unitInstance, resourceInstance, actionDict["infos"]["quantity"],
+                                                     actionDict["infos"]["nearestDP"])
+            except:
+                deadUnits.append(i)
+        for deads in deadUnits:
+            actionDict["people"].remove(deads)
+
+
+        self.currentEvents.append(actionDict)
+        self.eventQueue.remove(actionDict)
+
+
 
     def launchBuildAction(self, actionDict):
         #self.logger("J'ai lancé une construction attention")
@@ -736,10 +762,20 @@ class AIPlayer:
         nearTiles = self.gm.getNearTiles((newBuilding.surface[0], newBuilding.surface[1]),
                                          (target[0], target[1]))
         self.logger("AIPlayer | NearTiles result --- Building surface is :",newBuilding.surface)
+        deadUnits = []
         for u in actionDict["people"]:
             self.logger("AIPlayer | launchBuildAction--- building position is, and sendingPeopleTo :", target,nearTiles)
-            unit = self.team.community["v"][u]
-            self.gm.dumbAddUnitToMoveDict(unit,Position(nearTiles[0][0],nearTiles[0][1]))
+            try :
+                unit = self.team.community["v"][u]
+                self.gm.dumbAddUnitToMoveDict(unit, Position(nearTiles[0][0], nearTiles[0][1]))
+            except:
+                deadUnits.append(u)
+                self.logger("AIPlayer | launchBuildAction--- Impossible, unit is dead")
+        for dead in deadUnits:
+            actionDict["people"].remove(dead)
+        if not actionDict["people"]:
+            self.logger("AIPlayer | launchBuildAction--- seems that all selected units are dead, clearing event")
+            self.clearBuildAction(actionDict)
         self.team.add_building()
         actionDict["infos"]["uid"] = newInstanciatedBuilding.uid
         self.logger(actionDict)
@@ -762,8 +798,16 @@ class AIPlayer:
 
     def launchHumanAction(self, actionDict):
         concernedUnits = []
+        deadUnits = []
         for a in actionDict["people"]:
-            concernedUnits.append(self.team.community[actionDict["infos"]["unitType"]][a])
+            try:
+                concernedUnits.append(self.team.community[actionDict["infos"]["unitType"]][a])
+            except:
+                actionDict.remove(a)
+                deadUnits.append(a)
+        if not(concernedUnits) : # to check if all units selected are not of this world (dead)
+            self.clearAttackAction(actionDict)
+            return -1
         targetUnit = self.world.villages[actionDict["infos"]["targetTeam"]-1].community[actionDict["infos"]["targetType"]][actionDict["infos"]["targetID"]]
         for u in actionDict["people"]:
             unit = self.team.community["v"][u]

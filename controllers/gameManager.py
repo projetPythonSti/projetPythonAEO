@@ -222,7 +222,7 @@ class GameManager:
             resDistance = unitInstance.estimateDistance(unitInstance.position.toTuple(), resToCollect["resourceTarget"])
             unitSpaceLeft = unitInstance.spaceLeft()
             timeToFillPouch = int(unitSpaceLeft*60/25)
-            if resDistance <= (1,1):
+            if resDistance <= (1,1) and not resToCollect["full"]:
                 self.logger("GameManager | collectResources--- Near to the ressource, begin collecting")
                 if resToCollect["timeElapsed"] < timeToFillPouch and not resToCollect["full"]:
                     resToCollect["timeElapsed"] +=  gameDTTime
@@ -231,23 +231,26 @@ class GameManager:
                     quantityToCollect = unitSpaceLeft if unitSpaceLeft <= resToCollect["resourceQuantity"] else resToCollect["resourceQuantity"]
                     unitInstance.pouch[resToCollect["resourceType"]] += quantityToCollect
                     resToCollect["resourceQuantity"] -=  quantityToCollect
+                    self.logger("GameManager | collectResources--- pouchStatus ! ", unitInstance.isFull())
+                    self.logger("GameManager | collectResources--- resQuantity is ! ", resToCollect["resourceQuantity"])
                     resToCollect["full"] = unitInstance.isFull()
-                elif resToCollect["full"]:
+                if resToCollect["full"]:
                     self.logger("GameManager | collectResources--- Pouch is filled")
-                    self.dumbAddUnitToMoveDict(unitInstance,resToCollect["nearDPPos"])
+                    self.dumbAddUnitToMoveDict(unitInstance,Position(resToCollect["nearDPPos"][0],resToCollect["nearDPPos"][1]))
 
             else:
                 if resToCollect["full"]:
                     self.logger("GameManager | collectResources--- Full and going back to DP")
                     if dpDistance <= (1,1):
                         self.logger("GameManager | collectResources--- Arrived to DP")
+                        self.logger("GameManager | collectResources--- resQuantity is ! ",resToCollect["resourceQuantity"])
                         unitInstance.dropResources()
                         resToCollect["full"] = False
-                        resToCollect["finished"] = resToCollect["quantity"] == 0
+                        resToCollect["finished"] = resToCollect["resourceQuantity"] == 0
                         if resToCollect["finished"]:
                             pass
                         else:
-                            self.dumbAddUnitToMoveDict(unitInstance, resToCollect["nearDPPos"])
+                            self.dumbAddUnitToMoveDict(unitInstance, Position(resToCollect["resourceTarget"][0],resToCollect["resourceTarget"][1]))
                     else:
                         self.logger("GameManager | collectResources--- Waiting to arrive to DP")
                 else:
@@ -441,7 +444,7 @@ class GameManager:
                 else:
                    self.dumbCollectResources(k)
             if resToDelete != "":
-                self.unitToMove.pop(resToDelete)
+                self.ressourceToCollect.pop(resToDelete)
 
         def checkUnitToAttack(self):
             unitToDelete = ""
@@ -770,7 +773,7 @@ class GameManager:
             server_thread = threading.Thread(target=start_http_server, args=(directory_to_serve, port), daemon=True,name="htmlPage")
             server_thread.start()
             # Define the handler and server
-            webbrowser.open("http://localhost:8000",new=0, autoraise=True )
+            webbrowser.open(f"http://localhost:8000",new=0, autoraise=True )
             # Start the server
 
         #print("finisshed server")

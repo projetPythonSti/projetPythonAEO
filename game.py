@@ -286,7 +286,7 @@ class Game :
         #generate html
         self.make_json()
         self.gm.openHtmlPage()
-        os.system('cls' if os.name == 'nt' else 'clear')
+        #os.system('cls' if os.name == 'nt' else 'clear')
         print("Nous sommes en pause : ")
         print("Appuyez sur q pour quitter")
         print("Appuyez sur r pour reprendre")
