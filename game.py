@@ -9,6 +9,8 @@ import time
 import timeit
 import json
 
+from time import sleep
+
 #########################################
 ## Jeu
 #########################################
