@@ -13,7 +13,7 @@ class Villager(Unity):
         community = team.get_pplCount()
         villageName = team.get_name()
         uid = f"eq{villageName}p{community}" # 0 if
-        super().__init__(uid,"v", {"f" : 50}, 25, 40, 2, 0.8, 1, team=team)
+        super().__init__(uid,"v", {"f" : 50}, 25, 25, 2, 0.8, 1, team=team)
         self.carry_max = 25
         # self.buildingSpeed = buildingSpeed,
         self.ressources_dict = {

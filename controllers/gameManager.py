@@ -212,13 +212,13 @@ class GameManager:
             gameDTTime = (deltaTime.real*self.gameSpeed)
             unitInstance = self.world.villages[resToCollect["unitTeam"]-1].community["v"][uid]
             dpDistance = unitInstance.estimateDistance(unitInstance.position.toTuple(), resToCollect["nearDPPos"])
-            if not resToCollect["routeStarted"]:
+            """if not resToCollect["routeStarted"]:
                 if dpDistance< (1,1):
                     resToCollect["routeStarted"] = True
                     self.dumbAddUnitToMoveDict(unitInstance, Position(resToCollect["resourceTarget"][0],resToCollect["resourceTarget"][1]))
                 else:
                     self.logger("GameManager | collectResources--- Still not been to the nearestDP")
-                    return -1
+                    return -1"""
             resDistance = unitInstance.estimateDistance(unitInstance.position.toTuple(), resToCollect["resourceTarget"])
             unitSpaceLeft = unitInstance.spaceLeft()
             timeToFillPouch = int(unitSpaceLeft*60/25)
@@ -670,7 +670,7 @@ class GameManager:
                 "error" : False
             }
         def dumbAddResourceToCollectDict(self,unit,resource:Ressource, quantity, nearDP):
-            self.dumbAddUnitToMoveDict(unit, nearDP.position)
+            self.dumbAddUnitToMoveDict(unit, resource.position)
             self.ressourceToCollect[unit.uid] = {
                 "unit": unit.uid,
                 "unitTeam": self.getTeamNumber(unit.uid),
