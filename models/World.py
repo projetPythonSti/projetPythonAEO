@@ -111,9 +111,9 @@ class World:
             self.unitTiles[position]["filled"] = True
             self.unitTiles[position]["elements"] += [unit]
     def removeUnitPos(self, pos,unit):
-        self.unitTiles[pos]["elements"].remove(unit)
         try:
             self.unitTiles[pos]["elements"][0]
+            self.unitTiles[pos]["elements"].remove(unit)
         except:
             self.unitTiles.pop(pos)
     def show_world(self): #

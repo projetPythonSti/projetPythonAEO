@@ -112,6 +112,7 @@ class World_GUI:
         self.tile_images["projectile"] = pg.image.load("assets/images/buildings/projectile.png")
         self.tile_images["H"] = pg.image.load("assets/images/buildings/H.png").convert_alpha()
         self.tile_images["C"] = pg.image.load("assets/images/buildings/C.png")  # Added default image
+        self.tile_images["B"] = pg.image.load("assets/images/buildings/B.png")
         # self.tile_images["default"] = pg.image.load("assets/images/default.png").convert_alpha()  # Added default image
         # self.tile_images["sable"] = pg.image.load("assets/images/sable.png").convert_alpha()
         # self.tile_images["block"] = pg.image.load("assets/images/block.png").convert_alpha()

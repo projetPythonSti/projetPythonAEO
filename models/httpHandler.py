@@ -3,6 +3,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 class Serv(BaseHTTPRequestHandler):
 
     def do_GET(self):
+
        if self.path == '/':
            self.path = 'assets/web/index.html'
        try:
@@ -14,6 +15,11 @@ class Serv(BaseHTTPRequestHandler):
        self.end_headers()
        self.wfile.write(bytes(file_to_open, 'utf-8'))
 
+    def end_headers(self):
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        super().end_headers()
 
 import http.server
 import socketserver
